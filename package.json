@@ -1,0 +1,13 @@
+{
+    "name": "report-crn",
+    "version": "0.0.1",
+    "description": "A zero-configuration Google Gadget for presenting interactive CRN reports",
+    "author": "Chris Devereux <chris.devereux@nihr.ac.uk>",
+    
+    "devDependencies" : {
+        "grunt-processhtml": "latest",
+        "grunt-mocha": "latest",
+        "grunt-contrib-watch": "latest",
+        "mocha": "latest"
+     }
+}
