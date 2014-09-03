@@ -44,8 +44,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-browserify');
     
+    // Project Tasks
     grunt.loadTasks('tasks');
     
+    // Build Events
     grunt.registerTask('build', ['include_templates', 'browserify:app', 'processhtml:build']);
-    grunt.registerTask('spec', ['mochaTest']);
+    grunt.registerTask('test', ['mochaTest']);
 };
