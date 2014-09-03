@@ -31,7 +31,7 @@ module.exports = function(grunt) {
         },
         browserify: {
             app: {
-                src: ['src/js/*.js'],
+                src: ['src/js/*.js', 'build/templates.js'],
                 dest: 'build/app.js'
             }
         }
@@ -44,6 +44,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-browserify');
     
-    grunt.registerTask('build', ['browserify:app', 'processhtml:build']);
+    grunt.loadTasks('tasks');
+    
+    grunt.registerTask('build', ['include_templates', 'browserify:app', 'processhtml:build']);
     grunt.registerTask('spec', ['mochaTest']);
 };
