@@ -8,34 +8,42 @@ module.exports = function(grunt) {
             },
             script: {
                 files: ['src/js/*.js', 'spec/**'],
-                tasks: ['buildspec', 'spec']
+                tasks: ['spec']
             }
         },
         processhtml: {
             build: {
                 files: {
-                    'build/main.html': ['src/html/main.html']
-                }
-            },
-            buildspec: {
-                files: {
-                    'build/spec.html': ['spec/spec.html']
+                    'build/index.html': ['src/html/main.html']
+                },
+                options: {
+                    includeBase: '.'
                 }
             }
         },
-        mocha: {
+        mochaTest: {
             spec: {
-                src: ['build/index.html'],
+                src: ['spec/**/*.js'],
+                options: {
+                    reporter: 'spec'
+                }
             },
+        },
+        browserify: {
+            app: {
+                src: ['src/js/*.js'],
+                dest: 'build/app.js'
+            }
         }
     });
     
+    
+    // Development Dependencies
     grunt.loadNpmTasks('grunt-processhtml');
-    grunt.loadNpmTasks('grunt-mocha');
+    grunt.loadNpmTasks('grunt-mocha-test');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-browserify');
     
-    grunt.registerTask('spec', ['mocha']);
-    
-    grunt.registerTask('buildspec', ['processhtml:buildspec']);
-    grunt.registerTask('build', ['processhtml:build']);
+    grunt.registerTask('build', ['browserify:app', 'processhtml:build']);
+    grunt.registerTask('spec', ['mochaTest']);
 };
