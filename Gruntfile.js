@@ -8,7 +8,7 @@ module.exports = function(grunt) {
             },
             script: {
                 files: ['src/js/*.js', 'spec/**'],
-                tasks: ['spec']
+                tasks: ['test']
             }
         },
         processhtml: {
@@ -22,7 +22,7 @@ module.exports = function(grunt) {
             }
         },
         mochaTest: {
-            spec: {
+            test: {
                 src: ['spec/**/*.js'],
                 options: {
                     reporter: 'spec'
@@ -31,7 +31,7 @@ module.exports = function(grunt) {
         },
         browserify: {
             app: {
-                src: ['src/js/*.js', 'build/template.js'],
+                src: ['src/js/main.js'],
                 dest: 'build/app.js',
                 options: {
                     alias: ['./build/template.js:template']
