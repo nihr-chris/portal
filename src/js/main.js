@@ -1,15 +1,32 @@
 var Ractive = window.Ractive;
+
+var util = require('./util.js');
 var template = require('template');
+
+var reports = [
+    {id: 'overview', title: "Overview"},
+    require('./recruitment.js'),
+    {id: 'timeTarget', title: "Time & Target"}
+];
+
+var reportLookup = util.hashArray('id', reports);
 
 var r = new Ractive({
     el: 'sidebar',
-    template: template("sidebar"),
+    template: template("masterDetail"),
     data: {
-        navbarOptions: [
-            {title: "Overview", active: false},
-            {title: "Recruitment", active: true},
-            {title: "Time & Target", active: false},
-            {title: "Engagement", active: false}
-        ]
+        reports: reports,
+        activeReport: reportLookup['recruitment']
+    },
+    partials: {
+        "timeTarget": template("timeTarget"),
+        "overview": template("overview"),
+        "recruitment": template("recruitment")
+    },
+});
+
+r.on({
+    navbarSelect: function(event) {
+        this.set('activeReport', event.context);
     }
 });

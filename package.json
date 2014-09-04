@@ -12,6 +12,7 @@
     "mocha": "^1.21.4"
   },
   "dependencies": {
+    "chai": "^1.9.1",
     "sugar": "^1.4.1"
   }
 }
