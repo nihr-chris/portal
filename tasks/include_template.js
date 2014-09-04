@@ -9,8 +9,6 @@ module.exports = function(grunt) {
         var templates = {};
         
         if (files) {
-            console.log(files);
-            
             while (files.length > 0) {
                 var f = files.pop();
                 
@@ -23,6 +21,6 @@ module.exports = function(grunt) {
         js += "var templates = " + JSON.stringify(templates) + "; ";
         js += "module.exports = function(name) { return templates[name] };";
         
-        fs.writeFileSync("build/templates.js", js);
+        fs.writeFileSync("build/template.js", js);
     });
 };

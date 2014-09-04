@@ -31,8 +31,11 @@ module.exports = function(grunt) {
         },
         browserify: {
             app: {
-                src: ['src/js/*.js', 'build/templates.js'],
-                dest: 'build/app.js'
+                src: ['src/js/*.js', 'build/template.js'],
+                dest: 'build/app.js',
+                options: {
+                    alias: ['./build/template.js:template']
+                }
             }
         }
     });
