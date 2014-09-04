@@ -12,7 +12,7 @@ module.exports = function(grunt) {
             while (files.length > 0) {
                 var f = files.pop();
                 
-                var basename = path.basename(f, "html");
+                var basename = path.basename(f, ".html");
                 templates[basename] = fs.readFileSync(path.join(dir, f), "utf-8");
             }
         }
