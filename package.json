@@ -11,5 +11,7 @@
     "grunt-processhtml": "^0.3.3",
     "mocha": "^1.21.4"
   },
-  "dependencies": {}
+  "dependencies": {
+    "sugar": "^1.4.1"
+  }
 }

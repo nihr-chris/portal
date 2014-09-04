@@ -34,7 +34,8 @@ module.exports = function(grunt) {
                 src: ['src/js/main.js'],
                 dest: 'build/app.js',
                 options: {
-                    alias: ['./build/template.js:template']
+                    alias: ['./build/template.js:template'],
+                    // require: ['sugar']
                 }
             }
         },
