@@ -1,8 +1,6 @@
 var Ractive = window.Ractive;
 var template = require('template');
 
-console.log(template("sidebar"));
-
 var r = new Ractive({
     el: 'sidebar',
     template: template("sidebar"),
