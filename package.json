@@ -5,11 +5,11 @@
   "author": "Chris Devereux <chris.devereux@nihr.ac.uk>",
   "devDependencies": {
     "grunt-browserify": "^3.0.0",
+    "grunt-contrib-cssmin": "^0.10.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-mocha-test": "^0.11.0",
     "grunt-processhtml": "^0.3.3",
     "mocha": "^1.21.4"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

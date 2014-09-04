@@ -37,8 +37,13 @@ module.exports = function(grunt) {
                     alias: ['./build/template.js:template']
                 }
             }
+        },
+        cssmin: {
+            combine: {
+                files: {'build/style.css' : ['src/css/*.css']}
+            }
         }
-    });
+     });
     
     
     // Development Dependencies
@@ -46,11 +51,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-mocha-test');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-browserify');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
     
     // Project Tasks
     grunt.loadTasks('tasks');
     
     // Build Events
-    grunt.registerTask('build', ['include_templates', 'browserify:app', 'processhtml:build']);
+    grunt.registerTask('build', ['include_templates', 'cssmin', 'browserify:app', 'processhtml:build']);
     grunt.registerTask('test', ['mochaTest']);
 };
