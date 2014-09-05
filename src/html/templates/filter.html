@@ -1,20 +1,33 @@
-<div class='datafilter'>
-    <div class="btn-toolbar filterrow datafilter" role="toolbar">
-        <div class='btn-group btn-group-xs'>
-            <button type="button" class="close">
-                <span aria-hidden="true">&times;</span>
-                <span class="sr-only">Delete</span>  
-            </button>
-        </div>  
-        <div class='btn-group'>
-            <button type="button" class="btn btn-xs colorindicator">
-            </button>
-        </div>
-        <div class='btn-group'>
-            <dropdown title='All Networks'/>
-            <dropdown title='All Divisions'/>
-            <dropdown title='All Specialties'/>
-            <dropdown title='All Sites'/>
+<div class='col-sm-12 datafilter'>
+    {{# filterRows}}
+    {{>row}}
+    {{/filterRows}}
+    <div class='row'>
+        <button on-click="insert" type="button" class="btn btn-default">Add</button>
+    </div>
+</div>
+
+<!-- {{>row}} -->
+<div class='row'>
+    <div class='col-sm-12'>
+        <div class="btn-toolbar filterrow datafilter" role="toolbar">
+            <div class='btn-group btn-group-xs'>
+                <button on-click='delete' type="button" class="close">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Delete</span>  
+                </button>
+            </div>  
+            <div class='btn-group'>
+                <button type="button" class="btn btn-xs colorindicator" style='background-color:{{dataColor}}'>
+                </button>
+            </div>
+            <div class='btn-group'>
+                {{#network}}<dropdown options='{{options}}' current='{{current}}'/>{{/network}}
+                {{#division}}<dropdown options='{{options}}' current='{{current}}'/>{{/division}}
+                {{#specialty}}<dropdown options='{{options}}' current='{{current}}'/>{{/specialty}}
+                {{#site}}<dropdown options='{{options}}' current='{{current}}'/>{{/site}}
+            </div>
         </div>
     </div>
 </div>
+<!-- {{/row}} -->
