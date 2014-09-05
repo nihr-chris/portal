@@ -7,10 +7,16 @@ function filterModel(modelDefs) {
         filters: [],
         newRow: function() {
             var menusArray = modelDefs.map(function(x){ 
+                var optionNames = x.options;
+                
+                var optionModels = optionNames.map(function(x) {
+                    return {label: x};
+                });
+                
                 return {
                     type: x.type, 
-                    options: x.options, 
-                    current: x.options[0]
+                    options: optionModels, 
+                    current: optionModels[0]
                 };
             });
             
