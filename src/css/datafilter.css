@@ -1,6 +1,14 @@
 .filterrow {
   padding-top:5px;
   padding-bottom:5px;
+  vertical-align: middle;
+}
+
+.colorindicator {
+    background-color: #428bca;
+    border-width: 0px;
+    width: 50px;
+    height: 22px;
 }
 
 .datafilter {
