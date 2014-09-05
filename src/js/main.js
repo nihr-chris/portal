@@ -1,11 +1,12 @@
 var Ractive = window.Ractive;
+Ractive.components.dropdown = require('./dropdown.js');
 
 var util = require('./util.js');
 var template = require('template');
 
 var reports = [
     {id: 'overview', title: "Overview"},
-    require('./recruitment.js'),
+    {id: 'recruitment', title: "Recruitment"},
     {id: 'timeTarget', title: "Time & Target"}
 ];
 
@@ -23,6 +24,9 @@ var r = new Ractive({
         "overview": template("overview"),
         "recruitment": template("recruitment")
     },
+    components: {
+        recruitment: require('./recruitment.js')
+    }
 });
 
 r.on({
@@ -30,3 +34,5 @@ r.on({
         this.set('activeReport', event.context);
     }
 });
+
+console.log(r.findComponent('dropdown'));

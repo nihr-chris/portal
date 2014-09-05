@@ -1,0 +1,11 @@
+.button-row {
+  text-align: right;
+}
+
+.spacer {
+    margin-top: 40px; /* define margin as you see fit */
+}
+
+.filter-menu {
+  right: 10px;
+}
