@@ -1,5 +1,6 @@
 var Ractive = window.Ractive;
 Ractive.components.dropdown = require('./dropdown.js');
+Ractive.components.datafilter = require('./filter.js')
 
 var util = require('./util.js');
 var template = require('template');
@@ -13,7 +14,7 @@ var reports = [
 var reportLookup = util.hashArray('id', reports);
 
 var r = new Ractive({
-    el: 'sidebar',
+    el: 'main',
     template: template("masterDetail"),
     data: {
         reports: reports,
@@ -34,5 +35,3 @@ r.on({
         this.set('activeReport', event.context);
     }
 });
-
-console.log(r.findComponent('dropdown'));
