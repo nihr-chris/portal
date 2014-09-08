@@ -1,7 +1,7 @@
 var Ractive = window.Ractive;
 var util = require("./util.js");
 var template = require("template");
-var stock = require('paths-js/stock');
+var Chart = require('paths-js/smooth-line');
 
 function mkdate(y, m) {
   var d = new Date();
@@ -45,11 +45,15 @@ module.exports = Ractive.extend({
     data: {
         axisMin:function(axis){ return axis.ticks[0]; },
         axisMax:function(axis){ return axis.ticks[axis.ticks.length - 1]; },
+        fill: function(index) {
+          console.log(index);
+          return index === 0 ? "#772211" : "#227711";
+        },
         x: x,
         y: y,
         height: 200,
         chart: function() {
-            return stock({
+            return Chart({
                 data: [
                   [
                     { year: 2012, month: 1, value: 13 },

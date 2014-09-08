@@ -1,8 +1,4 @@
 <svg width=375 height=400>
-    
-    <!-- Border -->
-    <rect fill-opacity='0' stroke="#DDD" width=375 height=400></rect>
-        
     {{# chart()}} 
     
     <!--
@@ -11,9 +7,9 @@
     <g transform='translate( 25, {{ 25 - yscale(axisMax(y)) }} )'>
         
         <!-- Plots -->
-        {{# curves }}
+        {{# curves:index }}
         <g>
-            <path d="{{ line.path.print() }}" fill-opacity='0' stroke="#000" />
+            <path d="{{ area.path.print() }}" fill='{{ fill(index) }}' />
         </g>
         {{/}}
         
@@ -34,8 +30,8 @@
         
         {{# y.ticks }}
         <g transform="translate({{ xscale(axisMin(x)) }},{{ yscale(.) }})">
-            <circle r="2" cx="0" cy="0" stroke="grey" fill="grey" />
-            <text text-anchor="right">{{ y.format(.) }}</text>
+            <circle r="2" cx="0" cy="0"/>
+            <text text-anchor="end">{{ y.format(.) }}</text>
         </g>
         {{/}}
     </g>
