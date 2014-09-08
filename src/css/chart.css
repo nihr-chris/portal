@@ -1,12 +1,29 @@
-.chart-box {
-    fill: #ffffff;
-    stroke: #000000;
+.chart-area {
+    fill-opacity: 0.1;
+}
+
+.chart-line {
+    shape-rendering: "crispEdges";
+    stroke-opacity: 0.95;
+    stroke-width: 1.5;
+    fill-opacity: 0;
 }
 
 .chart-axis {
-    stroke: #000000;
+    shape-rendering: "crispEdges";
+    stroke: #000;
+    stroke-opacity: 0.2;
 }
 
-.chart-y-axis {
-    stroke: #ff0000;
+.chart-tick {
+    shape-rendering: "crispEdges";
+    stroke: #000;
+    stroke-opacity: 0.7;
+    fill: #fff;
+}
+
+.chart-tick-text {
+    text-rendering: "optimizeLegibility";
+    font-size: 10px;
+    text-color: #888;
 }

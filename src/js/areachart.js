@@ -1,4 +1,5 @@
 var Ractive = window.Ractive;
+var data = require('./areachart.data.js');
 var util = require("./util.js");
 var template = require("template");
 var Chart = require('paths-js/smooth-line');
@@ -73,7 +74,7 @@ module.exports = Ractive.extend({
                   return d.getTime();
                 },
                 yaccessor: function(d) { return d.value; },
-                width: 300,
+                width: 600,
                 height: 200,
                 closed: true
             });
