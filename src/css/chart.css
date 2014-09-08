@@ -1,0 +1,12 @@
+.chart-box {
+    fill: #ffffff;
+    stroke: #000000;
+}
+
+.chart-axis {
+    stroke: #000000;
+}
+
+.chart-y-axis {
+    stroke: #ff0000;
+}

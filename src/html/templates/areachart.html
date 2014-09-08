@@ -1,0 +1,43 @@
+<svg width=375 height=400>
+    
+    <!-- Border -->
+    <rect fill-opacity='0' stroke="#DDD" width=375 height=400></rect>
+        
+    {{# chart()}} 
+    
+    <!--
+        Offset the graph so that we have space for labels and to pad the top of the chart.
+    <-->
+    <g transform='translate( 25, {{ 25 - yscale(axisMax(y)) }} )'>
+        
+        <!-- Plots -->
+        {{# curves }}
+        <g>
+            <path d="{{ line.path.print() }}" fill-opacity='0' stroke="#000" />
+        </g>
+        {{/}}
+        
+        
+        <!-- X Axis -->
+        <line stroke="black" x1="{{ xscale(axisMin(x)) }}" y1="{{ yscale(axisMin(y)) }}" x2="{{ xscale(axisMax(x)) }}" y2="{{ yscale(axisMin(y)) }}" />
+        
+        {{# x.ticks }}
+        <g transform="translate({{ xscale(.) }},{{ yscale(axisMin(y)) }})">
+            <circle r="2" cx="0" cy="0" stroke="grey" fill="grey" />
+            <text transform="translate(5, 5)" text-anchor="middle">{{ x.format(.) }}</text>
+        </g>
+        {{/}}
+        
+        
+        <!-- Y Axis -->
+        <line stroke="black" x1="{{ xscale(axisMin(x)) }}" y1="{{ yscale(axisMin(y)) }}" x2="{{ xscale(axisMin(x)) }}" y2="{{ yscale(axisMax(y)) }}" />
+        
+        {{# y.ticks }}
+        <g transform="translate({{ xscale(axisMin(x)) }},{{ yscale(.) }})">
+            <circle r="2" cx="0" cy="0" stroke="grey" fill="grey" />
+            <text text-anchor="right">{{ y.format(.) }}</text>
+        </g>
+        {{/}}
+    </g>
+    {{/}}
+</svg>

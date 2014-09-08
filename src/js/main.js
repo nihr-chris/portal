@@ -1,6 +1,7 @@
 var Ractive = window.Ractive;
 Ractive.components.dropdown = require('./dropdown.js');
 Ractive.components.datafilter = require('./filter.js')
+Ractive.components.areachart = require('./areachart.js')
 
 var util = require('./util.js');
 var template = require('template');
