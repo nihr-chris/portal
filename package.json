@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "chai": "^1.9.1",
+    "paths-js": "^0.2.13",
     "sugar": "^1.4.1"
   }
 }
