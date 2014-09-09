@@ -2,38 +2,29 @@ var _ = require("underscore");
 var moment = require("moment");
 var numeral = require("numeral");
 
-function mktime(y, m) {
-  var d = new Date();
-  d.setYear(y);
-  d.setMonth(m - 1);
-  return d.getTime();
-}
-
-var x = {
-  ticks: [
-    mktime(2012, 1),
-    mktime(2012, 2),
-    mktime(2012, 3)
-  ],
-  format: function(time) {
-    var date = new Date();
-    date.setTime(time);
-    return date.getMonth(date) + 1;
+/**
+ * Given a maximum value and a preferred number of steps,
+ * return a factor that will produce a nicely incremented y axis,
+ * while covering all values.
+ */
+function findStepFactor(maxVal, preferredStepCount) {
+  var stepMajor = 1;
+  
+  while (true) {
+    var stepMinor = _.find([1, 2, 5], function(x){ 
+      return (x * stepMajor * preferredStepCount) >= maxVal;
+    });
+    
+    if (stepMinor) return stepMinor * stepMajor;
+    else stepMajor *= 10;
   }
 }
 
-var y = {
-  ticks: [
-    0,
-    10,
-    20,
-    25
-  ],
-  format: function(y) {
-    return y;
-  }
-}
-
+/**
+ * Convert rawData into a timeseries chart model.
+ * 
+ * See chartmodel.timeseries.spec.js for an example of the rawData argument.
+ */
 module.exports = function(rawData) {
     var dataPointsBySeries = _.map(rawData, 'points');
     var mergedDataPoints = _.flatten(dataPointsBySeries, true);
@@ -47,8 +38,11 @@ module.exports = function(rawData) {
     }
     
     var xTicks = _.map(tickValues(0), function(d){ return d.getTime(); });
-    var yTicks = tickValues(1);
-  
+    
+    var maxY = _.max(tickValues(1));
+    var yFactor = findStepFactor(maxY, 5);
+    var yTicks = _.range(0, maxY + yFactor, yFactor);
+    
     return {
         x: {
           ticks: _.uniq(xTicks, true),
@@ -57,7 +51,7 @@ module.exports = function(rawData) {
           }
         },
         y: {
-          ticks: _.uniq(yTicks, true),
+          ticks: yTicks,
           format: function(value) {
             return numeral(value).format("0,0");
           }

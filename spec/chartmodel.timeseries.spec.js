@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var timeseries = require("../src/js/areachart.model.timeseries.js");
+var timeseries = require("../src/js/chartmodel.timeseries.js");
 var describe = global.describe, it = global.it, beforeEach = global.beforeEach;
 
 describe("arechart timeseries", function() {
@@ -51,8 +51,8 @@ describe("arechart timeseries", function() {
         expect(example.x.format( new Date(2001, 0, 1).getTime() )).to.eql("Jan-01");
     });
     
-    it("should return all plotted y locations as tick points", function() {
-        expect(example.y.ticks).to.eql([5,6,7,12,13,15]);
+    it("should return y tick scale appropriate for order of magnitude", function() {
+        expect(example.y.ticks).to.eql([0,5,10,15]);
     });
     
     it("should format y ticks as human-readable number", function() {
