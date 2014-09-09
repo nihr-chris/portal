@@ -1,6 +1,7 @@
 var Ractive = window.Ractive;
 var util = require("./util.js");
 var template = require("template");
+var timeseries = require("./areachart.model.timeseries.js");
 
 var filterCategories = [
     {
@@ -26,6 +27,7 @@ module.exports = Ractive.extend({
         
     },
     data: {
-        categories: filterCategories
+        categories: filterCategories,
+        chartModel: timeseries()
     }
 });
