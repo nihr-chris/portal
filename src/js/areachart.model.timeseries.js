@@ -33,11 +33,29 @@ var y = {
 }
 
 module.exports = function(rawData) {
+    var dataPointsBySeries = _.map(rawData, 'points');
+    var mergedDataPoints = _.flatten(dataPointsBySeries, true);
+    
+    function tickValues(index) {
+      var values = _.map(mergedDataPoints, function(e){ 
+        return e[index]; 
+      });
+      
+      return _.sortBy(values, _.identity);
+    }
+    
+    var xTicks = _.map(tickValues(0), function(d){ return d.getTime(); });
+    var yTicks = tickValues(1);
+  
     return {
-        x: x,
-        y: y,
+        x: {
+          ticks: _.uniq(xTicks, true)
+        },
+        y: {
+          ticks: _.uniq(yTicks, true)
+        },
         
-        data: _.map(rawData, 'points'),
+        data: dataPointsBySeries,
           
         xaccessor: function(point){
           return point[0].getTime();

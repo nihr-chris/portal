@@ -43,6 +43,14 @@ describe("arechart timeseries", function() {
         expect(plotPoint(1, 2)).to.eql([9, 7]);
     });
     
+    it("should return all plotted x locations as tick points", function() {
+        expect(example.x.ticks).to.eql([2,3,4,6,9]);
+    });
+    
+    it("should return all plotted y locations as tick points", function() {
+        expect(example.y.ticks).to.eql([5,6,7,12,13,15]);
+    });
+    
     it("should return correct series colors", function() {
         expect(example.color(0)).to.eql("#FFF");
         expect(example.color(1)).to.eql("#000");
