@@ -9,7 +9,9 @@
         <!-- Areas -->
         {{# curves:index }}
         <g>
-            <path class='chart-element chart-area' d="{{ area.path.print() }}" fill='{{ model.color(index) }}' />
+            <path class='chart-element chart-area' 
+                d="{{ area.path.print() }}" 
+                fill='{{ model.color(index) }}' />
         </g>
         {{/}}
         
@@ -17,29 +19,61 @@
         <!-- Lines -->
         {{# curves:index }}
         <g>
-            <path class='chart-element chart-line' d="{{ line.path.print() }}" stroke='{{ model.color(index) }}' />
+            <path class='chart-element chart-line' 
+                d="{{ line.path.print() }}" 
+                stroke='{{ model.color(index) }}' />
         </g>
         {{/}}
         
         
         <!-- X Axis -->
-        <line class='chart-element chart-axis chart-x-axis' stroke="black" x1="{{ xscale(axisMin(model.x)) }}" y1="{{ yscale(axisMin(model.y)) }}" x2="{{ xscale(axisMax(model.x)) }}" y2="{{ yscale(axisMin(model.y)) }}" />
+        <line class='chart-element chart-axis chart-x-axis' 
+            stroke="black" 
+            x1="{{ xscale(axisMin(model.x)) }}" 
+            y1="{{ yscale(axisMin(model.y)) }}" 
+            x2="{{ xscale(axisMax(model.x)) }}" 
+            y2="{{ yscale(axisMin(model.y)) }}" />
         
         {{# model.x.ticks }}
         <g transform="translate({{ xscale(.) }},{{ yscale(axisMin(model.y)) }})">
-            <circle class='chart-element chart-axis-element chart-tick chart-x-tick' r="2" cx="0" cy="0"></circle>
-            <text class='chart-element chart-tick-text chart-x-tick-text' transform='translate(0, 12)' text-anchor="middle">{{ model.x.format(.) }}</text>
+        
+            <circle class='chart-element chart-axis-element chart-tick chart-x-tick' 
+                r="2" 
+                cx="0" 
+                cy="0" />
+                
+            <text class='chart-element chart-tick-text chart-x-tick-text' 
+                transform='translate(0, 12)' 
+                text-anchor="middle">
+                {{ model.x.format(.) }}
+            </text>
+            
         </g>
         {{/}}
         
         
         <!-- Y Axis -->
-        <line class='chart-element chart-axis chart-y-axis' stroke="black" x1="{{ xscale(axisMin(model.x)) }}" y1="{{ yscale(axisMin(model.y)) }}" x2="{{ xscale(axisMin(model.x)) }}" y2="{{ yscale(axisMax(model.y)) }}" />
+        <line class='chart-element chart-axis chart-y-axis' 
+            stroke="black" 
+            x1="{{ xscale(axisMin(model.x)) }}" 
+            y1="{{ yscale(axisMin(model.y)) }}" 
+            x2="{{ xscale(axisMin(model.x)) }}" 
+            y2="{{ yscale(axisMax(model.y)) }}" />
         
         {{# model.y.ticks }}
         <g transform="translate({{ xscale(axisMin(model.x)) }},{{ yscale(.) }})">
-            <circle class='chart-element chart-tick chart-y-tick' r="2" cx="0" cy="0"/>
-            <text class='chart-element chart-tick-text chart-y-tick-text' transform="translate(-6, 4)" text-anchor="end">{{ model.y.format(.) }}</text>
+        
+            <circle class='chart-element chart-tick chart-y-tick' 
+                r="2" 
+                cx="0" 
+                cy="0" />
+                
+            <text class='chart-element chart-tick-text chart-y-tick-text' 
+                transform="translate(-6, 4)" 
+                text-anchor="end">
+                {{ model.y.format(.) }}
+            </text>
+            
         </g>
         {{/}}
     </g>

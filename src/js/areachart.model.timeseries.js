@@ -36,23 +36,22 @@ module.exports = function() {
         y: y,
         data: [
           [
-            { year: 2012, month: 1, value: 13 },
-            { year: 2012, month: 2, value: 12 },
-            { year: 2012, month: 3, value: 15 }
+            [new Date(2012, 1, 13), 13],
+            [new Date(2012, 2, 13), 12],
+            [new Date(2012, 3, 13), 15]
           ],
           [
-            { year: 2012, month: 1, value: 21 },
-            { year: 2012, month: 2, value: 22 },
-            { year: 2012, month: 3, value: 22 }
+            [new Date(2012, 1, 13), 5],
+            [new Date(2012, 2, 13), 6],
+            [new Date(2012, 3, 13), 7]
           ]
         ],
-        xaccessor: function(data){
-          var d = new Date();
-          d.setYear(data.year);
-          d.setMonth(data.month - 1);
-          return d.getTime();
+        xaccessor: function(point){
+          return point[0].getTime();
         },
-        yaccessor: function(d) { return d.value; },
+        yaccessor: function(point) { 
+          return point[1]; 
+        },
         width: 600,
         height: 200,
         closed: true,
