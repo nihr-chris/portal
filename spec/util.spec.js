@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 var util = require("../src/js/util.js");
-var describe = window.describe, it = window.it;
+var describe = global.describe, it = global.it, beforeEach = global.beforeEach;
 
 describe('util', function(){
     describe("hashArray", function(){
