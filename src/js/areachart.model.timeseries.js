@@ -1,4 +1,6 @@
 var _ = require("underscore");
+var moment = require("moment");
+var numeral = require("numeral");
 
 function mktime(y, m) {
   var d = new Date();
@@ -49,10 +51,16 @@ module.exports = function(rawData) {
   
     return {
         x: {
-          ticks: _.uniq(xTicks, true)
+          ticks: _.uniq(xTicks, true),
+          format: function(time) {
+            return moment(time).format("MMM-YY");
+          }
         },
         y: {
-          ticks: _.uniq(yTicks, true)
+          ticks: _.uniq(yTicks, true),
+          format: function(value) {
+            return numeral(value).format("0,0");
+          }
         },
         
         data: dataPointsBySeries,

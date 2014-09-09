@@ -47,8 +47,16 @@ describe("arechart timeseries", function() {
         expect(example.x.ticks).to.eql([2,3,4,6,9]);
     });
     
+    it("should format x ticks as human-readable month", function() {
+        expect(example.x.format( new Date(2001, 0, 1).getTime() )).to.eql("Jan-01");
+    });
+    
     it("should return all plotted y locations as tick points", function() {
         expect(example.y.ticks).to.eql([5,6,7,12,13,15]);
+    });
+    
+    it("should format y ticks as human-readable number", function() {
+        expect(example.y.format(1234)).to.eql("1,234");
     });
     
     it("should return correct series colors", function() {
