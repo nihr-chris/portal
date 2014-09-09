@@ -14,6 +14,7 @@
   "dependencies": {
     "chai": "^1.9.1",
     "moment": "^2.8.3",
+    "numeral": "^1.5.3",
     "paths-js": "^0.2.13",
     "sugar": "^1.4.1",
     "underscore": "^1.7.0"
