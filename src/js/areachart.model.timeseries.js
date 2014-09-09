@@ -46,12 +46,12 @@ module.exports = function(rawData) {
           return point[1]; 
         },
         
-        width: 600,
-        height: 200,
+        width: rawData.width ? rawData.width : 600,
+        height: rawData.height ? rawData.height : 200,
         
         closed: true,
         color: function(index) {
-          return index === 0 ? "#772211" : "#227711";
+          return rawData[index].color;
         }
     };
 };

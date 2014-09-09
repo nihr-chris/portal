@@ -17,15 +17,15 @@ describe("arechart timeseries", function() {
             {
                 color: "#000",
                 points: [
-                    [new Date(2), 5],
-                    [new Date(4), 6],
-                    [new Date(6), 7]
+                    [new Date(3), 5],
+                    [new Date(6), 6],
+                    [new Date(9), 7]
                 ]
             }
         ]);
     });
     
-    it("should produce correct x and y plot points", function() {
+    it("should return correct x and y plot points", function() {
         function plotPoint(series, index) { 
             var dataPoints = example.data[series];
             return [
@@ -38,8 +38,13 @@ describe("arechart timeseries", function() {
         expect(plotPoint(0, 1)).to.eql([4, 12]);
         expect(plotPoint(0, 2)).to.eql([6, 15]);
         
-        expect(plotPoint(1, 0)).to.eql([2, 5]);
-        expect(plotPoint(1, 1)).to.eql([4, 6]);
-        expect(plotPoint(1, 2)).to.eql([6, 7]);
+        expect(plotPoint(1, 0)).to.eql([3, 5]);
+        expect(plotPoint(1, 1)).to.eql([6, 6]);
+        expect(plotPoint(1, 2)).to.eql([9, 7]);
+    });
+    
+    it("should return correct series colors", function() {
+        expect(example.color(0)).to.eql("#FFF");
+        expect(example.color(1)).to.eql("#000");
     });
 });
