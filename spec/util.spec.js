@@ -15,6 +15,26 @@ describe('util', function(){
        });
     });
     
+    describe("uid", function(){
+       it('should return distinct uids', function(){
+           expect(util.uid()).to.not.eql(util.uid());
+       });
+    });
+    
+    describe("merge", function(){
+       it('should merge objects', function(){
+           expect(util.merge([{a: 1}, {b: 2}])).to.eql({a: 1, b: 2});
+       });
+       
+       it('should merge using function if supplied', function(){
+           var merged = util.merge([{a: 1}, {a: 3, b: 2}], function(a, b) {
+               return a + b;
+           });
+           
+           expect(merged).to.eql({a: 4, b: 2});
+       });
+    });
+    
     describe('observers', function() {
         var Observable, Observer, source, observer;
         

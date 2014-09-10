@@ -88,6 +88,8 @@ var merge = function(objects, mergeFn) {
             }
         });
     });
+    
+    return merged;
 };
 
 
