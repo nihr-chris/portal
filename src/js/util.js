@@ -20,10 +20,10 @@ var hashArray = function(idKey, array) {
  
 var makeObservable = function(type) {
     var getObservers = function(instance, what) {
-        if (typeof this._observers === "undefined")  this._observers = {};
-        if (typeof this._observers[what] === "undefined")  this._observers[what] = [];
+        if (typeof instance._observers === "undefined")  instance._observers = {};
+        if (typeof instance._observers[what] === "undefined") instance._observers[what] = [];
         
-        return this._observers[what];
+        return instance._observers[what];
     };
     
     var notify = function(instance, what, fn) {
@@ -44,6 +44,7 @@ var makeObservable = function(type) {
     
     type.prototype.removeObserver = function(what, observer) {
         var observers = getObservers(this, what);
+        
         this._observers[what] = _.reject(observers, function(entry) {
             return entry[0] === observer;
         });
@@ -54,7 +55,7 @@ var makeObservable = function(type) {
         var instance = this;
         
         _.each(observers, function(x) {
-            notify(instance, what, x);
+            notify(instance, what, x[1]);
         });
     };
 };
