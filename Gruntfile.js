@@ -3,12 +3,12 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         watch: {
             all: {
-                files: ['src/**'],
+                files: ['src/html/**', 'src/css/**'],
                 tasks: ['build']
             },
             script: {
                 files: ['src/js/*.js', 'spec/**'],
-                tasks: ['test']
+                tasks: ['test', 'build']
             }
         },
         processhtml: {
