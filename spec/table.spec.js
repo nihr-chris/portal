@@ -25,6 +25,13 @@ describe('Table', function(){
         return new Table.Filter(key, [{predicate: predicate}]);
     }
     
+    function batmanOrSupermanFilter() {
+        return new Table.Filter("name", [
+            {predicate: "Batman"},
+            {predicate: "Superman"}
+        ]);
+    }
+    
     function batmanFilter() {
         return filter("name", "Batman");
     }
@@ -89,11 +96,36 @@ describe('Table', function(){
             var batmanView = new Table.View([batmanFilter()]);
             expect(batmanView.tableIndexes()).to.eql(["name"]);
         });
+        
+        it("value should bind to current filter selection", function() {
+            var multiFilter = batmanOrSupermanFilter();
+            
+            var view = new Table.View([multiFilter]);
+            
+            view.addObserver("value", null, observer);
+            table.addView(view);
+            
+            expect(view.value()).to.eql([rowsByName["Batman"]]);
+            expect(observer.value).to.eql([rowsByName["Batman"]]);
+            
+            multiFilter.selectOptionIndex(1);
+            
+            expect(view.value()).to.eql([rowsByName["Superman"]]);
+            expect(observer.value).to.eql([rowsByName["Superman"]]);
+        });
     });
     
     describe("Filter", function(){
         it("should return current option", function() {
             expect(batmanFilter().current().predicate).to.eql("Batman");
+        });
+        
+        it("should post option change notification", function() {
+            var multiFilter = batmanOrSupermanFilter();
+            multiFilter.addObserver("current", null, observer);
+            
+            multiFilter.selectOptionIndex(1);
+            expect(observer.value.predicate).to.eql("Superman");
         });
     });
 });

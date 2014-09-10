@@ -109,6 +109,10 @@ Table.View.prototype.tableIndexes = function() {
     return _.map(this._filters, util.getter("tableIndex"));
 };
 
+Table.View.prototype.filters = function() {
+    return this._filters;
+};
+
 Table.View.prototype.value = function() {
     return this._value;
 };
