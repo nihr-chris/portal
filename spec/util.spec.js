@@ -21,6 +21,15 @@ describe('util', function(){
        });
     });
     
+    describe("getter", function(){
+       it('should get', function(){
+           var t = function(){};
+           t.prototype.foo = function(){ return "bar"; };
+           
+           expect(util.getter("foo")(new t())).to.eql("bar");
+       });
+    });
+    
     describe("merge", function(){
        it('should merge objects', function(){
            expect(util.merge([{a: 1}, {b: 2}])).to.eql({a: 1, b: 2});

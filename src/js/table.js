@@ -106,7 +106,7 @@ Table.View.prototype.teardown = function(crossfilter) {
 };
 
 Table.View.prototype.tableIndexes = function() {
-    return _.map(this._filters, function(f){ return f.tableIndex(); });
+    return _.map(this._filters, util.getter("tableIndex"));
 };
 
 Table.View.prototype.value = function() {

@@ -73,6 +73,13 @@ var uid = function() {
 };
 
 
+/**
+ * merge()
+ * 
+ * Merges an array of objects, calling mergeFn to resolve conflicts.
+ * If mergeFn is not called, the entry towards the front of the array 'wins'
+ */
+ 
 var merge = function(objects, mergeFn) {
     if (typeof mergeFn === "undefined") {
         mergeFn = _.identity;
@@ -93,9 +100,21 @@ var merge = function(objects, mergeFn) {
 };
 
 
+/**
+ * getter()
+ * 
+ * Returns a function that calls the named method on a passed object.
+ * Useful for passing to map()
+ */
+ 
+var getter = function(method) {
+    return function(x){ return x[method](); };
+}
+
 module.exports = {
     hashArray: hashArray,
     uid: uid,
     merge: merge,
+    getter: getter,
     makeObservable: makeObservable
 };
