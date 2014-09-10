@@ -10,9 +10,9 @@ describe('Table', function(){
     
     beforeEach(function() {
         var data = [
-            {name: "Batman", power: 30, human: true},
-            {name: "Superman", power: 21, human: true},
-            {name: "Megazord", power: 19, human: false}
+            {name: "Batman", power: 100, human: true},
+            {name: "Superman", power: 30, human: true},
+            {name: "Megazord", power: 30, human: false}
         ];
         
         rowsByName = util.hashArray('name', data);
@@ -21,8 +21,12 @@ describe('Table', function(){
         observer = function(x){ observer.value = x; };
     });
     
+    function filter(key, predicate) {
+        return new Table.Filter(key, [{predicate: predicate}]);
+    }
+    
     function batmanFilter() {
-        return new Table.Filter("name", [{predicate: "Batman"}]);
+        return filter("name", "Batman");
     }
     
     describe("adding a view to a table", function(){
@@ -54,6 +58,31 @@ describe('Table', function(){
             table.addView(batmanView);
             
             expect(batmanView.value()).to.eql([rowsByName['Batman']]);
+        });
+        
+        it("should filter on multiple columns", function() {
+            var view = new Table.View([
+                filter("human", true),
+                filter("power", 100)
+            ]);
+            
+            table.addView(view);
+            
+            expect(view.value()).to.eql([rowsByName['Batman']]);
+        });
+        
+        it("should return multiple rows", function() {
+            var view = new Table.View([
+                filter("human", true)
+            ]);
+            
+            table.addView(view);
+            
+            expect(view.value().length).to.eql(2);
+            expect(view.value()).to.have.members([
+                rowsByName['Batman'],
+                rowsByName['Superman']
+            ]);
         });
         
         it("should vend table indexes", function() {
