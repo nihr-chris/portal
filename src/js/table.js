@@ -3,7 +3,7 @@
  * 
  * Fast, multivariate data tables with observable views.
  * 
- * Uses crossfilter.js (wrapped by simple-filter) for most of the 
+ * Uses crossfilter.js (wrapped by simple-filter.js) for most of the 
  * difficult stuff.
  */
 
@@ -24,8 +24,8 @@ var _ = require("underscore");
  * but this could be added if needed.
  */
 
-var Table = function(data) {
-    this._filter = new Filter(data);
+var Table = function(rows) {
+    this._data = new Filter(rows);
     this._views = {};
     this._indexCounts = {};
 };
@@ -36,18 +36,19 @@ Table.prototype.addView = function(view) {
     this._views[view.uid] = view;
     
     var instance = this;
-    _.each(view.indexes(), function(key) {
+    _.each(view.tableIndexes(), function(key) {
         if (instance._indexCounts[key]) {
             instance._indexCounts[key]++;
             
         } else {
             instance._indexCounts[key] = 1;
-            instance._filter.addIndex(key, function(row) {
+            instance._data.addIndex(key, function(row) {
                 return row[key];
             });
         }
     });
     
+    view.setup(this._data);
     this.notifyObservers("views");
 };
 
@@ -62,10 +63,11 @@ Table.prototype.removeView = function(view) {
         instance._indexCounts[key]--;
         
         if (instance._indexCounts[key] === 0) {
-            instance.delIndex(key);
+            instance._data.delIndex(key);
         }
     });
     
+    view.teardown();
     this.notifyObservers("views");
 };
 
@@ -80,7 +82,7 @@ util.makeObservable(Table);
  * View
  */
 
-Table.View = function(name, filters) {
+Table.View = function(filters) {
     this.uid = util.uid();
     this._filters = filters;
     this._value = [];
@@ -103,22 +105,29 @@ Table.View.prototype.teardown = function(crossfilter) {
     });
 };
 
-Table.view.prototype.tableIndexes = function() {
-    return _.flatten(_.map(this._filters, 'tableIndex'));
+Table.View.prototype.tableIndexes = function() {
+    return _.map(this._filters, function(f){ return f.tableIndex(); });
 };
 
-Table.View.value = function() {
+Table.View.prototype.value = function() {
     return this._value;
 };
 
-Table.View.update = function() {
-    var filterValues = _.map(this._filters, function(f){ return f.current(); });
+Table.View.prototype.update = function() {
+    if (typeof this._data === "undefined") return;
+    
+    var filterValues = _.map(this._filters, function(f) {
+        var entry = {};
+        entry[f.tableIndex()] = f.current().predicate;
+        return entry;
+    });
+   
     this._value = this._data.get(util.merge(filterValues));
     
     this.notifyObservers("value");
 };
 
-Table.View.filtersChanged = function() {
+Table.View.prototype.filtersChanged = function() {
     this.update();
 };
 
@@ -127,9 +136,7 @@ util.makeObservable(Table.View);
 
 /**
  * Filter
- */
-
-/**
+ * 
  * options should be an array of objects each containing a predicate: 
  * 
  * {
