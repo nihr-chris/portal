@@ -166,10 +166,6 @@ Table.Filter.prototype.tableIndex = function() {
     return this._tableIndex;
 };
 
-Table.Filter.prototype.options = function() {
-    return this._options;
-};
-
 Table.Filter.prototype.selectOptionIndex = function(index) {
     this._current = index;
     this.notifyObservers("current");
@@ -178,6 +174,15 @@ Table.Filter.prototype.selectOptionIndex = function(index) {
 Table.Filter.prototype.current = function() {
     return this._options[this._current];
 };
+
+Object.defineProperty(Table.Filter.prototype, "selectedIndex", {
+    get: function(){ return this._current; },
+    set: function(index){ this.selectOptionIndex(index); }
+});
+
+Object.defineProperty(Table.Filter.prototype, "options", {
+    get: function(){ return this._options; }
+});
 
 util.makeObservable(Table.Filter);
 

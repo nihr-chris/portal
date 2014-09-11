@@ -139,5 +139,17 @@ describe('Table', function(){
             multiFilter.selectOptionIndex(1);
             expect(observer.value.predicate).to.eql("Superman");
         });
+        
+        it("should expose selected index as property", function() {
+            var multiFilter = batmanOrSupermanFilter();
+            
+            expect(multiFilter.selectedIndex).to.eql(0);
+            
+            multiFilter.selectOptionIndex(1);
+            expect(multiFilter.selectedIndex).to.eql(1);
+            
+            multiFilter.selectedIndex = 0;
+            expect(multiFilter.selectedIndex).to.eql(0);
+        });
     });
 });
