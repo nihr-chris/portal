@@ -52,6 +52,12 @@ Table.prototype.addView = function(view) {
     this.notifyObservers("views");
 };
 
+Table.prototype.allValues = function(column) {
+    return _.map(this._data.get(), function(row) {
+        return row[column];
+    });
+};
+
 Table.prototype.removeView = function(view) {
     var old = this._views[view.uid];
     if (!old) return;

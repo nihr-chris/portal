@@ -59,6 +59,18 @@ describe('Table', function(){
         });
     });
     
+    it("should return all values for column, ignoring views", function(){
+         table.addView(new Table.View([batmanFilter()]));
+         
+         var values = table.allValues("name");
+         expect(values.length).to.eql(3);
+         expect(values).to.have.members([
+             "Batman", 
+             "Superman", 
+             "Megazord"
+        ]);
+    });
+    
     describe("View", function(){
         it("should apply filter to produce value", function() {
             var batmanView = new Table.View([batmanFilter()]);
