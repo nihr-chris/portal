@@ -191,12 +191,15 @@ var table = new Table([
 
 function recruitmentFilter(name, column) {
     var rowValues = _.uniq(table.allValues(column)).sort();
-    return new Table.Filter(column, _.map(rowValues, function(val) {
+    var view = new Table.Filter(column, _.map(rowValues, function(val) {
         return {
             label: val,
             predicate: val
         };
     }));
+    
+    view.dataColor = "#428bca";
+    return view;
 }
 
 // [hack] - Table doesn't work unless there is at least one indexed column. 
@@ -221,6 +224,7 @@ module.exports = Ractive.extend({
         });
         
         component.set('removeView', function(view) {
+            util.checkArgs(arguments, Table.View);
             var index = _.indexOf(component.data.views, view);
             
             if (index != -1) {
@@ -253,5 +257,6 @@ module.exports = Ractive.extend({
             }
             
         ])
-    }
+    },
+    isolated: true
 });

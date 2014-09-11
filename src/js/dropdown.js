@@ -5,14 +5,12 @@ module.exports = Ractive.extend({
     template: template('dropdown'),
     
     init: function() {
-        this.on('select', function(event) {
-            this.current = event.context;
+        var component = this;
+        
+        component.on('select', function(event) {
+            console.log(JSON.stringify(event.context));
+            component.current = event.context;
         });
     },
-    
-    data: {
-        title: null,
-        index: 0,
-        options: []
-    }
+    isolated: true
 });
