@@ -24,9 +24,6 @@ var checkArgs = function() {
         schemaMap[idx] = a;
     });
     
-    console.log(schemaMap);
-    console.log(argMap);
-    
     var argSchema = schema(schemaMap);
     
     if (!argSchema(args)) {
