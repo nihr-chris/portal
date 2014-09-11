@@ -191,15 +191,12 @@ var table = new Table([
 
 function recruitmentFilter(name, column) {
     var rowValues = _.uniq(table.allValues(column)).sort();
-    var view = new Table.Filter(column, _.map(rowValues, function(val) {
+    return new Table.Filter(column, _.map(rowValues, function(val) {
         return {
             label: val,
             predicate: val
         };
     }));
-    
-    view.dataColor = "#428bca";
-    return view;
 }
 
 // [hack] - Table doesn't work unless there is at least one indexed column. 
@@ -218,6 +215,8 @@ module.exports = Ractive.extend({
             var view = new Table.View([
                 recruitmentFilter("Trust", "trust")
             ]);
+            
+            view.dataColor = "#428bca";
             
             table.addView(view);
             component.push('views', view);

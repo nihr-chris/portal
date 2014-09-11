@@ -1,5 +1,6 @@
 var Ractive = window.Ractive;
 var template = require('template');
+var log = require('loglevel');
 
 module.exports = Ractive.extend({
     template: template('dropdown'),
@@ -8,8 +9,14 @@ module.exports = Ractive.extend({
         var component = this;
         
         component.on('select', function(event) {
-            console.log(JSON.stringify(event.context));
-            component.current = event.context;
+            log.info("selected: " + JSON.stringify(event.context));
+            
+            if (event.context.select) {
+                component.select(event.context);
+                
+            } else {
+                log.warn("No select function defined for dropdown");
+            }
         });
     },
     isolated: true

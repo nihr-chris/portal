@@ -5,6 +5,9 @@ Ractive.components.areachart = require('./areachart.js')
 
 var util = require('./util.js');
 var template = require('template');
+var log = require('loglevel');
+
+log.setLevel("trace");
 
 var reports = [
     {id: 'overview', title: "Overview"},
@@ -33,6 +36,7 @@ var r = new Ractive({
 
 r.on({
     navbarSelect: function(event) {
+        log.info("selected: " + event.context);
         this.set('activeReport', event.context);
     }
 });
