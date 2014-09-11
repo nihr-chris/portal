@@ -31,7 +31,7 @@ var checkArgs = function() {
         
         var msg = "Invalid argument types:\n" + JSON.stringify(errors);
         
-        if (console.error) console.error(msg);
+        if (console.trace) console.trace();
         throw new TypeError(msg);
     }
 };
