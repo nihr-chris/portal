@@ -15,6 +15,24 @@ describe('util', function(){
        });
     });
     
+    describe("checkArgs", function(){
+        function fn(str, num) {
+            util.checkArgs(arguments, String, Number);
+        }
+        
+       it('should reject invalid args', function(){
+           expect(function() {
+               fn(1, "2");
+           }).to.throw(TypeError);
+       });
+        
+       it('should accept valid args', function(){
+           expect(function() {
+               fn("1", 2);
+           }).to.not.throw(TypeError);
+       });
+    });
+    
     describe("uid", function(){
        it('should return distinct uids', function(){
            expect(util.uid()).to.not.eql(util.uid());

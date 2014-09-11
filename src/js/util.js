@@ -1,4 +1,5 @@
 var _ = require("underscore");
+var schema = require("js-schema");
 
 var hashArray = function(idKey, array) {
     var hash = {};
@@ -6,6 +7,32 @@ var hashArray = function(idKey, array) {
         hash[x[idKey]] = x; 
     });
     return hash;
+};
+
+
+var checkArgs = function() {
+    var args = _.first(arguments);
+    var argSchemaDef = _.rest(arguments);
+    
+    var argMap = {};
+    _.each(args, function(a, idx) {
+        argMap[idx] = a;
+    });
+    
+    var schemaMap = {};
+    _.each(argSchemaDef, function(a, idx) {
+        schemaMap[idx] = a;
+    });
+    
+    console.log(schemaMap);
+    console.log(argMap);
+    
+    var argSchema = schema(schemaMap);
+    
+    if (!argSchema(args)) {
+        var errors = argSchema.errors(args);
+        throw new TypeError("Invalid argument types:\n" + JSON.stringify(errors));
+    }
 };
 
 
@@ -112,6 +139,7 @@ var getter = function(method) {
 }
 
 module.exports = {
+    checkArgs: checkArgs,
     hashArray: hashArray,
     uid: uid,
     merge: merge,
