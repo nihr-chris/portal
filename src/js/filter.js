@@ -31,17 +31,16 @@ function filterModel(modelDefs) {
 module.exports = Ractive.extend({
     template: template('filter'),
     init: function () {
-        var ractive = this;
+        var component = this;
         
-        ractive.on('delete', function(event) {
-            ractive.data.removeRow();
+        component.on('delete', function(event) {
+            component.data.removeRow(event.context);
         });
         
-        ractive.on('insert', function(event) {
-            ractive.data.addRow();
+        component.on('insert', function(event) {
+            component.data.addRow();
         });
-    },
-    data: {
-        filterRows: []
+        
+        component.filterRows = [];
     }
 });

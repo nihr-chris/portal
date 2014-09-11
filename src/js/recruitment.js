@@ -199,28 +199,39 @@ function recruitmentFilter(name, column) {
     }));
 }
 
+// [hack] - Table doesn't work unless there is at least one indexed column. 
+table.addView(new Table.View([
+    new Table.Filter("trust", [
+        {predicate: function(x){return true}}
+    ])
+]));
+
 module.exports = Ractive.extend({
     template: template('recruitment'),
     init: function () {
         var component = this;
         
-        // Model -> view updates
-        
-        table.addObserver('views', this, function(views) {
-            component.set('data.views', views);
+        component.set('addView', function() {
+            var view = new Table.View([
+                recruitmentFilter("Trust", "trust")
+            ]);
+            
+            table.addView(view);
+            component.push('views', view);
         });
+        
+        component.set('removeView', function(view) {
+            var index = _.indexOf(component.data.views, view);
+            
+            if (index != -1) {
+                table.removeView(view);
+                component.data.views.splice(index, 1);
+            }
+        });
+        
+        component.set('views', []);
     },
     data: {
-        addView: function() {
-            table.addView(new Table.View([
-                recruitmentFilter("Trust", "trust")
-            ]));
-        },
-        removeView: function(index) {
-            
-        },
-        views: [],
-        
         chartModel: timeseries([
             {
                 color: "#FF2200",
