@@ -25,12 +25,16 @@ var _ = require("underscore");
  */
 
 var Table = function(rows) {
+    util.checkArgs(arguments, Array);
+    
     this._data = new Filter(rows);
     this._views = {};
     this._indexCounts = {};
 };
 
 Table.prototype.addView = function(view) {
+    util.checkArgs(arguments, Table.View);
+    
     if (this._views[view.uid]) return;
     
     this._views[view.uid] = view;
@@ -53,12 +57,16 @@ Table.prototype.addView = function(view) {
 };
 
 Table.prototype.allValues = function(column) {
+    util.checkArgs(arguments, String);
+    
     return _.map(this._data.get(), function(row) {
         return row[column];
     });
 };
 
 Table.prototype.removeView = function(view) {
+    util.checkArgs(arguments, Table.View);
+    
     var old = this._views[view.uid];
     if (!old) return;
     
@@ -89,6 +97,8 @@ util.makeObservable(Table);
  */
 
 Table.View = function(filters) {
+    util.checkArgs(arguments, Array.of(Table.Filter));
+    
     this.uid = util.uid();
     this._filters = filters;
     this._value = [];
@@ -104,7 +114,7 @@ Table.View.prototype.setup = function(data) {
     this.update();
 };
 
-Table.View.prototype.teardown = function(crossfilter) {
+Table.View.prototype.teardown = function() {
     var instance = this;
     _.each(this._filters, function(f) {
         f.removeObserver("current", instance);
@@ -157,6 +167,8 @@ util.makeObservable(Table.View);
  */
 
 Table.Filter = function(tableIndex, options) {
+    util.checkArgs(arguments, String, Array.of({predicate: [Function, String, Boolean, Number]}));
+    
     this._options = options;
     this._current = 0;
     this._tableIndex = tableIndex;
@@ -167,6 +179,8 @@ Table.Filter.prototype.tableIndex = function() {
 };
 
 Table.Filter.prototype.selectOptionIndex = function(index) {
+    util.checkArgs(arguments, Number);
+    
     this._current = index;
     this.notifyObservers("current");
 };

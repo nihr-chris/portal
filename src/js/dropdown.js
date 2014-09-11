@@ -12,7 +12,7 @@ module.exports = Ractive.extend({
     
     data: {
         title: null,
-        current: null,
+        index: 0,
         options: []
     }
 });

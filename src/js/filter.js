@@ -34,24 +34,14 @@ module.exports = Ractive.extend({
         var ractive = this;
         
         ractive.on('delete', function(event) {
-            ractive.set('filterRows', ractive.data.filterRows
-                .filter(function(x){
-                return x !== event.context;
-            }));
+            ractive.data.removeRow();
         });
         
         ractive.on('insert', function(event) {
-            ractive.push('filterRows', ractive.data.model.newRow());
+            ractive.data.addRow();
         });
     },
     data: {
-        model: filterModel([
-            {type: 'network', options: ["All Networks"]},
-            {type: 'division', options: ["All Divisions"]},
-            {type: 'specialty', options: ["All Specialties"]},
-            {type: 'site', options: ["All Sites"]}
-        ]),
-        
         filterRows: []
     }
 });

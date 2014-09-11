@@ -2,7 +2,8 @@
     {{# chart(model) }} 
     
     <!--
-        Offset the graph so that we have space for labels and to pad the top of the chart.
+        Offset the graph so that we have space for labels and to pad the 
+        top of the chart.
     <-->
     <g transform='translate( 25, {{ 25 - yscale(axisMax(model.y)) }} )'>
         
@@ -35,6 +36,10 @@
             y2="{{ yscale(axisMin(model.y)) }}" />
         
         {{# model.x.ticks }}
+        <!-- 
+            Position the tick point and its label, translating from the 
+            graph's coordinate system
+        -->
         <g transform="translate({{ xscale(.) }},{{ yscale(axisMin(model.y)) }})">
         
             <circle class='chart-element chart-axis-element chart-tick chart-x-tick' 
@@ -42,6 +47,7 @@
                 cx="0" 
                 cy="0" />
                 
+            <!-- position the text manually until we find a more elegant way... -->
             <text class='chart-element chart-tick-text chart-x-tick-text' 
                 transform='translate(0, 12)' 
                 text-anchor="middle">
@@ -61,6 +67,10 @@
             y2="{{ yscale(axisMax(model.y)) }}" />
         
         {{# model.y.ticks }}
+        <!-- 
+            Position the tick point and its label, translating from the 
+            graph's coordinate system
+        -->
         <g transform="translate({{ xscale(axisMin(model.x)) }},{{ yscale(.) }})">
         
             <circle class='chart-element chart-tick chart-y-tick' 
@@ -68,6 +78,7 @@
                 cx="0" 
                 cy="0" />
                 
+            <!-- position the text manually until we find a more elegant way... -->
             <text class='chart-element chart-tick-text chart-y-tick-text' 
                 transform="translate(-6, 4)" 
                 text-anchor="end">
