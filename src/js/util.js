@@ -28,7 +28,11 @@ var checkArgs = function() {
     
     if (!argSchema(args)) {
         var errors = argSchema.errors(args);
-        throw new TypeError("Invalid argument types:\n" + JSON.stringify(errors));
+        
+        var msg = "Invalid argument types:\n" + JSON.stringify(errors);
+        
+        if (console.error) console.error(msg);
+        throw new TypeError(msg);
     }
 };
 
