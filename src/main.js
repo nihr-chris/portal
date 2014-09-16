@@ -1,9 +1,11 @@
 var Ractive = window.Ractive;
-Ractive.components.dropdown = require('./dropdown.js');
-Ractive.components.datafilter = require('./filter.js')
-Ractive.components.areachart = require('./areachart.js')
 
-var util = require('./util.js');
+require('./components/areachart.js');
+require('./components/dropdown.js');
+require('./components/filter.js');
+require('./components/recruitment.js');
+
+var util = require('./modules/util.js');
 var template = require('template');
 var log = require('loglevel');
 
@@ -28,9 +30,6 @@ var r = new Ractive({
         "timeTarget": template("timeTarget"),
         "overview": template("overview"),
         "recruitment": template("recruitment")
-    },
-    components: {
-        recruitment: require('./recruitment.js')
     }
 });
 

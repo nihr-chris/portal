@@ -1,8 +1,8 @@
 var expect = require('chai').expect;
-var _ = require("underscore");
-
-var util = require("../src/js/util.js");
 var describe = global.describe, it = global.it, beforeEach = global.beforeEach;
+
+var _ = require("underscore");
+var util = require("../src/modules/util.js");
 
 describe('util', function(){
     describe("hashArray", function(){

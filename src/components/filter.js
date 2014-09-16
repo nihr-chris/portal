@@ -2,8 +2,8 @@ var Ractive = window.Ractive;
 var template = require("template");
 var log = require("loglevel");
 
-module.exports = Ractive.extend({
-    template: template('filter'),
+Ractive.components.filter = Ractive.extend({
+    template: template('filter.html'),
     init: function () {
         var component = this;
         

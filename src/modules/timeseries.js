@@ -23,7 +23,7 @@ function findStepFactor(maxVal, preferredStepCount) {
 /**
  * Convert rawData into a timeseries chart model.
  * 
- * See chartmodel.timeseries.spec.js for an example of the rawData argument.
+ * See timeseries.spec.js for an example of the rawData argument.
  */
 module.exports = function(rawData) {
     var dataPointsBySeries = _.map(rawData, 'points');

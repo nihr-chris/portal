@@ -2,8 +2,8 @@ var Ractive = window.Ractive;
 var template = require('template');
 var log = require('loglevel');
 
-module.exports = Ractive.extend({
-    template: template('dropdown'),
+Ractive.components.dropdown = Ractive.extend({
+    template: template('dropdown.html'),
     
     init: function() {
         var component = this;

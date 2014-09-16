@@ -1,6 +1,7 @@
 var expect = require('chai').expect;
-var timeseries = require("../src/js/chartmodel.timeseries.js");
 var describe = global.describe, it = global.it, beforeEach = global.beforeEach;
+
+var timeseries = require("../src/modules/timeseries.js");
 
 describe("arechart timeseries", function() {
     var example;

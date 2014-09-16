@@ -1,7 +1,8 @@
 var expect = require('chai').expect;
-var recruitment = require("../src/js/recruitment.data.js");
 var describe = global.describe, it = global.it, beforeEach = global.beforeEach;
+
 var _ = require("underscore");
+var recruitment = require("../src/modules/recruitment.data.js");
 
 function testRow(net, div, sp, si, date, val) {
     return {

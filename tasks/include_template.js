@@ -3,7 +3,7 @@ var path = require("path");
 
 module.exports = function(grunt) {
     grunt.registerTask('include_templates', function() {
-        var dir = "src/html/templates";
+        var dir = "src/components";
         var files = fs.readdirSync(dir);
         
         var templates = {};
@@ -12,8 +12,9 @@ module.exports = function(grunt) {
             while (files.length > 0) {
                 var f = files.pop();
                 
-                var basename = path.basename(f, ".html");
-                templates[basename] = fs.readFileSync(path.join(dir, f), "utf-8");
+                if (path.extname(f) === ".html") {
+                    templates[f] = fs.readFileSync(path.join(dir, f), "utf-8");
+                }
             }
         }
         

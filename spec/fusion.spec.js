@@ -1,6 +1,7 @@
 var expect = require('chai').expect;
-var Fusion = require("../src/js/fusion.js");
 var describe = global.describe, it = global.it, beforeEach = global.beforeEach;
+
+var Fusion = require("../src/modules/fusion.js");
 
 describe("Fusion", function() {
     Fusion.APIKey = "myKey";

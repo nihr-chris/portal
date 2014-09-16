@@ -8,8 +8,8 @@
 var Ractive = window.Ractive;
 var template = require("template");
 
-module.exports = Ractive.extend({
-    template: template('areachart'),
+Ractive.components.areachart = Ractive.extend({
+    template: template('areachart.html'),
     init: function () {
       
     },
