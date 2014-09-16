@@ -12,6 +12,7 @@
     "mocha": "^1.21.4"
   },
   "dependencies": {
+    "bimap": "0.0.15",
     "browser-request": "^0.3.2",
     "chai": "^1.9.1",
     "crossfilter": "^1.3.9",
