@@ -9,18 +9,16 @@ var ReportContext = function(trustTable, recTable, studyTable) {
     var data = new BiMap();
     var pendingOps = [];
     
-    this._recTable = recTable;
-    this._studyTable = studyTable;
+    this.recruitmentTable = recTable;
+    this.studyTable = studyTable;
     
     this.trustID = function(name) {
-            console.log(JSON.stringify(data));
         var it = data.val(name);
         if (!it) throw new Error("Unknown trust: " + name);
         return it;
     };
     
     this.trustName = function(id) {
-            console.log(JSON.stringify(data));
         var it = data.key(id);
         if (!it) throw new Error("Unknown trustID: " + id);
         return it;
@@ -35,9 +33,50 @@ var ReportContext = function(trustTable, recTable, studyTable) {
                 data.push(row.MemberOrgID, row.MemberOrg);
             });
             
-            console.log(JSON.stringify(data));
             pendingOps.splice(pendingOps.indexOf(loadingOpID));
         });
+};
+
+
+ReportContext.prototype.getNonCommercialStudies = function() {
+    return this.studyTable.fetch(
+        ["StudyID"],
+        [Fusion.eql("Commercial", 0)]
+    );
+};
+
+ReportContext.prototype.studyMonthlyRecruitment = function() {
+    var ctx = this.ctx;
+    
+    return function(studies) {
+        var studyIDs = _.map(studies, "StudyID");
+        
+        return ctx.studyTable
+            .fetch(
+                ["Month", "TrustID", "StudyID", "MonthRecruitment"],
+                [
+                    Fusion.in("StudyID", studyIDs),
+                    Fusion.between("Month", ctx.startDate, ctx.endDate)
+                ]
+            )
+            .then(function(recruitmentCount) {
+                var monthlyRecruitment = {};
+                
+                function studyInfo(id) {
+                    if (!monthlyRecruitment[id]) monthlyRecruitment[id] = {};
+                    return monthlyRecruitment[id];
+                }
+                
+                recruitmentCount.each(function(row) {
+                    studyInfo(row.StudyID)[row.Month] = row.MonthRecruitment;
+                });
+                
+                return {
+                    recruitment: monthlyRecruitment,
+                    studies: studies
+                };
+            });
+    }
 };
 
 ReportContext.testContext = function() {

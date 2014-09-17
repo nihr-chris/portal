@@ -74,8 +74,23 @@ Fusion.mock = function(responses) {
     };
 };
 
-Fusion.eql = function(a, b) {
-    return a + " = " + encodeQueryParam(b);
+Fusion.eql = function(field, x) {
+    return field + " = " + encodeQueryParam(x);
+};
+
+Fusion.between = function(field, begin, endExcl) {
+    return (
+        field + " >= " + encodeQueryParam(begin)
+        + field + "<" + encodeQueryParam(endExcl)
+    );
+};
+
+Fusion.in = function(field, options) {
+    return (
+        field + " in ("
+        + _.map(options, encodeQueryParam).join(", ")
+        + ")"
+    );
 };
 
 module.exports = Fusion;
