@@ -30,7 +30,7 @@ var Fusion = function(tableID, httpClient) {
     this._ID = tableID;
     this._makeRequest = httpClient ? httpClient : Fusion.HTTPClient;
     
-    if (!Fusion.APIKey) throw new Error("Fusion table without defining API Key");
+    if (!Fusion.APIKey) throw new Error("Fusion table initialized without defining API Key");
     if (!this._makeRequest) throw new Error("Fusion table initialized without an HTTP Client");
 };
 
