@@ -11,12 +11,16 @@ describe("DataSource", function() {
     var data;
     
     function shouldMakeQuery(params) {
-        params.query.values = "EXPECTED VALUES";
-        params.table.stub(params.query);
+        var expectedValues = params.query.values ? params.query.values : "EXPECTED";
+        
+        if (params.table) {
+            params.query.values = expectedValues;
+            params.table.stub(params.query);
+        }
         
         return params.fn(params.inputValues)
             .then(function(values) {
-                expect(values).to.eql("EXPECTED VALUES");
+                expect(values).to.eql(expectedValues);
             });
     }
     
@@ -98,14 +102,14 @@ describe("DataSource", function() {
         });
     });
     
-    // describe("accumulateByDate", function() {
-    //     it("should accumulate count field over date field, grouping by other fields", function() {
-    //         var input = [
-    //             {group1: "a", group2: "a", Month: new Date(2011, 1, 1)},
-    //             {group1: "a", group2: "b", Month: new Date(2011, 1, 1)},
-    //         ];
+    describe("accumulateByDate", function() {
+        it("should accumulate count field over date field, grouping by other fields", function() {
+            var input = [
+                {a: "a", b: "a", Month: new Date(2011, 1, 1)},
+                {a: "a", b: "b", Month: new Date(2011, 1, 1)},
+            ];
             
-    //         data.accumulateMonthly("a")
-    //     });
-    // });
+            data.accumulateMonthly()().then
+        });
+    });
 });
