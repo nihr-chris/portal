@@ -34,8 +34,10 @@ var Fusion = function(tableID, httpClient) {
     if (!this._makeRequest) throw new Error("Fusion table initialized without an HTTP Client");
 };
 
-Fusion.prototype.fetch = function(fields, filters) {
-    var url = encodeQueryURL(this._ID, fields, filters, Fusion.APIKey);
+Fusion.prototype.fetch = function(query) {
+    if (!query) query = {};
+    
+    var url = encodeQueryURL(this._ID, query.select, query.where, Fusion.APIKey);
     var makeRequest = this._makeRequest;
     
     return new Promise(function(fulfill, reject) {
@@ -44,34 +46,6 @@ Fusion.prototype.fetch = function(fields, filters) {
             else fulfill(body);
         });
     });
-};
-
-Fusion.mock = function(responses) {
-    var queryKey = function(fields, filters) {
-        return JSON.stringify([fields, filters]);
-    };
-    
-    var stubMap = {};
-    _.each(responses, function(x) {
-        stubMap[queryKey(x[0])] = x[1]; 
-    });
-    
-    return {
-        fetch: function(fields, filters) {
-            var query = queryKey(fields, filters);
-            
-            if (stubMap[query]) {
-                return Promise.resolve(stubMap[query]);
-                
-            } else {
-                throw new Error(
-                    "Unstubbed query invoked on mock Fusion Table.\n"
-                    + "- Query was: " + query + "\n"
-                    + "- Stubbed queries are: " + JSON.stringify(_.keys(stubMap))
-                );
-            }
-        }
-    };
 };
 
 Fusion.eql = function(field, x) {

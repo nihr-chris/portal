@@ -26,7 +26,10 @@ describe("Fusion", function() {
     });
     
     it("should construct fetch request with filters and fields", function() {
-        subject.fetch(["f1", "f2"], [Fusion.eql("f1", 1), Fusion.eql("f2", 2)]);
+        subject.fetch({
+            select: ["f1", "f2"], 
+            where: [Fusion.eql("f1", 1), Fusion.eql("f2", 2)]
+        });
         
         expect(req.uri).to.eql(
             "https://www.googleapis.com/fusiontables/v1/query?"

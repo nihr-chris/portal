@@ -9,6 +9,7 @@ var DataSource = function(trustTable, recTable, studyTable) {
     var data = new BiMap();
     var pendingOps = [];
     
+    this.trustTable = trustTable;
     this.recruitmentTable = recTable;
     this.studyTable = studyTable;
     
@@ -27,7 +28,9 @@ var DataSource = function(trustTable, recTable, studyTable) {
     var loadingOpID = util.uid();
     pendingOps.push(loadingOpID);
     
-    this.waitForLoad = trustTable.fetch(["MemberOrgID", "MemberOrg"])
+    this.waitForLoad = trustTable.fetch({
+            select: ["MemberOrgID", "MemberOrg"]
+        })
         .then(function(result) {
             _.each(result, function(row) {
                 data.push(row.MemberOrgID, row.MemberOrg);
@@ -77,19 +80,6 @@ DataSource.prototype.studyMonthlyRecruitment = function() {
                 };
             });
     }
-};
-
-DataSource.testSource = function() {
-    var trusts = Fusion.mock([
-        [["MemberOrgID", "MemberOrg"], [
-            {"MemberOrg": "Org1", "MemberOrgID": 1},
-            {"MemberOrg": "Org2", "MemberOrgID": 2},
-            {"MemberOrg": "Org3", "MemberOrgID": 3},
-            {"MemberOrg": "Org4", "MemberOrgID": 4}
-        ]]
-    ]);
-    
-    return new DataSource(trusts);
 };
 
 module.exports = DataSource;
