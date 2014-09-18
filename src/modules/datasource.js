@@ -5,13 +5,13 @@ var _ = require('underscore');
 var Fusion = require("./fusion.js");
 var util = require('./util.js');
 
-var DataSource = function(trustTable, recTable, studyTable) {
+var DataSource = function(params) {
     var data = new BiMap();
     var pendingOps = [];
     
-    this.trustTable = trustTable;
-    this.recruitmentTable = recTable;
-    this.studyTable = studyTable;
+    this.trustTable = params.trustTable;
+    this.recruitmentTable = params.recruitmentTable;
+    this.studyTable = params.studyTable;
     
     this.trustID = function(name) {
         var it = data.val(name);
@@ -25,61 +25,45 @@ var DataSource = function(trustTable, recTable, studyTable) {
         return it;
     };
     
-    var loadingOpID = util.uid();
-    pendingOps.push(loadingOpID);
-    
-    this.waitForLoad = trustTable.fetch({
+    this.waitForLoad = this.trustTable.fetch({
             select: ["MemberOrgID", "MemberOrg"]
         })
         .then(function(result) {
             _.each(result, function(row) {
                 data.push(row.MemberOrgID, row.MemberOrg);
             });
-            
-            pendingOps.splice(pendingOps.indexOf(loadingOpID));
         });
 };
 
 
 DataSource.prototype.getNonCommercialStudies = function() {
-    return this.studyTable.fetch(
-        ["StudyID"],
-        [Fusion.eql("Commercial", 0)]
-    );
+    var data = this;
+    
+    return function() {
+        return data.studyTable.fetch({
+            select: ["StudyID"],
+            where: [Fusion.eql("Commercial", 0)]
+        });
+    };
 };
 
-DataSource.prototype.studyMonthlyRecruitment = function() {
-    var ctx = this.ctx;
+DataSource.prototype.monthlyRecruitment = function(startDate, endDate, groupBy) {
+    if (!groupBy) groupBy = [];
+    var data = this;
     
     return function(studies) {
         var studyIDs = _.map(studies, "StudyID");
         
-        return ctx.studyTable
-            .fetch(
-                ["Month", "TrustID", "StudyID", "MonthRecruitment"],
-                [
+        return data.recruitmentTable
+            .fetch({
+                select: ["Month", "SUM(MonthRecruitment)"].concat(groupBy),
+                where: [
                     Fusion.in("StudyID", studyIDs),
-                    Fusion.between("Month", ctx.startDate, ctx.endDate)
-                ]
-            )
-            .then(function(recruitmentCount) {
-                var monthlyRecruitment = {};
-                
-                function studyInfo(id) {
-                    if (!monthlyRecruitment[id]) monthlyRecruitment[id] = {};
-                    return monthlyRecruitment[id];
-                }
-                
-                recruitmentCount.each(function(row) {
-                    studyInfo(row.StudyID)[row.Month] = row.MonthRecruitment;
-                });
-                
-                return {
-                    recruitment: monthlyRecruitment,
-                    studies: studies
-                };
+                    Fusion.between("Month", startDate, endDate)
+                ],
+                groupBy: ["Month"].concat(groupBy)
             });
-    }
+    };
 };
 
 module.exports = DataSource;

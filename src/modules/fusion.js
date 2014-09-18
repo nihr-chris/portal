@@ -1,24 +1,29 @@
 var Promise = require('promise');
+var moment = require('moment');
 var _ = require('underscore');
 
 var encodeQueryParam = function(x) {
-    if (typeof x === "string") {
+    if (_.isString(x)) {
         if (x.indexOf('"') !== -1) throw new Error("Cannot include double-quotes in query");
         else return '"' + x + '"';
     }
-    else if (typeof x === "number") {
+    else if (_.isNumber(x)) {
         return x;
+    }
+    else if (_.isDate(x)) {
+        return moment(x).format("YYYY.MM.DD");
     }
     else {
         throw new TypeError("Invalid query parameter type: " + typeof x);
     }
 };
 
-var encodeQueryURL = function(tableID, fields, filters, key) {
+var encodeQueryURL = function(tableID, fields, filters, groupFields, key) {
     var select = (fields && fields.length > 0) ? "SELECT " + fields.join(', ') : "SELECT *";
     var where = (filters && filters.length > 0) ? " WHERE " + filters.join(' AND ') : "";
+    var groupBy = (groupFields && groupFields.length > 0) ? " GROUP BY " + groupFields.join(', ') : "";
     
-    var query = encodeURIComponent(select + " FROM " + tableID + where);
+    var query = encodeURIComponent(select + " FROM " + tableID + where + groupBy);
     return (
         "https://www.googleapis.com/fusiontables/v1/query" 
         + "?sql=" + query
@@ -37,7 +42,7 @@ var Fusion = function(tableID, httpClient) {
 Fusion.prototype.fetch = function(query) {
     if (!query) query = {};
     
-    var url = encodeQueryURL(this._ID, query.select, query.where, Fusion.APIKey);
+    var url = encodeQueryURL(this._ID, query.select, query.where, query.groupBy, Fusion.APIKey);
     var makeRequest = this._makeRequest;
     
     return new Promise(function(fulfill, reject) {

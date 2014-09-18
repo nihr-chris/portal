@@ -7,9 +7,10 @@ var fusionMock = function() {
     var queryKey= function(query) {
         if (!query.select) query.select = [];
         if (!query.where) query.where = [];
+        if (!query.groupBy) query.groupBy = [];
         
         return JSON.stringify(
-            [query.select.sort(), query.where.sort()]
+            [query.select.sort(), query.where.sort(), query.groupBy.sort()]
         );
     };
     

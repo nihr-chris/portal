@@ -17,6 +17,10 @@ describe("Fusion", function() {
         expect(Fusion.eql("f1", 1)).to.eql('f1 = 1');
     });
     
+    it("should encode equals date condition", function() {
+        expect(Fusion.eql("f1", new Date(2011, 0, 2))).to.eql('f1 = 2011.01.02');
+    });
+    
     it("should encode equals string condition", function() {
         expect(Fusion.eql("f1", "1")).to.eql('f1 = "1"');
     });
@@ -25,15 +29,16 @@ describe("Fusion", function() {
         expect(function(){ Fusion.eql("f1", '"')}).to.throw();
     });
     
-    it("should construct fetch request with filters and fields", function() {
+    it("should construct fetch request with filters, fields and groupings", function() {
         subject.fetch({
-            select: ["f1", "f2"], 
-            where: [Fusion.eql("f1", 1), Fusion.eql("f2", 2)]
+            select: ["f1", "f2", "f3"], 
+            where: [Fusion.eql("f1", 1), Fusion.eql("f2", 2)],
+            groupBy: ["f1", "f3"]
         });
         
         expect(req.uri).to.eql(
             "https://www.googleapis.com/fusiontables/v1/query?"
-            + "sql=" + encodeURIComponent("SELECT f1, f2 FROM MyTable WHERE f1 = 1 AND f2 = 2")
+            + "sql=" + encodeURIComponent("SELECT f1, f2, f3 FROM MyTable WHERE f1 = 1 AND f2 = 2 GROUP BY f1, f3")
             + "&key=myKey"
         );
     });
