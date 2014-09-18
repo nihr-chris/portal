@@ -1,13 +1,13 @@
 var expect = require('chai').expect;
 var describe = global.describe, it = global.it, beforeEach = global.beforeEach;
 
-var ReportContext = require("../src/modules/report-context.js");
+var DataSource = require("../src/modules/datasource.js");
 
-describe("ReportContext", function() {
+describe("DataSource", function() {
     var ctx;
     
     beforeEach(function(){
-        ctx = ReportContext.testContext();
+        ctx = DataSource.testSource();
         return ctx.waitForLoad;
     });
     

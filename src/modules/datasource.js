@@ -5,7 +5,7 @@ var _ = require('underscore');
 var Fusion = require("./fusion.js");
 var util = require('./util.js');
 
-var ReportContext = function(trustTable, recTable, studyTable) {
+var DataSource = function(trustTable, recTable, studyTable) {
     var data = new BiMap();
     var pendingOps = [];
     
@@ -38,14 +38,14 @@ var ReportContext = function(trustTable, recTable, studyTable) {
 };
 
 
-ReportContext.prototype.getNonCommercialStudies = function() {
+DataSource.prototype.getNonCommercialStudies = function() {
     return this.studyTable.fetch(
         ["StudyID"],
         [Fusion.eql("Commercial", 0)]
     );
 };
 
-ReportContext.prototype.studyMonthlyRecruitment = function() {
+DataSource.prototype.studyMonthlyRecruitment = function() {
     var ctx = this.ctx;
     
     return function(studies) {
@@ -79,7 +79,7 @@ ReportContext.prototype.studyMonthlyRecruitment = function() {
     }
 };
 
-ReportContext.testContext = function() {
+DataSource.testSource = function() {
     var trusts = Fusion.mock([
         [["MemberOrgID", "MemberOrg"], [
             {"MemberOrg": "Org1", "MemberOrgID": 1},
@@ -89,7 +89,7 @@ ReportContext.testContext = function() {
         ]]
     ]);
     
-    return new ReportContext(trusts);
+    return new DataSource(trusts);
 };
 
-module.exports = ReportContext;
+module.exports = DataSource;
