@@ -107,4 +107,39 @@ DataSource.prototype.monthlyRecruitment = function(startDate, endDate, groupBy) 
     };
 };
 
+DataSource.prototype.runningTotal = function(totalField, sequenceField) {
+    return function(inputRows) {
+        var groupedRows = _.groupBy(inputRows, function(row) {
+            var groupByMap = _.omit(row, totalField, sequenceField);
+            return _.values(groupByMap);
+        });
+        
+        var dateSortedGroupedRows = _.map(groupedRows, function(row) {
+            return _.sortBy(row, sequenceField);
+        });
+        
+        _.each(dateSortedGroupedRows, function(group) {
+            var total = 0;
+            var lastDate = null;
+            
+            _.each(group, function(row) {
+                var thisDate = row[sequenceField];
+                var changed = !lastDate || (thisDate < lastDate) || (thisDate > lastDate);
+                
+                if (changed) {
+                    total = row[totalField] + total;
+                } else {
+                    total = row[totalField];
+                }
+                
+                row[totalField] = total;
+                lastDate = thisDate;
+            });
+        });
+        
+        var result = _.flatten(_.values(dateSortedGroupedRows), true);
+        return Promise.resolve(result);
+    };
+};
+
 module.exports = DataSource;

@@ -10,18 +10,29 @@ var fusionMock = require('./fusion.mock.js');
 describe("DataSource", function() {
     var data;
     
-    function shouldMakeQuery(params) {
-        var expectedValues = params.query.values ? params.query.values : "EXPECTED";
+    function testProcessingFunction(params) {
+        var expectedValues = params.values ? params.values : "EXPECTED";
         
         if (params.table) {
             params.query.values = expectedValues;
             params.table.stub(params.query);
         }
         
-        return params.fn(params.inputValues)
-            .then(function(values) {
-                expect(values).to.eql(expectedValues);
-            });
+        if (params.ignoreOrdering) {
+            expectedValues.sort();
+            
+            return params.fn(params.inputValues)
+                .then(function(values) {
+                    expect(values.sort()).to.eql(expectedValues);
+                });
+                
+        } else {
+            return params.fn(params.inputValues)
+                .then(function(values) {
+                    expect(values).to.eql(expectedValues);
+                });
+        }
+        
     }
     
     beforeEach(function(){
@@ -45,7 +56,7 @@ describe("DataSource", function() {
     
     describe("getNonCommercialStudies", function() {
         it("should fetch only noncommercial studies", function() {
-            return shouldMakeQuery({
+            return testProcessingFunction({
                 table: data.studyTable,
                 query: {
                     select: ["StudyID"],
@@ -66,7 +77,7 @@ describe("DataSource", function() {
         describe("when grouping specified", function(){
            it("should return sum monthly recruitment, also grouped by specified fields", function() {
                
-                return shouldMakeQuery({
+                return testProcessingFunction({
                     table: data.recruitmentTable,
                     query: {
                         select: ["SUM(MonthRecruitment)", "Month", "StudyID"],
@@ -85,7 +96,7 @@ describe("DataSource", function() {
         describe("when grouping not specified", function(){
            it("should return sum monthly recruitment, also grouped by specified fields", function() {
                
-                return shouldMakeQuery({
+                return testProcessingFunction({
                     table: data.recruitmentTable,
                     query: {
                         select: ["SUM(MonthRecruitment)", "Month"],
@@ -102,14 +113,45 @@ describe("DataSource", function() {
         });
     });
     
-    describe("accumulateByDate", function() {
-        it("should accumulate count field over date field, grouping by other fields", function() {
-            var input = [
-                {a: "a", b: "a", Month: new Date(2011, 1, 1)},
-                {a: "a", b: "b", Month: new Date(2011, 1, 1)},
-            ];
-            
-            data.accumulateMonthly()().then
+    describe("runningTotal", function() {
+        it("should accumulate count over date, when other rows are identical", function() {
+            return testProcessingFunction({
+                fn: data.runningTotal("count", "date"),
+                inputValues: [
+                    {a: 1, b: 2, date: new Date(1, 2, 3), count: 5},
+                    {a: 1, b: 2, date: new Date(1, 3, 3), count: 7}, 
+                    {a: 1, b: 3, date: new Date(1, 3, 3), count: 4}, 
+                    {a: 1, b: 3, date: new Date(1, 5, 3), count: 20}
+                ],
+                values: [
+                    {a: 1, b: 2, date: new Date(1, 2, 3), count: 5},
+                    {a: 1, b: 2, date: new Date(1, 3, 3), count: 12}, 
+                    {a: 1, b: 3, date: new Date(1, 3, 3), count: 4}, 
+                    {a: 1, b: 3, date: new Date(1, 5, 3), count: 24}
+                ],
+                ignoreOrdering: true
+            });
+        });
+        
+        it("should handle duplicates gracefully", function() {
+            return testProcessingFunction({
+                fn: data.runningTotal("count", "date"),
+                inputValues: [
+                    {a: 1, b: 2, date: new Date(1, 2, 3), count: 5},
+                    {a: 1, b: 2, date: new Date(1, 2, 3), count: 5},
+                    {a: 1, b: 2, date: new Date(1, 3, 3), count: 7}, 
+                    {a: 1, b: 2, date: new Date(1, 3, 3), count: 4}, 
+                    {a: 1, b: 2, date: new Date(1, 5, 3), count: 20}
+                ],
+                values: [
+                    {a: 1, b: 2, date: new Date(1, 2, 3), count: 5},
+                    {a: 1, b: 2, date: new Date(1, 2, 3), count: 5},
+                    {a: 1, b: 2, date: new Date(1, 3, 3), count: 12}, 
+                    {a: 1, b: 2, date: new Date(1, 3, 3), count: 4}, 
+                    {a: 1, b: 2, date: new Date(1, 5, 3), count: 24}
+                ],
+                ignoreOrdering: true
+            });
         });
     });
 });
