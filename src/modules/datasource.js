@@ -44,7 +44,6 @@ var util = require('./util.js');
         }
     });
 */
-    
 
 var DataSource = function(params) {
     var data = new BiMap();
@@ -76,6 +75,26 @@ var DataSource = function(params) {
         });
 };
 
+var mainDataSource;
+DataSource.main = function() {
+    if (!mainDataSource) mainDataSource = new DataSource(DataSource.config);
+    return mainDataSource;
+};
+
+DataSource.compose = function() {
+    var addOperation = function(prev, next){ return prev.then(next) };
+    
+    var first = _.first(arguments);
+    var rest = _.rest(arguments);
+    
+    return function(input) {
+        return _.reduce(rest, addOperation, first(input));
+    };
+};
+
+DataSource.do = function(params) {
+    params.operation().then(params.onCompleted);
+};
 
 DataSource.prototype.getNonCommercialStudies = function() {
     var data = this;
