@@ -214,4 +214,16 @@ Operation.prototype.withNameOfTrust = function(params) {
     });
 };
 
+Operation.prototype.justFields = function(fields) {
+    return this.childOperation({
+        inputColumns: fields,
+        outputColumns: fields,
+        transform: function(rows) {
+            return _.map(rows, function(r) {
+                return _.pick(r, fields);
+            });
+        }
+    });
+};
+
 module.exports = Operation;

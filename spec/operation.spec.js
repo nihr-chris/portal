@@ -269,4 +269,14 @@ describe("Common Operation", function() {
             ]);
          });
      });
+     
+     describe("justFields", function() {
+         it("should drop all unspecified fields", function() {
+            return expectOperation(function(parent){
+                return parent.justFields(["a", "b"]);
+            })
+            .withInput([{a: 1, b: 2, c: 3}, {a: 11, b: 12, c: 13}])
+            .toReturn([{a: 1, b: 2}, {a: 11, b: 12}]);
+         });
+     });
 });
