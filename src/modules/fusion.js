@@ -13,6 +13,9 @@ var encodeQueryParam = function(x) {
     else if (_.isDate(x)) {
         return moment(x).format("YYYY.MM.DD");
     }
+    else if (_.isNull(x)) {
+        return "''";
+    }
     else {
         throw new TypeError("Invalid query parameter type: " + typeof x);
     }
@@ -60,16 +63,38 @@ Fusion.eql = function(field, x) {
 Fusion.between = function(field, begin, endExcl) {
     return (
         field + " >= " + encodeQueryParam(begin)
-        + field + "<" + encodeQueryParam(endExcl)
+        + " AND " + field + " < " + encodeQueryParam(endExcl)
     );
 };
 
 Fusion.in = function(field, options) {
     return (
-        field + " in ("
-        + _.map(options, encodeQueryParam).join(", ")
+        field + " IN ("
+        + _.map(options.sort(), encodeQueryParam).join(", ")
         + ")"
     );
+};
+
+Fusion.notIn = function(field, options) {
+    return (
+        "NOT (" + field + " IN ("
+        + _.map(options.sort(), encodeQueryParam).join(", ")
+        + "))"
+    );
+};
+
+Fusion.or = function() {
+    return _.reduce(arguments, function(last, x) {
+        return "(" + last + " OR " + x + ")";
+    });
+};
+
+Fusion.gte = function(field, x) {
+    return field + " >= " + encodeQueryParam(x);
+};
+
+Fusion.lt = function(field, x) {
+    return field + " < " + encodeQueryParam(x);
 };
 
 module.exports = Fusion;

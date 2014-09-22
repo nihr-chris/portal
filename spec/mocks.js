@@ -66,7 +66,7 @@ var mocks = {
     },
     
     rootOperation: function(rows) {
-        var columnNames = _.keys(rows[0]);
+        var columnNames = rows ? _.keys(rows[0]) : [];
         
         return new Operation({
             dataSource: mocks.dataSource(),

@@ -112,4 +112,60 @@ Operation.prototype.monthlyRecruitment = function(params) {
     });
 };
 
+Operation.prototype.getHLO1Studies = function(params) {
+    var studyTable = this.dataSource.studyTable;
+    var fields = ["StudyID"];
+    
+    return this.childOperation({
+        inputColumns: [],
+        outputColumns: fields,
+        transform: function() {
+            return studyTable.fetch({
+                select: fields,
+                where: [
+                    Fusion.lt("ActualStartDate", params.endDate),
+                    Fusion.or(Fusion.eql("ActualEndDate", null), Fusion.gte("ActualEndDate", params.startDate))
+                ],
+                groupBy: ["StudyID"]
+            });
+        }
+    });
+}
+
+Operation.prototype.getHLO2Studies = function(params) {
+    var columns = ["StudyID", "TrustID", "FullTitle", "Banding", "ActualStartDate", "ExpectedEndDate", "ActualEndDate"];
+    var studyTable = this.dataSource.studyTable;
+    
+    var conditions = [
+        Fusion.gte("PortfolioQualificationDate", new Date(2010, 3, 1)),
+        Fusion.eql("ProjectStatus", "Blue"),
+        Fusion.notIn("RecruitmentInformationStatus", ["No NHS Support", "Sample Data: No Consent Requested"]),
+    ];
+    
+    if (params.commercial) {
+        conditions.push(Fusion.eql("Commercial", 1));
+    } else {
+        conditions.push(Fusion.eql("Commercial", 0));
+    }
+    
+    if (params.closed) {
+        conditions.push(Fusion.in("ActiveStatus", ["Closed - in follow-up", "Closed - follow-up complete"]));
+        conditions.push(Fusion.between("ActualEndDate", params.startDate, params.endDate));
+    } else {
+        conditions.push(Fusion.eql("ActiveStatus", "Open"));
+        conditions.push(Fusion.gte("ActualStartDate", new Date("2010-04-01")));
+    }
+    
+    return this.childOperation({
+        inputColumns: [],
+        outputColumns: columns,
+        transform: function() {
+            return studyTable.fetch({
+                select: columns,
+                where: conditions
+            });
+        }
+    });
+};
+
 module.exports = Operation;

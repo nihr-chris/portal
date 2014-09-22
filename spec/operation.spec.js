@@ -77,10 +77,107 @@ describe("any Operation", function(){
 });
 
 describe("Common Operation", function() {
+    var startDate = new Date(2011, 1, 2);
+    var endDate = new Date(2011, 3, 2);
+    
+    var HLOStudyFields = ["StudyID", "TrustID", "FullTitle", "Banding", "ActualStartDate", "ExpectedEndDate", "ActualEndDate"];
+        
+    describe("getHLO1Studies", function() {
+        it("should fetch studies", function() {
+            return expectOperation(function(parent) {
+                return parent.getHLO1Studies({
+                    startDate: startDate,
+                    endDate: endDate
+                });
+            })
+            .toMakeQuery({
+                select: ["StudyID"],
+                where: [
+                    Fusion.lt("ActualStartDate", endDate),
+                    Fusion.or(Fusion.eql("ActualEndDate", null), Fusion.gte("ActualEndDate", startDate))
+                ],
+                groupBy: ["StudyID"]
+            })
+            .onTable("studyTable")
+            .andReturnQueryResults();
+        });
+    })
+        
+    describe("getHLO2Studies", function() {
+        it("should fetch HLO2a(closed) query", function() {
+            return expectOperation(function(parent){
+                return parent.getHLO2Studies({
+                    startDate: startDate,
+                    endDate: endDate,
+                    commercial: true,
+                    closed: true
+                });
+            })
+            .toMakeQuery({
+                select: HLOStudyFields,
+                where: [
+                    Fusion.gte("PortfolioQualificationDate", new Date("2010-04-01")),
+                    Fusion.eql("Commercial", 1),
+                    Fusion.notIn("RecruitmentInformationStatus", ["No NHS Support", "Sample Data: No Consent Requested"]),
+                    Fusion.in("ActiveStatus", ["Closed - in follow-up", "Closed - follow-up complete"]),
+                    Fusion.eql("ProjectStatus", "Blue"),
+                    Fusion.between("ActualEndDate", startDate, endDate)
+                ]
+            })
+            .onTable("studyTable")
+            .andReturnQueryResults();
+        });
+        
+        it("should fetch HLO2a(open) query", function() {
+            return expectOperation(function(parent){
+                return parent.getHLO2Studies({
+                    startDate: startDate,
+                    endDate: endDate,
+                    commercial: true,
+                    closed: false
+                });
+            })
+            .toMakeQuery({
+                select: HLOStudyFields,
+                where: [
+                    Fusion.gte("PortfolioQualificationDate", new Date("2010-04-01")),
+                    Fusion.eql("Commercial", 1),
+                    Fusion.notIn("RecruitmentInformationStatus", ["No NHS Support", "Sample Data: No Consent Requested"]),
+                    Fusion.eql("ActiveStatus", "Open"),
+                    Fusion.eql("ProjectStatus", "Blue"),
+                    Fusion.gte("ActualStartDate", new Date("2010-04-01"))
+                ]
+            })
+            .onTable("studyTable")
+            .andReturnQueryResults();
+        });
+        
+        it("should fetch HLO2b query", function() {
+            return expectOperation(function(parent){
+                return parent.getHLO2Studies({
+                    startDate: startDate,
+                    endDate: endDate,
+                    commercial: false,
+                    closed: true
+                });
+            })
+            .toMakeQuery({
+                select: HLOStudyFields,
+                where: [
+                    Fusion.gte("PortfolioQualificationDate", new Date("2010-04-01")),
+                    Fusion.eql("Commercial", 0),
+                    Fusion.notIn("RecruitmentInformationStatus", ["No NHS Support", "Sample Data: No Consent Requested"]),
+                    Fusion.in("ActiveStatus", ["Closed - in follow-up", "Closed - follow-up complete"]),
+                    Fusion.eql("ProjectStatus", "Blue"),
+                    Fusion.between("ActualEndDate", startDate, endDate)
+                ]
+            })
+            .onTable("studyTable")
+            .andReturnQueryResults();
+        });
+    });
+    
     describe("monthlyRecruitment", function() {
-        var startDate = new Date(2011, 1, 2);
-        var endDate = new Date(2011, 3, 2);
-          
         describe("when forEach is specified", function(){
             it("should fetch total monthly recruitment, grouped by specified fields", function() {
                 return expectOperation(function(parent){

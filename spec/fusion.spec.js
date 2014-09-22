@@ -14,11 +14,40 @@ describe("Fusion", function() {
     });
     
     it("should encode equals number condition", function() {
-        expect(Fusion.eql("f1", 1)).to.eql('f1 = 1');
+        expect(Fusion.eql("f1", "1")).to.eql('f1 = "1"');
+    });
+    
+    it("should encode between condition", function() {
+        expect(Fusion.between("f1", "a", "b")).to.eql('f1 >= "a" AND f1 < "b"');
+    });
+    
+    it("should encode lt condition", function() {
+        expect(Fusion.lt("f1", "1")).to.eql('f1 < "1"');
+    });
+    
+    it("should encode gte condition", function() {
+        expect(Fusion.gte("f1", "1")).to.eql('f1 >= "1"');
+    });
+    
+    it("should encode or condition", function() {
+        expect(Fusion.or("a", "b")).to.eql('(a OR b)');
+        expect(Fusion.or("a", "b", "c")).to.eql('((a OR b) OR c)');
+    });
+    
+    it("should encode in condition", function() {
+        expect(Fusion.in("f1", ["a", "b"])).to.eql('f1 IN ("a", "b")');
+    });
+    
+    it("should encode not in condition", function() {
+        expect(Fusion.notIn("f1", ["a", "b"])).to.eql('NOT (f1 IN ("a", "b"))');
     });
     
     it("should encode equals date condition", function() {
         expect(Fusion.eql("f1", new Date(2011, 0, 2))).to.eql('f1 = 2011.01.02');
+    });
+    
+    it("should encode equals null condition", function() {
+        expect(Fusion.eql("f1", null)).to.eql("f1 = ''");
     });
     
     it("should encode equals string condition", function() {
