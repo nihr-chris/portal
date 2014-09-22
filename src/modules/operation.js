@@ -70,8 +70,8 @@ Operation.prototype.childOperation = function(params) {
 };
 
 
-Operation.prototype.onCompleted = function(completionHandler) {
-    return this.promise.then(completionHandler);
+Operation.prototype.onCompleted = function(completionHandler, errorHandler) {
+    return this.promise.then(completionHandler, errorHandler);
 };
 
 
@@ -225,5 +225,67 @@ Operation.prototype.justFields = function(fields) {
         }
     });
 };
+
+Operation.prototype.group = function(params) {
+    var countedColumn = params.count.valuesFromField;
+    var valueColumnMap = params.count.inFields;
+    var groupByColumns = params.byFields;
+    var countColumns = _.values(params.count.inFields);
+    
+    var inputColumns = groupByColumns.concat([countedColumn]);
+    var unmentionedColumns = _.difference(this.outputColumns, inputColumns);
+    var copiedColumns = _.without(this.outputColumns, countedColumn);
+    
+    return this.childOperation({
+        inputColumns: inputColumns,
+        outputColumns: _.uniq(copiedColumns.concat(countColumns)),
+        transform: function(rows) {
+            var grouped = _.groupBy(rows, function(row) {
+                return JSON.stringify(_.pick(row, params.byFields));
+            });
+            
+            return _.map(grouped, function(group) {
+                var result = {};
+                
+                // Fill out the uncounted values from the first row
+                var firstRow = group[0];
+                _.each(copiedColumns, function(column) {
+                    result[column] = firstRow[column];
+                });
+                
+                // Initialize the counted values to zero
+                _.each(countColumns, function(targetColumn) {
+                    result[targetColumn] = 0;
+                });
+                
+                // Count the counted column
+                _.each(group, function(row) {
+                    var fieldVal = row[countedColumn];
+                    var matchedColumn = valueColumnMap[fieldVal];
+                    
+                    if (matchedColumn) {
+                        result[matchedColumn] = result[matchedColumn] + 1;
+                    } else {
+                        throw new Error(
+                            "Unexpected value '" + fieldVal + "' in column +'" + countedColumn + "'"
+                        );
+                    }
+                    
+                    // Check that there isn't any variation within the other columns
+                    _.each(unmentionedColumns, function(column) {
+                        if (row[column] !== firstRow[column]) {
+                            throw new Error(
+                                "Grouping has an ambiguous column value. "
+                                + "Could be '" + row[column] + "' or '" + firstRow[column] + "'"
+                            );
+                        }
+                    });
+                });
+                
+                return result;
+            });
+        }
+    });
+}
 
 module.exports = Operation;

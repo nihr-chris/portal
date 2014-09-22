@@ -1,11 +1,12 @@
 var expect      = require('chai').expect;
+var assert      = require('chai').assert;
 var _           = require("underscore");
 
 var mocks       = require("./mocks.js");
 
 module.exports = {
     expectOperation: function (makeOperation) {
-        function expectation(input, query, tableName, stubValues, expectedResult) {
+        function expectation(input, query, tableName, stubValues, expectedResult, expectedError) {
             var parent = mocks.rootOperation(input);
             
             if (tableName && stubValues) {
@@ -17,9 +18,21 @@ module.exports = {
             }
             
             var operation = makeOperation(parent);
-            return operation.onCompleted(function(results) {
-                expect(results).to.eql(expectedResult);
-            });
+                
+            if (expectedError) {
+                return operation.onCompleted(function(results) {
+                    assert.fail(null, null, "Expected operation to fail.");
+                }, function(error) {
+                    expect(error.message).to.have.string(expectedError);
+                });
+                
+            } else {
+                return operation.onCompleted(function(results) {
+                    expect(results).to.eql(expectedResult);
+                }, function(error) {
+                    assert.fail(null, null, "Expected operation to succeed.");
+                });
+            }
         }
         
         function expectOperationWithInputToMakeQuery(input, query) {
@@ -48,6 +61,9 @@ module.exports = {
                     },
                     toReturn: function(value) {
                         return expectation(input, null, null, null, value);
+                    },
+                    toFailWithError: function(error) {
+                        return expectation(input, null, null, null, null, error);
                     }
                 }
             }
