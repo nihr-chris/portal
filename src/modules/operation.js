@@ -171,7 +171,7 @@ Operation.prototype.getHLO2Studies = function(params) {
 Operation.prototype.with = function(params) {
     if (params.valueOfField) {
         return this.childOperation({
-            inputColumns: [],
+            inputColumns: [params.valueOfField],
             outputColumns: this.outputColumns.concat(params.inField),
             transform: function(rows) {
                 _.each(rows, function(r) {
@@ -196,6 +196,22 @@ Operation.prototype.with = function(params) {
     } else {
         throw new Error("with operation should specify either valueOfField or value");
     }
+};
+
+Operation.prototype.withNameOfTrust = function(params) {
+    var dataSource = this.dataSource;
+    
+    return this.childOperation({
+        inputColumns: [params.fromField],
+        outputColumns: [this.outputColumns + params.inField],
+        transform: function(rows) {
+            _.each(rows, function(r) {
+                var trustID = r[params.fromField];
+                r[params.inField] = dataSource.trustName(trustID);
+            });
+            return rows;
+        }
+    });
 };
 
 module.exports = Operation;

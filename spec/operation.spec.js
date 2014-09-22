@@ -253,4 +253,20 @@ describe("Common Operation", function() {
             ]);
          });
      });
+     
+     describe("withNameOfTrust", function() {
+         it("should add trust name", function() {
+            return expectOperation(function(parent){
+                return parent.withNameOfTrust({
+                    fromField: "trustID",
+                    inField: "trustName"
+                });
+            })
+            .withInput([{trustID: 1}, {trustID: 2}])
+            .toReturn([
+                {trustID: 1, trustName: "Org1"}, 
+                {trustID: 2, trustName: "Org2"}
+            ]);
+         });
+     });
 });
