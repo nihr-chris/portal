@@ -3,6 +3,7 @@ var Promise     = require('promise');
 
 var Fusion      = require("../src/modules/fusion.js");
 var DataSource  = require("../src/modules/datasource.js");
+var Operation   = require("../src/modules/operation.js");
 
 var mocks = {
     fusionTable: function() {
@@ -61,6 +62,16 @@ var mocks = {
             trustTable: mocks.trustTable(),
             recruitmentTable: mocks.fusionTable(),
             studyTable: mocks.fusionTable()
+        });
+    },
+    
+    rootOperation: function(rows) {
+        var columnNames = _.keys(rows[0]);
+        
+        return new Operation({
+            dataSource: mocks.dataSource(),
+            outputColumns: columnNames,
+            promise: Promise.resolve(rows)
         });
     }
 };

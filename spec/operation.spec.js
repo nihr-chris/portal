@@ -5,11 +5,12 @@ var _           = require("underscore");
 var Promise     = require("promise");
 
 var DataSource  = require("../src/modules/datasource.js");
+var Fusion      = require("../src/modules/fusion.js");
 var Operation   = require("../src/modules/operation.js");
 var mocks       = require("./mocks.js");
 
 
-describe("Operation", function(){
+describe("any Operation", function(){
     var data = mocks.dataSource();
     
     var rootOperation;
@@ -72,4 +73,95 @@ describe("Operation", function(){
             });
         });
     });
+});
+
+describe("Common Operation", function() {
+    function expectOperation(makeOperation) {
+        
+        function expectation(input, query, tableName, stubValues, expectedResult) {
+            var parent = mocks.rootOperation(input);
+            var table = parent.dataSource[tableName];
+            
+            var stubParams = _.clone(query);
+            stubParams.values = stubValues;
+            
+            table.stub(stubParams);
+            var operation = makeOperation(parent);
+            
+            return operation.onCompleted(function(results) {
+                expect(results).to.eql(expectedResult);
+            });
+        }
+        
+        // Todo: these functions are chained to customize the expectation.
+        // Could probably be made less ugly.
+        return {
+            withInput: function(input) {
+                return {
+                    toMakeQuery: function(query) {
+                        return {
+                            onTable: function(table) {
+                                return {
+                                    andReturnQueryResults: function() {
+                                        var result = "RESULT";
+                                        return expectation(input, query, table, result, result);
+                                    }
+                                };
+                            }
+                        };
+                    }
+                };
+            }
+        };
+    } 
+    
+    describe("monthlyRecruitment", function() {
+        var startDate = new Date(2011, 1, 2);
+        var endDate = new Date(2011, 3, 2);
+          
+        describe("when forEach is specified", function(){
+            it("should fetch total monthly recruitment, grouped by specified fields", function() {
+                return expectOperation(function(parent){
+                    return parent.monthlyRecruitment({
+                        forEach: ["StudyID"],
+                        from: startDate,
+                        until: endDate
+                    });
+                })
+                .withInput([{StudyID: 1}, {StudyID: 2}])
+                .toMakeQuery({
+                    select: ["SUM(MonthRecruitment) AS RecruitmentCount", "Month", "StudyID"],
+                    where: [
+                        Fusion.between("Month", startDate, endDate),
+                        Fusion.in("StudyID", [1,2])
+                    ],
+                    groupBy: ["Month", "StudyID"],
+                })
+                .onTable("recruitmentTable")
+                .andReturnQueryResults();
+            });
+        });
+          
+        describe("when forEach is not specified", function(){
+            it("should fetch network-wide total monthly recruitment", function() {
+                return expectOperation(function(parent){
+                    return parent.monthlyRecruitment({
+                        from: startDate,
+                        until: endDate
+                    });
+                })
+                .withInput([{StudyID: 1}, {StudyID: 2}])
+                .toMakeQuery({
+                    select: ["SUM(MonthRecruitment) AS RecruitmentCount", "Month"],
+                    where: [
+                        Fusion.between("Month", startDate, endDate),
+                        Fusion.in("StudyID", [1,2])
+                    ],
+                    groupBy: ["Month"],
+                })
+                .onTable("recruitmentTable")
+                .andReturnQueryResults();
+            });
+        });
+     });
 });

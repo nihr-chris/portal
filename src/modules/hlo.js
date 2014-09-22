@@ -6,7 +6,7 @@ var HLO1 = function(startDate, endDate) {
     
     var byTrust = studies
         .monthlyRecruitment({
-            per: ["TrustID"],
+            forEach: ["TrustID"],
             from: startDate, 
             to: endDate, 
         })

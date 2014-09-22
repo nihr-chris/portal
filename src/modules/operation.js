@@ -24,6 +24,7 @@
  
  var util       = require("./util.js");
  var DataSource = require("./datasource.js");
+ var Fusion     = require("./fusion.js");
  
 
 var Operation = function(params) {
@@ -73,21 +74,42 @@ Operation.prototype.onCompleted = function(completionHandler) {
     return this.promise.then(completionHandler);
 };
 
-// Operation.prototype.monthlyRecruitment = function(params) {
-//     _.defaults(params, {
-//         per: []
-//     });
+
+/**
+ * Common operations
+ */
+
+Operation.prototype.monthlyRecruitment = function(params) {
+    util.checkArgs(arguments, {
+        forEach: [null, Array.of(String)],
+        from: Date,
+        until: Date
+    });
     
-//     var groupByColumns = params.per;
+    _.defaults(params, {
+        forEach: []
+    });
     
-//     return new Operation({
-//         dataSource: this.dataSource,
-//         inputColumns: ["TrustID", "StudyID"],
-//         outputColumns: ["TrustID", "StudyID"].concat(groupByColumns)
-//         fn: function(rows) {
-            
-//         }
-//     });
-// };
+    var groupByColumns = params.forEach;
+    var recruitment = this.dataSource.recruitmentTable;
+    
+    return this.childOperation({
+        inputColumns: ["StudyID"],
+        outputColumns: groupByColumns.concat(["Month"]),
+        transform: function(input) {
+            var studyIDs = _.map(input, "StudyID"); 
+    
+            return recruitment.fetch({
+                select: groupByColumns.concat([
+                    "Month", "SUM(MonthRecruitment) AS RecruitmentCount"]),
+                where: [
+                    Fusion.between("Month", params.from, params.until),
+                    Fusion.in("StudyID", studyIDs)
+                ],
+                groupBy: ["Month"].concat(groupByColumns)
+            });
+        }
+    });
+};
 
 module.exports = Operation;
