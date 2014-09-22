@@ -6,15 +6,17 @@ var mocks       = require("./mocks.js");
 module.exports = {
     expectOperation: function (makeOperation) {
         function expectation(input, query, tableName, stubValues, expectedResult) {
-            var stubParams = _.clone(query);
-            stubParams.values = stubValues;
-            
             var parent = mocks.rootOperation(input);
-            var table = parent.dataSource[tableName];
             
-            table.stub(stubParams);
+            if (tableName && stubValues) {
+                var stubParams = _.clone(query);
+                stubParams.values = stubValues;
+            
+                var table = parent.dataSource[tableName];
+                table.stub(stubParams);
+            }
+            
             var operation = makeOperation(parent);
-            
             return operation.onCompleted(function(results) {
                 expect(results).to.eql(expectedResult);
             });
@@ -43,6 +45,9 @@ module.exports = {
                 return {
                     toMakeQuery: function(query) {
                         return expectOperationWithInputToMakeQuery(input, query);
+                    },
+                    toReturn: function(value) {
+                        return expectation(input, null, null, null, value);
                     }
                 }
             }

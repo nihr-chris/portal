@@ -168,4 +168,34 @@ Operation.prototype.getHLO2Studies = function(params) {
     });
 };
 
+Operation.prototype.with = function(params) {
+    if (params.valueOfField) {
+        return this.childOperation({
+            inputColumns: [],
+            outputColumns: this.outputColumns.concat(params.inField),
+            transform: function(rows) {
+                _.each(rows, function(r) {
+                    r[params.inField] = r[params.valueOfField];
+                });
+                return rows;
+            }
+        });
+        
+    } else if (params.value) {
+        return this.childOperation({
+            inputColumns: [],
+            outputColumns: this.outputColumns.concat(params.inField),
+            transform: function(rows) {
+                _.each(rows, function(r) {
+                    r[params.inField] = params.value;
+                });
+                return rows;
+            }
+        });
+        
+    } else {
+        throw new Error("with operation should specify either valueOfField or value");
+    }
+};
+
 module.exports = Operation;

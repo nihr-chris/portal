@@ -101,7 +101,7 @@ describe("Common Operation", function() {
             .onTable("studyTable")
             .andReturnQueryResults();
         });
-    })
+    });
         
     describe("getHLO2Studies", function() {
         it("should fetch HLO2a(closed) query", function() {
@@ -222,5 +222,35 @@ describe("Common Operation", function() {
                 .andReturnQueryResults();
             });
         });
+     });
+     
+     describe("with", function() {
+         it("should add literal value", function() {
+            return expectOperation(function(parent){
+                return parent.with({
+                    value: "myValue",
+                    inField: "myField"
+                });
+            })
+            .withInput([{StudyID: 1}, {StudyID: 2}])
+            .toReturn([
+                {StudyID: 1, myField: "myValue"}, 
+                {StudyID: 2, myField: "myValue"}
+            ]);
+         });
+         
+         it("should add field value", function() {
+            return expectOperation(function(parent){
+                return parent.with({
+                    valueOfField: "a",
+                    inField: "b"
+                });
+            })
+            .withInput([{a: 1}, {a: 2}])
+            .toReturn([
+                {a: 1, b: 1}, 
+                {a: 2, b: 2}
+            ]);
+         });
      });
 });
