@@ -224,12 +224,11 @@ describe("Common Operation", function() {
         });
      });
      
-     describe("with", function() {
-         it("should add literal value", function() {
+     describe("withValues", function() {
+         it("should add literal values", function() {
             return expectOperation(function(parent){
-                return parent.with({
-                    value: "myValue",
-                    inField: "myField"
+                return parent.withValues({
+                    myField: "myValue"
                 });
             })
             .withInput([{StudyID: 1}, {StudyID: 2}])
@@ -238,12 +237,13 @@ describe("Common Operation", function() {
                 {StudyID: 2, myField: "myValue"}
             ]);
          });
-         
-         it("should add field value", function() {
+     });
+     
+     describe("withFieldValues", function() {
+         it("should add field values", function() {
             return expectOperation(function(parent){
-                return parent.with({
-                    valueOfField: "a",
-                    inField: "b"
+                return parent.withFieldValues({
+                    b: "a"
                 });
             })
             .withInput([{a: 1}, {a: 2}])
@@ -254,12 +254,11 @@ describe("Common Operation", function() {
          });
      });
      
-     describe("withNameOfTrust", function() {
+     describe("withTrustName", function() {
          it("should add trust name", function() {
             return expectOperation(function(parent){
-                return parent.withNameOfTrust({
-                    fromField: "trustID",
-                    inField: "trustName"
+                return parent.withTrustName({
+                    trustName: "trustID"
                 });
             })
             .withInput([{trustID: 1}, {trustID: 2}])
@@ -311,6 +310,29 @@ describe("Common Operation", function() {
             .toFailWithError("ambiguous value");
         });
     });
+     
+     describe("sum", function() {
+         it("should group with sum", function() {
+            return expectOperation(function(parent) {
+                return parent.sum({
+                    valuesFromField: "val",
+                    inField: "total",
+                    groupBy: ["a", "b"]
+                });
+            })
+            .withInput([
+                {a: 1, b: 2, c:0, val: 1}, 
+                {a: 1, b: 2, c:0, val: 2},
+                
+                {a: 2, b: 2, c:0, val: 3},
+                {a: 2, b: 2, c:0, val: 4}
+            ])
+            .toReturn([
+                {a: 1, b: 2, c:0, total: 3},
+                {a: 2, b: 2, c:0, total: 7}
+            ]);
+         });
+     });
      
      describe("count", function() {
          it("should group with count", function() {

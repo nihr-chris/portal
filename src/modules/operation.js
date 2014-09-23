@@ -70,161 +70,28 @@ Operation.prototype.childOperation = function(params) {
 };
 
 
-Operation.prototype.onCompleted = function(completionHandler, errorHandler) {
-    return this.promise.then(completionHandler, errorHandler);
-};
-
-
-/**
- * Common operations
- */
-
-Operation.prototype.monthlyRecruitment = function(params) {
+Operation.prototype.withOperation = function(params) {
     util.checkArgs(arguments, {
-        forEach: [null, Array.of(String)],
-        from: Date,
-        until: Date
+        addedColumns: Array.of(String),
+        inputColumns: [Array.of(String), null],
+        rowValues: Function
     });
-    
-    _.defaults(params, {
-        forEach: []
-    });
-    
-    var groupByColumns = params.forEach;
-    var recruitment = this.dataSource.recruitmentTable;
     
     return this.childOperation({
-        inputColumns: ["StudyID"],
-        outputColumns: groupByColumns.concat(["Month"]),
-        transform: function(input) {
-            var studyIDs = _.map(input, "StudyID"); 
-    
-            return recruitment.fetch({
-                select: groupByColumns.concat([
-                    "Month", "SUM(MonthRecruitment) AS RecruitmentCount"]),
-                where: [
-                    Fusion.between("Month", params.from, params.until),
-                    Fusion.in("StudyID", studyIDs)
-                ],
-                groupBy: ["Month"].concat(groupByColumns)
-            });
-        }
-    });
-};
-
-Operation.prototype.getHLO1Studies = function(params) {
-    var studyTable = this.dataSource.studyTable;
-    var fields = ["StudyID"];
-    
-    return this.childOperation({
-        inputColumns: [],
-        outputColumns: fields,
-        transform: function() {
-            return studyTable.fetch({
-                select: fields,
-                where: [
-                    Fusion.lt("ActualStartDate", params.endDate),
-                    Fusion.or(Fusion.eql("ActualEndDate", null), Fusion.gte("ActualEndDate", params.startDate))
-                ],
-                groupBy: ["StudyID"]
-            });
-        }
-    });
-}
-
-Operation.prototype.getHLO2Studies = function(params) {
-    var columns = ["StudyID", "TrustID", "FullTitle", "Banding", "ActualStartDate", "ExpectedEndDate", "ActualEndDate"];
-    var studyTable = this.dataSource.studyTable;
-    
-    var conditions = [
-        Fusion.gte("PortfolioQualificationDate", new Date(2010, 3, 1)),
-        Fusion.eql("ProjectStatus", "Blue"),
-        Fusion.notIn("RecruitmentInformationStatus", ["No NHS Support", "Sample Data: No Consent Requested"]),
-    ];
-    
-    if (params.commercial) {
-        conditions.push(Fusion.eql("Commercial", 1));
-    } else {
-        conditions.push(Fusion.eql("Commercial", 0));
-    }
-    
-    if (params.closed) {
-        conditions.push(Fusion.in("ActiveStatus", ["Closed - in follow-up", "Closed - follow-up complete"]));
-        conditions.push(Fusion.between("ActualEndDate", params.startDate, params.endDate));
-    } else {
-        conditions.push(Fusion.eql("ActiveStatus", "Open"));
-        conditions.push(Fusion.gte("ActualStartDate", new Date("2010-04-01")));
-    }
-    
-    return this.childOperation({
-        inputColumns: [],
-        outputColumns: columns,
-        transform: function() {
-            return studyTable.fetch({
-                select: columns,
-                where: conditions
-            });
-        }
-    });
-};
-
-Operation.prototype.with = function(params) {
-    if (params.valueOfField) {
-        return this.childOperation({
-            inputColumns: [params.valueOfField],
-            outputColumns: this.outputColumns.concat(params.inField),
-            transform: function(rows) {
-                _.each(rows, function(r) {
-                    r[params.inField] = r[params.valueOfField];
-                });
-                return rows;
-            }
-        });
-        
-    } else if (params.value) {
-        return this.childOperation({
-            inputColumns: [],
-            outputColumns: this.outputColumns.concat(params.inField),
-            transform: function(rows) {
-                _.each(rows, function(r) {
-                    r[params.inField] = params.value;
-                });
-                return rows;
-            }
-        });
-        
-    } else {
-        throw new Error("with operation should specify either valueOfField or value");
-    }
-};
-
-Operation.prototype.withNameOfTrust = function(params) {
-    var dataSource = this.dataSource;
-    
-    return this.childOperation({
-        inputColumns: [params.fromField],
-        outputColumns: [this.outputColumns + params.inField],
+        inputColumns: params.inputColumns ? params.inputColumns : [],
+        outputColumns: _.union(params.addedColumns, this.outputColumns),
         transform: function(rows) {
-            _.each(rows, function(r) {
-                var trustID = r[params.fromField];
-                r[params.inField] = dataSource.trustName(trustID);
-            });
-            return rows;
-        }
-    });
-};
-
-Operation.prototype.justFields = function(fields) {
-    return this.childOperation({
-        inputColumns: fields,
-        outputColumns: fields,
-        transform: function(rows) {
-            return _.map(rows, function(r) {
-                return _.pick(r, fields);
+            return _.map(rows, function(row) {
+                var result = _.clone(row);
+                var addedFields = params.rowValues(row);
+                _.each(addedFields, function(value, key) {
+                    result[key] = value;
+                });
+                return result;
             });
         }
     });
-};
+};  
 
 /**
  * Private helper method for creating operations that summarize many rows into
@@ -302,6 +169,156 @@ Operation.prototype.summarizeOperation = function(params) {
     });
 };
 
+
+Operation.prototype.onCompleted = function(completionHandler, errorHandler) {
+    return this.promise.then(completionHandler, errorHandler);
+};
+
+
+/**
+ * Common operations
+ */
+
+Operation.prototype.monthlyRecruitment = function(params) {
+    util.checkArgs(arguments, {
+        forEach: [null, Array.of(String)],
+        from: Date,
+        until: Date
+    });
+    
+    _.defaults(params, {
+        forEach: []
+    });
+    
+    var groupByColumns = params.forEach;
+    var recruitment = this.dataSource.recruitmentTable;
+    
+    return this.childOperation({
+        inputColumns: ["StudyID"],
+        outputColumns: groupByColumns.concat(["Month"]),
+        transform: function(input) {
+            var studyIDs = _.map(input, "StudyID"); 
+    
+            return recruitment.fetch({
+                select: groupByColumns.concat([
+                    "Month", "SUM(MonthRecruitment) AS RecruitmentCount"]),
+                where: [
+                    Fusion.between("Month", params.from, params.until),
+                    Fusion.in("StudyID", studyIDs)
+                ],
+                groupBy: ["Month"].concat(groupByColumns)
+            });
+        }
+    });
+};
+
+Operation.prototype.getHLO1Studies = function(params) {
+    var studyTable = this.dataSource.studyTable;
+    var fields = ["StudyID"];
+    
+    return this.childOperation({
+        inputColumns: [],
+        outputColumns: fields,
+        transform: function() {
+            return studyTable.fetch({
+                select: fields,
+                where: [
+                    Fusion.lt("ActualStartDate", params.endDate),
+                    Fusion.or(Fusion.eql("ActualEndDate", null), Fusion.gte("ActualEndDate", params.startDate))
+                ],
+                groupBy: ["StudyID"]
+            });
+        }
+    });
+};
+
+Operation.prototype.getHLO2Studies = function(params) {
+    var columns = ["StudyID", "TrustID", "FullTitle", "Banding", "ActualStartDate", "ExpectedEndDate", "ActualEndDate"];
+    var studyTable = this.dataSource.studyTable;
+    
+    var conditions = [
+        Fusion.gte("PortfolioQualificationDate", new Date(2010, 3, 1)),
+        Fusion.eql("ProjectStatus", "Blue"),
+        Fusion.notIn("RecruitmentInformationStatus", ["No NHS Support", "Sample Data: No Consent Requested"]),
+    ];
+    
+    if (params.commercial) {
+        conditions.push(Fusion.eql("Commercial", 1));
+    } else {
+        conditions.push(Fusion.eql("Commercial", 0));
+    }
+    
+    if (params.closed) {
+        conditions.push(Fusion.in("ActiveStatus", ["Closed - in follow-up", "Closed - follow-up complete"]));
+        conditions.push(Fusion.between("ActualEndDate", params.startDate, params.endDate));
+    } else {
+        conditions.push(Fusion.eql("ActiveStatus", "Open"));
+        conditions.push(Fusion.gte("ActualStartDate", new Date("2010-04-01")));
+    }
+    
+    return this.childOperation({
+        inputColumns: [],
+        outputColumns: columns,
+        transform: function() {
+            return studyTable.fetch({
+                select: columns,
+                where: conditions
+            });
+        }
+    });
+};
+
+Operation.prototype.withValues = function(fieldMap) {
+    return this.withOperation({
+        addedColumns: _.keys(fieldMap),
+        rowValues: function(row) {
+            return fieldMap;
+        }
+    });
+};
+
+Operation.prototype.withFieldValues = function(fieldMap) {
+    return this.withOperation({
+        inputColumns: _.values(fieldMap),
+        addedColumns: _.keys(fieldMap),
+        rowValues: function(row) {
+            var values = {};
+            _.each(fieldMap, function(sourceColumn, targetColumn) {
+                values[targetColumn] = row[sourceColumn];
+            });
+            return values;
+        }
+    });
+};
+
+Operation.prototype.withTrustName = function(fieldMap) {
+    var dataSource = this.dataSource;
+    
+    return this.withOperation({
+        inputColumns: _.values(fieldMap),
+        addedColumns: _.keys(fieldMap),
+        rowValues: function(row) {
+            var values = {};
+            _.each(fieldMap, function(sourceColumn, targetColumn) {
+                values[targetColumn] = dataSource.trustName(row[sourceColumn]);
+            });
+            return values;
+        }
+    });
+};
+
+Operation.prototype.justFields = function(fields) {
+    return this.childOperation({
+        inputColumns: fields,
+        outputColumns: fields,
+        transform: function(rows) {
+            return _.map(rows, function(r) {
+                return _.pick(r, fields);
+            });
+        }
+    });
+};
+
 Operation.prototype.count = function(params) {
     util.checkArgs(arguments, {
         valuesFromField: String,
@@ -337,6 +354,31 @@ Operation.prototype.count = function(params) {
                     );
                 }
             });
+        }
+    });
+};
+
+Operation.prototype.sum = function(params) {
+    util.checkArgs(arguments, {
+        valuesFromField: String,
+        inField: Object,
+        groupBy: Array.of(String)
+    });
+    
+    var totalColumn = params.inField;
+    var summedColumn = params.valuesFromField;
+    
+    return this.summarizeOperation({
+        summarizeColumns: [summedColumn],
+        addedColumns: [summedColumn],
+        
+        groupBy: params.groupBy,
+        summarize: function(rows, summary) {
+            function sumField(total, row) {
+                return total + row[summedColumn];
+            }
+            
+            summary[totalColumn] = _.reduce(rows, sumField, 0);
         }
     });
 };
