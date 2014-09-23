@@ -83,9 +83,8 @@ Operation.prototype.withOperation = function(params) {
         transform: function(rows) {
             return _.map(rows, function(row) {
                 var result = _.clone(row);
-                var addedFields = params.rowValues(row);
-                _.each(addedFields, function(value, key) {
-                    result[key] = value;
+                _.each(params.addedColumns, function(outputColumn) {
+                    result[outputColumn] = params.rowValues(row, outputColumn);
                 });
                 return result;
             });
@@ -271,8 +270,8 @@ Operation.prototype.getHLO2Studies = function(params) {
 Operation.prototype.withValues = function(fieldMap) {
     return this.withOperation({
         addedColumns: _.keys(fieldMap),
-        rowValues: function(row) {
-            return fieldMap;
+        rowValues: function(row, outputColumn) {
+            return fieldMap[outputColumn];
         }
     });
 };
@@ -281,12 +280,9 @@ Operation.prototype.withFieldValues = function(fieldMap) {
     return this.withOperation({
         inputColumns: _.values(fieldMap),
         addedColumns: _.keys(fieldMap),
-        rowValues: function(row) {
-            var values = {};
-            _.each(fieldMap, function(sourceColumn, targetColumn) {
-                values[targetColumn] = row[sourceColumn];
-            });
-            return values;
+        rowValues: function(row, outputColumn) {
+            var sourceColumn = fieldMap[outputColumn];
+            return row[sourceColumn];
         }
     });
 };
@@ -297,12 +293,20 @@ Operation.prototype.withTrustName = function(fieldMap) {
     return this.withOperation({
         inputColumns: _.values(fieldMap),
         addedColumns: _.keys(fieldMap),
-        rowValues: function(row) {
-            var values = {};
-            _.each(fieldMap, function(sourceColumn, targetColumn) {
-                values[targetColumn] = dataSource.trustName(row[sourceColumn]);
-            });
-            return values;
+        rowValues: function(row, outputColumn) {
+            var sourceColumn = fieldMap[outputColumn];
+            return dataSource.trustName(row[sourceColumn]);
+        }
+    });
+};
+
+Operation.prototype.withFY = function(fieldMap) {
+    return this.withOperation({
+        inputColumns: _.values(fieldMap),
+        addedColumns: _.keys(fieldMap),
+        rowValues: function(row, outputColumn) {
+            var dateColumn = fieldMap[outputColumn];
+            return util.getFY(row[dateColumn]);
         }
     });
 };

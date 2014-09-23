@@ -269,6 +269,24 @@ describe("Common Operation", function() {
          });
      });
      
+     describe("withFY", function() {
+         it("should add financial year", function() {
+            return expectOperation(function(parent){
+                return parent.withFY({
+                    fy: "date"
+                });
+            })
+            .withInput([
+                {date: new Date("2011-4-1")}, 
+                {date: new Date("2011-3-1")}
+            ])
+            .toReturn([
+                {date: new Date("2011-4-1"), fy: 2011}, 
+                {date: new Date("2011-3-1"), fy: 2010}
+            ]);
+         });
+     });
+     
      describe("justFields", function() {
          it("should drop all unspecified fields", function() {
             return expectOperation(function(parent){
