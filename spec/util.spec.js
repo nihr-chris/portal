@@ -15,6 +15,15 @@ describe('util', function(){
        });
     });
     
+    describe("getFY", function() {
+        it("should return previous calendar year in march", function() {
+            expect(util.getFY(new Date("2011-03-31"))).to.eql(2010);
+        });
+        it("should return same calendar year in april", function() {
+            expect(util.getFY(new Date("2011-04-01"))).to.eql(2011);
+        });
+    });
+    
     describe("checkArgs", function(){
         function fn(str, num) {
             util.checkArgs(arguments, String, Number);

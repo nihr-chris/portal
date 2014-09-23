@@ -37,6 +37,18 @@ var checkArgs = function() {
 };
 
 
+function getFY(date) {
+    var month = date.getMonth(date);
+    var year = date.getFullYear(date);
+    
+    if (month < 3) {
+        return year - 1;
+    } else {
+        return year;
+    }
+}
+
+
 /**
  * makeObservable()
  * 
@@ -145,5 +157,6 @@ module.exports = {
     uid: uid,
     merge: merge,
     getter: getter,
-    makeObservable: makeObservable
+    makeObservable: makeObservable,
+    getFY: getFY
 };
