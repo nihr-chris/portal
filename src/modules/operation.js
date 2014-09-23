@@ -387,4 +387,30 @@ Operation.prototype.sum = function(params) {
     });
 };
 
+Operation.prototype.accumulate = function(params) {
+    var totalField = params.inField;
+    var summedField = params.field;
+    var groupFields = params.overFields;
+    
+    return this.childOperation({
+        inputColumns: groupFields.concat([summedField]),
+        outputColumns: this.outputColumns.concat([totalField]),
+        transform: function(rows) {
+            var rowGroups = _.groupBy(rows, function(row) {
+                return JSON.stringify(_.pick(row, groupFields));
+            });
+            
+            _.each(rowGroups, function(groupRows) {
+                 var total = 0;
+                 _.each(groupRows, function(row) {
+                     total += row[summedField];
+                     row[totalField] = total;
+                 });
+            });
+            
+            return _.flatten(_.values(rowGroups));
+        }
+    });
+};
+
 module.exports = Operation;

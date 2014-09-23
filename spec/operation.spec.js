@@ -287,6 +287,30 @@ describe("Common Operation", function() {
          });
      });
      
+     describe("accumulate", function() {
+         it("should accumulate over fields in order provided", function() {
+            return expectOperation(function(parent){
+                return parent.accumulate({
+                    field: "count",
+                    inField: "runningTotal",
+                    overFields: ["a", "b"]
+                });
+            })
+            .withInput([
+                {a: 1, b: 2, count: 30},
+                {a: 1, b: 2, count: 40},
+                {a: 1, b: 1, count: 10},
+                {a: 1, b: 1, count: 20},
+            ])
+            .toReturn([
+                {a: 1, b: 2, count: 30, runningTotal: 30},
+                {a: 1, b: 2, count: 40, runningTotal: 70},
+                {a: 1, b: 1, count: 10, runningTotal: 10},
+                {a: 1, b: 1, count: 20, runningTotal: 30},
+            ]);
+         });
+     });
+     
      describe("justFields", function() {
          it("should drop all unspecified fields", function() {
             return expectOperation(function(parent){
