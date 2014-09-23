@@ -283,13 +283,12 @@ describe("Common Operation", function() {
      describe("groupByOperation", function() {
         it("should group and summarize", function() {
             return expectOperation(function(parent){
-                return parent.groupByOperation({
-                    group: ["a", "b"],
+                return parent.summarizeOperation({
+                    groupBy: ["a", "b"],
                     summarize: function(rows, summary) {
                         summary["first"] = rows[0]["c"];
                     },
-                    inputColumns: ["a", "b", "c"],
-                    deletedColumns: ["c"],
+                    summarizeColumns: ["c"],
                     addedColumns: ["first"]
                 });
             })
@@ -299,18 +298,17 @@ describe("Common Operation", function() {
         
         it("should fail if group has variation within unsummarized column", function() {
             return expectOperation(function(parent){
-                return parent.groupByOperation({
-                    group: ["a", "b"],
+                return parent.summarizeOperation({
+                    groupBy: ["a", "b"],
                     summarize: function(rows, summary) {
                         summary["first"] = rows[0]["c"];
                     },
-                    inputColumns: ["a", "b", "c"],
-                    deletedColumns: ["c"],
+                    summarizeColumns: ["c"],
                     addedColumns: ["first"]
                 });
             })
             .withInput([{a: 1, b: 2, c: 3, d: 1}, {a: 1, b: 2, c: 4, d: 2}, {a: 11, b: 12, c: 13, d: 1}])
-            .toFailWithError("ambiguous column value");
+            .toFailWithError("ambiguous value");
         });
     });
      

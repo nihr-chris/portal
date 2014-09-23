@@ -227,51 +227,61 @@ Operation.prototype.justFields = function(fields) {
 };
 
 /**
- * Private helper method for creating a child operations that group and aggregate.
+ * Private helper method for creating operations that summarize many rows into
+ * fewer rows (similar to SQL's GROUP BY + aggregation functions).
  * 
- * Most of the shared logic for a groupBy + aggregate lives here.
- * Operations such as count() call this, passing in the additional logic.
+ * Most of the common logic for a summarizing operation lives here.
+ * For example, count() calls this, passing in the additional logic specific to
+ * counting.
  */
-Operation.prototype.groupByOperation = function(params) {
+Operation.prototype.summarizeOperation = function(params) {
     util.checkArgs(arguments, {
-        group: [Function, Array.of(String)],
+        // Names of columns to group by
+        groupBy: Array.of(String),
+        
+        // Function that takes an array of rows and writes summarized values to
+        // one or more new columns
         summarize: Function,
-        inputColumns: Array.of(String),
-        deletedColumns: Array.of(String),
+        
+        // Array of column names that are summarized by the summarize function.
+        // These are deleted from the returned rows.
+        summarizeColumns: Array.of(String),
+        
+        // Array of column names that are added by the summarize function. Used
+        // for error-checking by child operations.
         addedColumns: Array.of(String)
     });
     
-    var keptColumns = _.difference(this.outputColumns, params.deletedColumns);
-    
-    var getRowGroup;
-    if (_.isFunction(params.group)) {
-        getRowGroup = params.group;
-    } else {
-        getRowGroup = function(row){ return _.pick(row, params.group) };
-    }
+    var keptColumns = _.difference(this.outputColumns, params.summarizeColumns);
     
     return this.childOperation({
-        inputColumns: params.inputColumns,
+        inputColumns: _.union(params.summarizeColumns, params.groupBy),
         outputColumns: _.union(keptColumns, params.addedColumns),
         transform: function(rows) {
+            // Group...
             var groups = _.groupBy(rows, function(row) {
-                return JSON.stringify(getRowGroup(row));
+                return JSON.stringify(_.pick(row, params.groupBy));
             });
             
+            // And summarize...
             return _.map(groups, function(groupRows) {
                 var result = {};
                 var firstRow = groupRows[0];
                 
                 // Check that there isn't any variation within the group for each
-                // unsummarized column. SQL would require all returned columns to
-                // either be grouped or an aggregation function, but it's actually
-                // quite useful to copy the values across while checking that they
-                // are all the same.
+                // unsummarized column. Raise an error if there is.
+                
+                // SQL would require all returned columns to either be grouped or 
+                // passed to an aggregation function, but it's actually quite useful 
+                // to copy across values from columns we aren't grouping by, while
+                // checking that they would have been part of the same group if 
+                // we'd included them in the groupBy array.
                 _.each(groupRows, function(row) {
                     _.each(keptColumns, function(column) {
                         if (firstRow[column] !== row[column]) {
                             throw new Error(
-                                "Grouping has an ambiguous column value. "
+                                "Column " + column + " has an ambiguous value that is "
+                                + "not being grouped or summarized.\n"
                                 + "Could be " + row[column] + " or " + firstRow[column]
                             );
                         }
@@ -282,7 +292,6 @@ Operation.prototype.groupByOperation = function(params) {
                 _.each(keptColumns, function(column) {
                     result[column] = firstRow[column];
                 });
-                
                 
                 // Merge in the summarized column values
                 params.summarize(groupRows, result);
@@ -303,12 +312,11 @@ Operation.prototype.count = function(params) {
     var valueColumnMap = params.inFields;
     var countedColumn = params.valuesFromField;
     
-    return this.groupByOperation({
-        inputColumns: _.union(params.byFields, [countedColumn]),
-        deletedColumns: [countedColumn],
+    return this.summarizeOperation({
+        summarizeColumns: [countedColumn],
         addedColumns: _.values(valueColumnMap),
         
-        group: params.groupBy,
+        groupBy: params.groupBy,
         summarize: function(rows, summary) {
             _.each(valueColumnMap, function(column) {
                 summary[column] = 0;
