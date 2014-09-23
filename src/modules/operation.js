@@ -413,4 +413,18 @@ Operation.prototype.accumulate = function(params) {
     });
 };
 
+Operation.prototype.union = function(otherOperation) {
+    return this.childOperation({
+        inputColumns: otherOperation.outputColumns,
+        outputColumns: otherOperation.outputColumns,
+        transform: function(rows) {
+            return otherOperation.promise.then(function(otherRows) {
+                return _.union(rows, otherRows);
+            });
+        }
+    });
+};
+
+
+
 module.exports = Operation;

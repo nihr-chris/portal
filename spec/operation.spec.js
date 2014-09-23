@@ -311,6 +311,29 @@ describe("Common Operation", function() {
          });
      });
      
+     describe("union", function() {
+         it("should return union of operation result", function() {
+            var otherOperation = mocks.rootOperation([
+                {id: 3},
+                {id: 4},
+            ]);
+             
+            return expectOperation(function(parent){
+                return parent.union(otherOperation);
+            })
+            .withInput([
+                {id: 1},
+                {id: 2}
+            ])
+            .toReturn([
+                {id: 1},
+                {id: 2},
+                {id: 3},
+                {id: 4}
+            ]);
+         });
+     });
+     
      describe("justFields", function() {
          it("should drop all unspecified fields", function() {
             return expectOperation(function(parent){
