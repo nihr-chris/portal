@@ -280,18 +280,50 @@ describe("Common Operation", function() {
          });
      });
      
-     describe("group", function() {
+     describe("groupByOperation", function() {
+        it("should group and summarize", function() {
+            return expectOperation(function(parent){
+                return parent.groupByOperation({
+                    group: ["a", "b"],
+                    summarize: function(rows, summary) {
+                        summary["first"] = rows[0]["c"];
+                    },
+                    inputColumns: ["a", "b", "c"],
+                    deletedColumns: ["c"],
+                    addedColumns: ["first"]
+                });
+            })
+            .withInput([{a: 1, b: 2, c: 3}, {a: 1, b: 2, c: 4}, {a: 11, b: 12, c: 13}])
+            .toReturn([{a: 1, b: 2, first: 3}, {a: 11, b: 12, first: 13}]);
+        });
+        
+        it("should fail if group has variation within unsummarized column", function() {
+            return expectOperation(function(parent){
+                return parent.groupByOperation({
+                    group: ["a", "b"],
+                    summarize: function(rows, summary) {
+                        summary["first"] = rows[0]["c"];
+                    },
+                    inputColumns: ["a", "b", "c"],
+                    deletedColumns: ["c"],
+                    addedColumns: ["first"]
+                });
+            })
+            .withInput([{a: 1, b: 2, c: 3, d: 1}, {a: 1, b: 2, c: 4, d: 2}, {a: 11, b: 12, c: 13, d: 1}])
+            .toFailWithError("ambiguous column value");
+        });
+    });
+     
+     describe("count", function() {
          it("should group with count", function() {
             return expectOperation(function(parent) {
-                 return parent.group({
-                     byFields: ["a", "b"],
-                     count: {
-                         valuesFromField: "colour",
-                         inFields: {
-                             "blue": "blueCount",
-                             "green": "greenCount"
-                        }
-                    }
+                return parent.count({
+                    valuesFromField: "colour",
+                    inFields: {
+                        "blue": "blueCount",
+                        "green": "greenCount"
+                    },
+                    groupBy: ["a", "b"]
                 });
             })
             .withInput([
@@ -299,7 +331,7 @@ describe("Common Operation", function() {
                 {a: 1, b: 2, c:0, colour: "green"},
                 
                 {a: 2, b: 2, c:0, colour: "blue"},
-                {a: 2, b: 2, c:0, colour: "blue"},
+                {a: 2, b: 2, c:0, colour: "blue"}
             ])
             .toReturn([
                 {a: 1, b: 2, c:0, blueCount: 1, greenCount: 1},
@@ -307,43 +339,21 @@ describe("Common Operation", function() {
             ]);
          });
          
-         it("should fail for ambiguous field value", function() {
-            return expectOperation(function(parent) {
-                 return parent.group({
-                     byFields: ["a", "b"],
-                     count: {
-                         valuesFromField: "colour",
-                         inFields: {
-                             "blue": "blueCount",
-                             "green": "greenCount"
-                        }
-                    }
-                });
-            })
-            .withInput([
-                {a: 1, b: 2, c:0, colour: "blue"}, 
-                {a: 1, b: 2, c:1, colour: "green"}
-            ])
-            .toFailWithError("ambiguous column value");
-         });
-         
          it("should fail for unexpected counted value", function() {
             return expectOperation(function(parent) {
-                 return parent.group({
-                     byFields: ["a", "b"],
-                     count: {
-                         valuesFromField: "colour",
-                         inFields: {
-                             "blue": "blueCount"
-                        }
-                    }
+                 return parent.count({
+                    valuesFromField: "colour",
+                    inFields: {
+                        "blue": "blueCount"
+                    },
+                    groupBy: ["a", "b"]
                 });
             })
             .withInput([
-                {a: 1, b: 2, c:0, colour: "blue"}, 
-                {a: 1, b: 2, c:1, colour: "green"}
+                {a: 1, b: 2, colour: "blue"}, 
+                {a: 1, b: 2, colour: "green"}
             ])
             .toFailWithError("Unexpected value");
-         });
-     });
+        });
+    });
 });

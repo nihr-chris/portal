@@ -12,8 +12,10 @@ var mocks = {
             if (!query.where) query.where = [];
             if (!query.groupBy) query.groupBy = [];
             
-            return JSON.stringify(
-                [query.select.sort(), query.where.sort(), query.groupBy.sort()]
+            return (
+                "select " + query.select.sort().join(", ") + "\n"
+                + "where " + query.where.sort().join(", ") + "\n"
+                + "group by " + query.groupBy.sort().join(", ")
             );
         };
         

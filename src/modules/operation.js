@@ -226,66 +226,111 @@ Operation.prototype.justFields = function(fields) {
     });
 };
 
-Operation.prototype.group = function(params) {
-    var countedColumn = params.count.valuesFromField;
-    var valueColumnMap = params.count.inFields;
-    var groupByColumns = params.byFields;
-    var countColumns = _.values(params.count.inFields);
+/**
+ * Private helper method for creating a child operations that group and aggregate.
+ * 
+ * Most of the shared logic for a groupBy + aggregate lives here.
+ * Operations such as count() call this, passing in the additional logic.
+ */
+Operation.prototype.groupByOperation = function(params) {
+    util.checkArgs(arguments, {
+        group: [Function, Array.of(String)],
+        summarize: Function,
+        inputColumns: Array.of(String),
+        deletedColumns: Array.of(String),
+        addedColumns: Array.of(String)
+    });
     
-    var inputColumns = groupByColumns.concat([countedColumn]);
-    var unmentionedColumns = _.difference(this.outputColumns, inputColumns);
-    var copiedColumns = _.without(this.outputColumns, countedColumn);
+    var keptColumns = _.difference(this.outputColumns, params.deletedColumns);
+    
+    var getRowGroup;
+    if (_.isFunction(params.group)) {
+        getRowGroup = params.group;
+    } else {
+        getRowGroup = function(row){ return _.pick(row, params.group) };
+    }
     
     return this.childOperation({
-        inputColumns: inputColumns,
-        outputColumns: _.uniq(copiedColumns.concat(countColumns)),
+        inputColumns: params.inputColumns,
+        outputColumns: _.union(keptColumns, params.addedColumns),
         transform: function(rows) {
-            var grouped = _.groupBy(rows, function(row) {
-                return JSON.stringify(_.pick(row, params.byFields));
+            var groups = _.groupBy(rows, function(row) {
+                return JSON.stringify(getRowGroup(row));
             });
             
-            return _.map(grouped, function(group) {
+            return _.map(groups, function(groupRows) {
                 var result = {};
+                var firstRow = groupRows[0];
                 
-                // Fill out the uncounted values from the first row
-                var firstRow = group[0];
-                _.each(copiedColumns, function(column) {
-                    result[column] = firstRow[column];
-                });
-                
-                // Initialize the counted values to zero
-                _.each(countColumns, function(targetColumn) {
-                    result[targetColumn] = 0;
-                });
-                
-                // Count the counted column
-                _.each(group, function(row) {
-                    var fieldVal = row[countedColumn];
-                    var matchedColumn = valueColumnMap[fieldVal];
-                    
-                    if (matchedColumn) {
-                        result[matchedColumn] = result[matchedColumn] + 1;
-                    } else {
-                        throw new Error(
-                            "Unexpected value '" + fieldVal + "' in column +'" + countedColumn + "'"
-                        );
-                    }
-                    
-                    // Check that there isn't any variation within the other columns
-                    _.each(unmentionedColumns, function(column) {
-                        if (row[column] !== firstRow[column]) {
+                // Check that there isn't any variation within the group for each
+                // unsummarized column. SQL would require all returned columns to
+                // either be grouped or an aggregation function, but it's actually
+                // quite useful to copy the values across while checking that they
+                // are all the same.
+                _.each(groupRows, function(row) {
+                    _.each(keptColumns, function(column) {
+                        if (firstRow[column] !== row[column]) {
                             throw new Error(
                                 "Grouping has an ambiguous column value. "
-                                + "Could be '" + row[column] + "' or '" + firstRow[column] + "'"
+                                + "Could be " + row[column] + " or " + firstRow[column]
                             );
                         }
                     });
                 });
                 
+                // Take the first row's value for each unsummarized column
+                _.each(keptColumns, function(column) {
+                    result[column] = firstRow[column];
+                });
+                
+                
+                // Merge in the summarized column values
+                params.summarize(groupRows, result);
+                
                 return result;
             });
         }
     });
-}
+};
+
+Operation.prototype.count = function(params) {
+    util.checkArgs(arguments, {
+        valuesFromField: String,
+        inFields: Object,
+        groupBy: Array.of(String)
+    });
+    
+    var valueColumnMap = params.inFields;
+    var countedColumn = params.valuesFromField;
+    
+    return this.groupByOperation({
+        inputColumns: _.union(params.byFields, [countedColumn]),
+        deletedColumns: [countedColumn],
+        addedColumns: _.values(valueColumnMap),
+        
+        group: params.groupBy,
+        summarize: function(rows, summary) {
+            _.each(valueColumnMap, function(column) {
+                summary[column] = 0;
+            });
+            
+            _.each(rows, function(row) {
+                var value = row[countedColumn];
+                var sumColumn = valueColumnMap[value];
+                
+                if (sumColumn) {
+                    summary[sumColumn] += 1;
+                    
+                } else {
+                    console.log(value);
+                    console.log(JSON.stringify(row));
+                    throw new Error(
+                        "Unexpected value " + value + " in column " + countedColumn
+                    );
+                }
+            });
+        }
+    });
+};
 
 module.exports = Operation;

@@ -29,8 +29,6 @@ module.exports = {
             } else {
                 return operation.onCompleted(function(results) {
                     expect(results).to.eql(expectedResult);
-                }, function(error) {
-                    assert.fail(null, null, "Expected operation to succeed.");
                 });
             }
         }
