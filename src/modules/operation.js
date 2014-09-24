@@ -21,6 +21,7 @@
  
  var _          = require('underscore');
  var Promise    = require('promise');
+ var moment     = require('moment');
  
  var util       = require("./util.js");
  var DataSource = require("./datasource.js");
@@ -96,7 +97,7 @@ Operation.prototype.withOperation = function(params) {
  * Private helper method for creating operations that summarize many rows into
  * fewer rows (similar to SQL's GROUP BY + aggregation functions).
  * 
- * Most of the common logic for a summarizing operation lives here.
+ * Most of the common logic (/ugliness) for a summarizing operation lives here.
  * For example, count() calls this, passing in the additional logic specific to
  * counting.
  */
@@ -425,6 +426,51 @@ Operation.prototype.union = function(otherOperation) {
     });
 };
 
+
+Operation.prototype.withTimeTargetRAG = function(params) {
+    util.checkArgs(arguments, {
+        includeAmber: Boolean,
+        columns: {
+            actualStartDate: String,
+            expectedStartDate: String,
+            actualEndDate: String,
+            expectedEndDate: String,
+            actualRecruitment : String,
+            expectedRecruitment: String
+        }
+    });
+    
+    function getRedGreenRating(row) {
+        function columnValue(what) {
+            var columnName = params.columns[what];
+            return row[columnName];
+        }
+        
+        var actualDays = moment(columnValue("actualEndDate"))
+            .diff(columnValue("actualStartDate"));
+            
+        var expectedDays = moment(columnValue("expectedEndDate"))
+            .diff(columnValue("expectedStartDate"));
+        
+        if (actualDays > expectedDays) {
+            return "Red";
+            
+        } else if (columnValue("actualRecruitment") < columnValue("expectedRecruitment")) {
+            return "Red";
+            
+        } else {
+            return "Green";
+        }
+    }
+    
+    return this.withOperation({
+        inputColumns: _.values(params.fields),
+        addedColumns: ["RAG"],
+        rowValues: function(row, outputColumn) {
+            return getRedGreenRating(row);
+        }
+    });
+}
 
 
 module.exports = Operation;

@@ -3,6 +3,7 @@ var describe        = global.describe, it = global.it, beforeEach = global.befor
 
 var _               = require("underscore");
 var Promise         = require("promise");
+var moment          = require("moment");
 
 var DataSource      = require("../src/modules/datasource.js");
 var Fusion          = require("../src/modules/fusion.js");
@@ -225,7 +226,7 @@ describe("Common Operation", function() {
      });
      
      describe("withValues", function() {
-         it("should add literal values", function() {
+        it("should add literal values", function() {
             return expectOperation(function(parent){
                 return parent.withValues({
                     myField: "myValue"
@@ -236,7 +237,7 @@ describe("Common Operation", function() {
                 {StudyID: 1, myField: "myValue"}, 
                 {StudyID: 2, myField: "myValue"}
             ]);
-         });
+        });
      });
      
      describe("withFieldValues", function() {
@@ -376,8 +377,8 @@ describe("Common Operation", function() {
         });
     });
      
-     describe("sum", function() {
-         it("should group with sum", function() {
+    describe("sum", function() {
+        it("should group with sum", function() {
             return expectOperation(function(parent) {
                 return parent.sum({
                     valuesFromField: "val",
@@ -396,11 +397,11 @@ describe("Common Operation", function() {
                 {a: 1, b: 2, c:0, total: 3},
                 {a: 2, b: 2, c:0, total: 7}
             ]);
-         });
-     });
+        });
+    });
      
-     describe("count", function() {
-         it("should group with count", function() {
+    describe("count", function() {
+        it("should group with count", function() {
             return expectOperation(function(parent) {
                 return parent.count({
                     valuesFromField: "colour",
@@ -422,7 +423,7 @@ describe("Common Operation", function() {
                 {a: 1, b: 2, c:0, blueCount: 1, greenCount: 1},
                 {a: 2, b: 2, c:0, blueCount: 2, greenCount: 0}
             ]);
-         });
+        });
          
          it("should fail for unexpected counted value", function() {
             return expectOperation(function(parent) {
@@ -439,6 +440,93 @@ describe("Common Operation", function() {
                 {a: 1, b: 2, colour: "green"}
             ])
             .toFailWithError("Unexpected value");
+        });
+    });
+    
+    describe("withTimeTargetRAG", function() {
+        function withRAGValues(studies, map) {
+            return _.map(studies, function(study) {
+                var withRAG = _.clone(study);
+                withRAG.RAG = map[study.id];
+                return withRAG;
+            });
+        }
+        
+        it("should return expected RAG for closed studies", function() {
+            return expectOperation(function(parent) {
+                 return parent.withTimeTargetRAG({
+                     includeAmber: false,
+                     columns: {
+                        actualStartDate: "actStart",
+                        expectedStartDate: "expStart",
+                        actualEndDate: "actEnd",
+                        expectedEndDate: "expEnd",
+                        actualRecruitment : "actRec",
+                        expectedRecruitment: "expRec"
+                    }
+                });
+            })
+            .withInput([
+                {
+                    id:         "TooManyDays", 
+                    actStart:   new Date("2011-1-1"), 
+                    actEnd:     new Date("2011-1-5"),
+                    expStart:   new Date("2012-1-1"), 
+                    expEnd:     new Date("2012-1-4"),
+                    expRec:     4,
+                    actRec:     5
+                },
+                {
+                    id:         "TooFewRecruits", 
+                    actStart:   new Date("2011-1-1"), 
+                    actEnd:     new Date("2011-1-4"),
+                    expStart:   new Date("2012-1-1"), 
+                    expEnd:     new Date("2012-1-5"),
+                    expRec:     5,
+                    actRec:     4
+                },
+                {
+                    id:         "JustRight", 
+                    actStart:   new Date("2011-1-1"), 
+                    actEnd:     new Date("2011-1-5"),
+                    expStart:   new Date("2012-1-1"), 
+                    expEnd:     new Date("2012-1-5"),
+                    expRec:     5,
+                    actRec:     5
+                }
+            ])
+            .toReturn([
+                {
+                    id:         "TooManyDays", 
+                    actStart:   new Date("2011-1-1"), 
+                    actEnd:     new Date("2011-1-5"),
+                    expStart:   new Date("2012-1-1"), 
+                    expEnd:     new Date("2012-1-4"),
+                    expRec:     4,
+                    actRec:     5,
+                    RAG:        "Red"
+                },
+                {
+                    id:         "TooFewRecruits", 
+                    actStart:   new Date("2011-1-1"), 
+                    actEnd:     new Date("2011-1-4"),
+                    expStart:   new Date("2012-1-1"), 
+                    expEnd:     new Date("2012-1-5"),
+                    expRec:     5,
+                    actRec:     4,
+                    RAG:        "Red"
+                },
+                {
+                    id:         "JustRight", 
+                    actStart:   new Date("2011-1-1"), 
+                    actEnd:     new Date("2011-1-5"),
+                    expStart:   new Date("2012-1-1"), 
+                    expEnd:     new Date("2012-1-5"),
+                    expRec:     5,
+                    actRec:     5,
+                    RAG:        "Green"
+                }
+            ]);
         });
     });
 });
