@@ -443,90 +443,245 @@ describe("Common Operation", function() {
         });
     });
     
-    describe("withTimeTargetRAG", function() {
-        function withRAGValues(studies, map) {
-            return _.map(studies, function(study) {
-                var withRAG = _.clone(study);
-                withRAG.RAG = map[study.id];
-                return withRAG;
-            });
-        }
-        
-        it("should return expected RAG for closed studies", function() {
+    describe("withDurations", function() {
+        it("should calculate expected and actual durations", function() {
             return expectOperation(function(parent) {
-                 return parent.withTimeTargetRAG({
-                     includeAmber: false,
-                     columns: {
-                        actualStartDate: "actStart",
-                        expectedStartDate: "expStart",
-                        actualEndDate: "actEnd",
-                        expectedEndDate: "expEnd",
-                        actualRecruitment : "actRec",
-                        expectedRecruitment: "expRec"
-                    }
-                });
+                return parent.withDurations([
+                    {between: "start", and: "end", in: "numDays"}
+                ]);
             })
             .withInput([
-                {
-                    id:         "TooManyDays", 
-                    actStart:   new Date("2011-1-1"), 
-                    actEnd:     new Date("2011-1-5"),
-                    expStart:   new Date("2012-1-1"), 
-                    expEnd:     new Date("2012-1-4"),
-                    expRec:     4,
-                    actRec:     5
-                },
-                {
-                    id:         "TooFewRecruits", 
-                    actStart:   new Date("2011-1-1"), 
-                    actEnd:     new Date("2011-1-4"),
-                    expStart:   new Date("2012-1-1"), 
-                    expEnd:     new Date("2012-1-5"),
-                    expRec:     5,
-                    actRec:     4
-                },
-                {
-                    id:         "JustRight", 
-                    actStart:   new Date("2011-1-1"), 
-                    actEnd:     new Date("2011-1-5"),
-                    expStart:   new Date("2012-1-1"), 
-                    expEnd:     new Date("2012-1-5"),
-                    expRec:     5,
-                    actRec:     5
-                }
+                {start: new Date("2011-1-1"), end: new Date("2011-1-5")}
             ])
             .toReturn([
-                {
-                    id:         "TooManyDays", 
-                    actStart:   new Date("2011-1-1"), 
-                    actEnd:     new Date("2011-1-5"),
-                    expStart:   new Date("2012-1-1"), 
-                    expEnd:     new Date("2012-1-4"),
-                    expRec:     4,
-                    actRec:     5,
-                    RAG:        "Red"
-                },
-                {
-                    id:         "TooFewRecruits", 
-                    actStart:   new Date("2011-1-1"), 
-                    actEnd:     new Date("2011-1-4"),
-                    expStart:   new Date("2012-1-1"), 
-                    expEnd:     new Date("2012-1-5"),
-                    expRec:     5,
-                    actRec:     4,
-                    RAG:        "Red"
-                },
-                {
-                    id:         "JustRight", 
-                    actStart:   new Date("2011-1-1"), 
-                    actEnd:     new Date("2011-1-5"),
-                    expStart:   new Date("2012-1-1"), 
-                    expEnd:     new Date("2012-1-5"),
-                    expRec:     5,
-                    actRec:     5,
-                    RAG:        "Green"
-                }
+                {start: new Date("2011-1-1"), end: new Date("2011-1-5"), numDays: 4}
             ]);
         });
+    });
+    
+    describe("withRAG", function() {
+        // it("should return expected timeTarget scores for closed studies", function() {
+        //     return expectOperation(function(parent) {
+        //          return parent.withTimeTargetRAG({
+        //              fromColumns: {
+        //                 actualStartDate: "actStart",
+        //                 expectedStartDate: "expStart",
+        //                 actualEndDate: "actEnd",
+        //                 expectedEndDate: "expEnd",
+        //                 actualRecruitment : "actRec",
+        //                 expectedRecruitment: "expRec"
+        //             },
+        //             toColumns: {
+        //                 RAGBanding: "RAG",
+        //                 expectedDays: "expDays",
+        //                 actualDays: "actDays"
+        //             },
+        //             includeAmber: false
+        //         });
+        //     })
+        //     .withInput([
+        //         {
+        //             id:         "TooManyDays", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-5"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-4"),
+        //             expRec:     4,
+        //             actRec:     5
+        //         },
+        //         {
+        //             id:         "TooFewRecruits", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-4"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-5"),
+        //             expRec:     5,
+        //             actRec:     4
+        //         },
+        //         {
+        //             id:         "JustRight", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-5"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-5"),
+        //             expRec:     5,
+        //             actRec:     5
+        //         }
+        //     ])
+        //     .toReturn([
+        //         {
+        //             id:         "TooManyDays", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-5"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-4"),
+        //             expRec:     4,
+        //             actRec:     5,
+        //             expDays:    3,
+        //             actDays:    4,
+        //             RAG:        "Red",
+        //         },
+        //         {
+        //             id:         "TooFewRecruits", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-4"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-5"),
+        //             expRec:     5,
+        //             actRec:     4,
+        //             expDays:    4,
+        //             actDays:    3,
+        //             RAG:        "Red"
+        //         },
+        //         {
+        //             id:         "JustRight", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-5"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-5"),
+        //             expRec:     5,
+        //             actRec:     5,
+        //             expDays:    4,
+        //             actDays:    4,
+        //             RAG:        "Green"
+        //         }
+        //     ]);
+        // });
+        
+        // it("should return expected RAG for open studies", function() {
+        //     return expectOperation(function(parent) {
+        //          return parent.withTimeTargetRAG({
+        //              fromColumns: {
+        //                 actualStartDate: "actStart",
+        //                 expectedStartDate: "expStart",
+        //                 actualEndDate: "actEnd",
+        //                 expectedEndDate: "expEnd",
+        //                 actualRecruitment : "actRec",
+        //                 expectedRecruitment: "expRec"
+        //             },
+        //             toColumns: {
+        //                 RAGBanding: "RAG",
+        //                 RAGScore: "score",
+        //                 expectedDays: "expDays",
+        //                 actualDays: "actDays"
+        //             },
+        //             includeAmber: true
+        //         });
+        //     })
+        //     .withInput([
+        //         {
+        //             id:         "TooManyDays-Amber", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-8"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-11"),
+        //             expRec:     4,
+        //             actRec:     4
+        //         },
+        //         {
+        //             id:         "TooFewRecruits-Amber", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-2"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-2"),
+        //             expRec:     10,
+        //             actRec:     7
+        //         },
+        //         {
+        //             id:         "TooManyDays-Red", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-7"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-11"),
+        //             expRec:     4,
+        //             actRec:     4
+        //         },
+        //         {
+        //             id:         "TooFewRecruits-Red", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-2"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-2"),
+        //             expRec:     10,
+        //             actRec:     6
+        //         },
+        //         {
+        //             id:         "JustRight", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-5"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-5"),
+        //             expRec:     5,
+        //             actRec:     5
+        //         }
+        //     ])
+        //     .toReturn([
+        //         {
+        //             id:         "TooManyDays-Amber", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-8"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-11"),
+        //             expRec:     4,
+        //             actRec:     4,
+        //             expDays:    7,
+        //             actDays:    10,
+        //             score:      0.7,
+        //             RAG:        "Amber"
+        //         },
+        //         {
+        //             id:         "TooFewRecruits-Amber", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-2"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-2"),
+        //             expRec:     10,
+        //             actRec:     7,
+        //             expDays:    1,
+        //             actDays:    1,
+        //             score:      0.7,
+        //             RAG:        "Amber"
+        //         },
+        //         {
+        //             id:         "TooManyDays-Red", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-7"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-11"),
+        //             expRec:     10,
+        //             actRec:     12,
+        //             expDays:    10,
+        //             actDays:    1,
+        //             score:      0.6,
+        //             RAG:        "Red"
+        //         },
+        //         {
+        //             id:         "TooFewRecruits-Red", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-2"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-2"),
+        //             expRec:     10,
+        //             actRec:     6,
+        //             expDays:    1,
+        //             actDays:    1,
+        //             score:      0.6,
+        //             RAG:        "Red"
+        //         },
+        //         {
+        //             id:         "JustRight", 
+        //             actStart:   new Date("2011-1-1"), 
+        //             actEnd:     new Date("2011-1-5"),
+        //             expStart:   new Date("2012-1-1"), 
+        //             expEnd:     new Date("2012-1-5"),
+        //             expRec:     5,
+        //             actRec:     5,
+        //             expDays:    4,
+        //             actDays:    4,
+        //             score:      1,
+        //             RAG:        "Green"
+        //         }
+        //     ]);
+        // });
     });
 });

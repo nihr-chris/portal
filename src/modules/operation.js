@@ -426,51 +426,26 @@ Operation.prototype.union = function(otherOperation) {
     });
 };
 
-
-Operation.prototype.withTimeTargetRAG = function(params) {
-    util.checkArgs(arguments, {
-        includeAmber: Boolean,
-        columns: {
-            actualStartDate: String,
-            expectedStartDate: String,
-            actualEndDate: String,
-            expectedEndDate: String,
-            actualRecruitment : String,
-            expectedRecruitment: String
-        }
-    });
+Operation.prototype.withDurations = function(columns) {
+    util.checkArgs(arguments, Array.of(
+        {between: String, and: String, in: String}
+    ));
     
-    function getRedGreenRating(row) {
-        function columnValue(what) {
-            var columnName = params.columns[what];
-            return row[columnName];
-        }
-        
-        var actualDays = moment(columnValue("actualEndDate"))
-            .diff(columnValue("actualStartDate"));
-            
-        var expectedDays = moment(columnValue("expectedEndDate"))
-            .diff(columnValue("expectedStartDate"));
-        
-        if (actualDays > expectedDays) {
-            return "Red";
-            
-        } else if (columnValue("actualRecruitment") < columnValue("expectedRecruitment")) {
-            return "Red";
-            
-        } else {
-            return "Green";
-        }
-    }
+    var columnMap = util.hashArray("in", columns);
     
     return this.withOperation({
-        inputColumns: _.values(params.fields),
-        addedColumns: ["RAG"],
+        inputColumns: _.map(columns, "between").concat(_.map(columns, "and")),
+        addedColumns: _.map(columns, "in"),
         rowValues: function(row, outputColumn) {
-            return getRedGreenRating(row);
+            var sourceInfo = columnMap[outputColumn];
+            
+            var dateFrom = row[sourceInfo.between];
+            var dateTo = row[sourceInfo.and];
+            
+            return moment(dateTo).diff(dateFrom, "d");
         }
     });
-}
+};
 
 
 module.exports = Operation;

@@ -3,7 +3,7 @@ var schema = require("js-schema");
 
 var hashArray = function(idKey, array) {
     var hash = {};
-    array.forEach(function(x) {
+    _.each(array, function(x) {
         hash[x[idKey]] = x; 
     });
     return hash;
@@ -149,7 +149,7 @@ var merge = function(objects, mergeFn) {
  
 var getter = function(method) {
     return function(x){ return x[method](); };
-}
+};
 
 module.exports = {
     checkArgs: checkArgs,
