@@ -447,5 +447,64 @@ Operation.prototype.withDurations = function(columns) {
     });
 };
 
+Operation.prototype.withTimeTargetRatings = function(params){
+    util.checkArgs(arguments, {
+        partiallyCompleted: Boolean,
+        from: {
+            expectedDays: String,
+            actualDays: String,
+            expectedRecruitment: String,
+            actualRecruitment: String
+        },
+        in: {
+            "?percentCompleted": String,
+            "?targetScore": String,
+            "?combinedScore": String,
+            "?rating": String
+        }
+    });
+
+    function get(row, what) {
+        var column = params.from[what];
+        return row[column];
+    }
+    
+    var measure = {
+        percentCompleted: function(row) {
+            return get(row, "actualDays") / get(row, "expectedDays");
+        },
+        targetScore: function(row) {
+            return get(row, "actualRecruitment") / get(row, "expectedRecruitment");
+        },
+        combinedScore: function(row) {
+            return measure.targetScore(row) / measure.percentCompleted(row);
+        },
+        rating: function(row) {
+            if (params.partiallyCompleted) {
+                var score = measure.combinedScore(row);
+                
+                if (score < 0.7) {
+                    return "Red";
+                } else if (score < 1) {
+                    return "Amber";
+                } else {
+                    return "Green";
+                }
+            }
+        }
+    };
+    
+    var outputMap = _.invert(params.in);
+    
+    return this.withOperation({
+        inputColumns: _.values(params.from),
+        addedColumns: _.values(params.in),
+        rowValues: function(row, outputColumn) {
+            var what = outputMap[outputColumn];
+            return measure[what](row);
+        }
+    });
+};
+
 
 module.exports = Operation;
