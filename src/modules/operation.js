@@ -65,8 +65,9 @@ var operationModule = function(params) {
     });
     addOperations(params.operations);
     
+    
     /**
-     * Returns a submodule of the module it is called on. Submodules inherit
+     * Returns a submodule of the operation module it is called on. Submodules inherit
      * all operations from their parent, along with any other models passed as
      * imports.
      * 
@@ -134,6 +135,7 @@ var operationModule = function(params) {
             }
         });
     };  
+    
     
     /**
      * Private helper method for creating operations that summarize many rows into
@@ -216,342 +218,348 @@ var operationModule = function(params) {
         return this.promise.then(completionHandler, errorHandler);
     };
     
-/**
- * Common operations
- */
-
-Operation.prototype.monthlyRecruitment = function(params) {
-    util.checkArgs(arguments, {
-        forEach: [null, Array.of(String)],
-        from: Date,
-        until: Date
-    });
-    
-    _.defaults(params, {
-        forEach: []
-    });
-    
-    var groupByColumns = params.forEach;
-    var recruitment = this.dataSource.recruitmentTable;
-    
-    return this.childOperation({
-        inputColumns: ["StudyID"],
-        outputColumns: groupByColumns.concat(["Month"]),
-        transform: function(input) {
-            var studyIDs = _.map(input, "StudyID"); 
-    
-            return recruitment.fetch({
-                select: groupByColumns.concat([
-                    "Month", "SUM(MonthRecruitment) AS RecruitmentCount"]),
-                where: [
-                    Fusion.between("Month", params.from, params.until),
-                    Fusion.in("StudyID", studyIDs)
-                ],
-                groupBy: ["Month"].concat(groupByColumns)
-            });
-        }
-    });
-};
-
-Operation.prototype.getHLO1Studies = function(params) {
-    var studyTable = this.dataSource.studyTable;
-    var fields = ["StudyID"];
-    
-    return this.childOperation({
-        inputColumns: [],
-        outputColumns: fields,
-        transform: function() {
-            return studyTable.fetch({
-                select: fields,
-                where: [
-                    Fusion.lt("ActualStartDate", params.endDate),
-                    Fusion.or(Fusion.eql("ActualEndDate", null), Fusion.gte("ActualEndDate", params.startDate))
-                ],
-                groupBy: ["StudyID"]
-            });
-        }
-    });
-};
-
-Operation.prototype.getHLO2Studies = function(params) {
-    var columns = ["StudyID", "TrustID", "FullTitle", "Banding", "ActualStartDate", "ExpectedEndDate", "ActualEndDate"];
-    var studyTable = this.dataSource.studyTable;
-    
-    var conditions = [
-        Fusion.gte("PortfolioQualificationDate", new Date(2010, 3, 1)),
-        Fusion.eql("ProjectStatus", "Blue"),
-        Fusion.notIn("RecruitmentInformationStatus", ["No NHS Support", "Sample Data: No Consent Requested"]),
-    ];
-    
-    if (params.commercial) {
-        conditions.push(Fusion.eql("Commercial", 1));
-    } else {
-        conditions.push(Fusion.eql("Commercial", 0));
-    }
-    
-    if (params.closed) {
-        conditions.push(Fusion.in("ActiveStatus", ["Closed - in follow-up", "Closed - follow-up complete"]));
-        conditions.push(Fusion.between("ActualEndDate", params.startDate, params.endDate));
-    } else {
-        conditions.push(Fusion.eql("ActiveStatus", "Open"));
-        conditions.push(Fusion.gte("ActualStartDate", new Date("2010-04-01")));
-    }
-    
-    return this.childOperation({
-        inputColumns: [],
-        outputColumns: columns,
-        transform: function() {
-            return studyTable.fetch({
-                select: columns,
-                where: conditions
-            });
-        }
-    });
-};
-
-Operation.prototype.withValues = function(fieldMap) {
-    return this.withOperation({
-        addedColumns: _.keys(fieldMap),
-        rowValues: function(row, outputColumn) {
-            return fieldMap[outputColumn];
-        }
-    });
-};
-
-Operation.prototype.withFieldValues = function(fieldMap) {
-    return this.withOperation({
-        inputColumns: _.values(fieldMap),
-        addedColumns: _.keys(fieldMap),
-        rowValues: function(row, outputColumn) {
-            var sourceColumn = fieldMap[outputColumn];
-            return row[sourceColumn];
-        }
-    });
-};
-
-Operation.prototype.withTrustName = function(fieldMap) {
-    var dataSource = this.dataSource;
-    
-    return this.withOperation({
-        inputColumns: _.values(fieldMap),
-        addedColumns: _.keys(fieldMap),
-        rowValues: function(row, outputColumn) {
-            var sourceColumn = fieldMap[outputColumn];
-            return dataSource.trustName(row[sourceColumn]);
-        }
-    });
-};
-
-
-
-Operation.prototype.withFY = function(fieldMap) {
-    return this.withOperation({
-        inputColumns: _.values(fieldMap),
-        addedColumns: _.keys(fieldMap),
-        rowValues: function(row, outputColumn) {
-            var dateColumn = fieldMap[outputColumn];
-            return util.getFY(row[dateColumn]);
-        }
-    });
-};
-
-Operation.prototype.justFields = function(fields) {
-    return this.childOperation({
-        inputColumns: fields,
-        outputColumns: fields,
-        transform: function(rows) {
-            return _.map(rows, function(r) {
-                return _.pick(r, fields);
-            });
-        }
-    });
-};
-
-Operation.prototype.count = function(params) {
-    util.checkArgs(arguments, {
-        valuesFromField: String,
-        inFields: Object,
-        groupBy: Array.of(String)
-    });
-    
-    var valueColumnMap = params.inFields;
-    var countedColumn = params.valuesFromField;
-    
-    return this.summarizeOperation({
-        summarizeColumns: [countedColumn],
-        addedColumns: _.values(valueColumnMap),
-        
-        groupBy: params.groupBy,
-        summarize: function(rows, summary) {
-            _.each(valueColumnMap, function(column) {
-                summary[column] = 0;
-            });
-            
-            _.each(rows, function(row) {
-                var value = row[countedColumn];
-                var sumColumn = valueColumnMap[value];
-                
-                if (sumColumn) {
-                    summary[sumColumn] += 1;
-                    
-                } else {
-                    console.log(value);
-                    console.log(JSON.stringify(row));
-                    throw new Error(
-                        "Unexpected value " + value + " in column " + countedColumn
-                    );
-                }
-            });
-        }
-    });
-};
-
-Operation.prototype.sum = function(params) {
-    util.checkArgs(arguments, {
-        valuesFromField: String,
-        inField: Object,
-        groupBy: Array.of(String)
-    });
-    
-    var totalColumn = params.inField;
-    var summedColumn = params.valuesFromField;
-    
-    return this.summarizeOperation({
-        summarizeColumns: [summedColumn],
-        addedColumns: [summedColumn],
-        
-        groupBy: params.groupBy,
-        summarize: function(rows, summary) {
-            function sumField(total, row) {
-                return total + row[summedColumn];
-            }
-            
-            summary[totalColumn] = _.reduce(rows, sumField, 0);
-        }
-    });
-};
-
-Operation.prototype.accumulate = function(params) {
-    var totalField = params.inField;
-    var summedField = params.field;
-    var groupFields = params.overFields;
-    
-    return this.childOperation({
-        inputColumns: groupFields.concat([summedField]),
-        outputColumns: this.outputColumns.concat([totalField]),
-        transform: function(rows) {
-            var rowGroups = _.groupBy(rows, function(row) {
-                return JSON.stringify(_.pick(row, groupFields));
-            });
-            
-            _.each(rowGroups, function(groupRows) {
-                 var total = 0;
-                 _.each(groupRows, function(row) {
-                     total += row[summedField];
-                     row[totalField] = total;
-                 });
-            });
-            
-            return _.flatten(_.values(rowGroups));
-        }
-    });
-};
-
-Operation.prototype.union = function(otherOperation) {
-    return this.childOperation({
-        inputColumns: otherOperation.outputColumns,
-        outputColumns: otherOperation.outputColumns,
-        transform: function(rows) {
-            return otherOperation.promise.then(function(otherRows) {
-                return _.union(rows, otherRows);
-            });
-        }
-    });
-};
-
-Operation.prototype.withDurations = function(columns) {
-    util.checkArgs(arguments, Array.of(
-        {between: String, and: String, in: String}
-    ));
-    
-    var columnMap = util.hashArray("in", columns);
-    
-    return this.withOperation({
-        inputColumns: _.map(columns, "between").concat(_.map(columns, "and")),
-        addedColumns: _.map(columns, "in"),
-        rowValues: function(row, outputColumn) {
-            var sourceInfo = columnMap[outputColumn];
-            
-            var dateFrom = row[sourceInfo.between];
-            var dateTo = row[sourceInfo.and];
-            
-            return moment(dateTo).diff(dateFrom, "d");
-        }
-    });
-};
-
-Operation.prototype.withTimeTargetRatings = function(params){
-    util.checkArgs(arguments, {
-        partiallyCompleted: Boolean,
-        from: {
-            expectedDays: String,
-            actualDays: String,
-            expectedRecruitment: String,
-            actualRecruitment: String
-        },
-        in: {
-            "?percentCompleted": String,
-            "?targetScore": String,
-            "?combinedScore": String,
-            "?rating": String
-        }
-    });
-
-    function get(row, what) {
-        var column = params.from[what];
-        return row[column];
-    }
-    
-    var measure = {
-        percentCompleted: function(row) {
-            return get(row, "actualDays") / get(row, "expectedDays");
-        },
-        targetScore: function(row) {
-            return get(row, "actualRecruitment") / get(row, "expectedRecruitment");
-        },
-        combinedScore: function(row) {
-            return measure.targetScore(row) / measure.percentCompleted(row);
-        },
-        rating: function(row) {
-            if (params.partiallyCompleted) {
-                var score = measure.combinedScore(row);
-                
-                if (score < 0.7) {
-                    return "Red";
-                } else if (score < 1) {
-                    return "Amber";
-                } else {
-                    return "Green";
-                }
-            }
-        }
-    };
-    
-    var outputMap = _.invert(params.in);
-    
-    return this.withOperation({
-        inputColumns: _.values(params.from),
-        addedColumns: _.values(params.in),
-        rowValues: function(row, outputColumn) {
-            var what = outputMap[outputColumn];
-            return measure[what](row);
-        }
-    });
-};
-    
     return Operation;
 };
-
+    
+/**
+ * Core operations that are available to all modules.
+ */
 module.exports = operationModule({
-    operations: {}
+    operations:{
+        monthlyRecruitment: function(params) {
+            util.checkArgs(arguments, {
+                forEach: [null, Array.of(String)],
+                from: Date,
+                until: Date
+            });
+            
+            _.defaults(params, {
+                forEach: []
+            });
+            
+            var groupByColumns = params.forEach;
+            var recruitment = this.dataSource.recruitmentTable;
+            
+            return this.childOperation({
+                inputColumns: ["StudyID"],
+                outputColumns: groupByColumns.concat(["Month"]),
+                transform: function(input) {
+                    var studyIDs = _.map(input, "StudyID"); 
+            
+                    return recruitment.fetch({
+                        select: groupByColumns.concat([
+                            "Month", "SUM(MonthRecruitment) AS RecruitmentCount"]),
+                        where: [
+                            Fusion.between("Month", params.from, params.until),
+                            Fusion.in("StudyID", studyIDs)
+                        ],
+                        groupBy: ["Month"].concat(groupByColumns)
+                    });
+                }
+            });
+        },
+        
+        getHLO1Studies: function(params) {
+            var studyTable = this.dataSource.studyTable;
+            var fields = ["StudyID"];
+            
+            return this.childOperation({
+                inputColumns: [],
+                outputColumns: fields,
+                transform: function() {
+                    return studyTable.fetch({
+                        select: fields,
+                        where: [
+                            Fusion.lt("ActualStartDate", params.endDate),
+                            Fusion.or(Fusion.eql("ActualEndDate", null), Fusion.gte("ActualEndDate", params.startDate))
+                        ],
+                        groupBy: ["StudyID"]
+                    });
+                }
+            });
+        },
+        
+        getHLO2Studies: function(params) {
+            var columns = ["StudyID", "TrustID", "FullTitle", "Banding", "ActualStartDate", "ExpectedEndDate", "ActualEndDate"];
+            var studyTable = this.dataSource.studyTable;
+            
+            var conditions = [
+                Fusion.gte("PortfolioQualificationDate", new Date(2010, 3, 1)),
+                Fusion.eql("ProjectStatus", "Blue"),
+                Fusion.notIn("RecruitmentInformationStatus", ["No NHS Support", "Sample Data: No Consent Requested"]),
+            ];
+            
+            if (params.commercial) {
+                conditions.push(Fusion.eql("Commercial", 1));
+            } else {
+                conditions.push(Fusion.eql("Commercial", 0));
+            }
+            
+            if (params.closed) {
+                conditions.push(Fusion.in("ActiveStatus", ["Closed - in follow-up", "Closed - follow-up complete"]));
+                conditions.push(Fusion.between("ActualEndDate", params.startDate, params.endDate));
+            } else {
+                conditions.push(Fusion.eql("ActiveStatus", "Open"));
+                conditions.push(Fusion.gte("ActualStartDate", new Date("2010-04-01")));
+            }
+            
+            return this.childOperation({
+                inputColumns: [],
+                outputColumns: columns,
+                transform: function() {
+                    return studyTable.fetch({
+                        select: columns,
+                        where: conditions
+                    });
+                }
+            });
+        },
+        
+        
+        /** Column Operations **/
+        
+        withValues: function(fieldMap) {
+            return this.withOperation({
+                addedColumns: _.keys(fieldMap),
+                rowValues: function(row, outputColumn) {
+                    return fieldMap[outputColumn];
+                }
+            });
+        },
+        
+        withFieldValues: function(fieldMap) {
+            return this.withOperation({
+                inputColumns: _.values(fieldMap),
+                addedColumns: _.keys(fieldMap),
+                rowValues: function(row, outputColumn) {
+                    var sourceColumn = fieldMap[outputColumn];
+                    return row[sourceColumn];
+                }
+            });
+        },
+        
+        withTrustName: function(fieldMap) {
+            var dataSource = this.dataSource;
+            
+            return this.withOperation({
+                inputColumns: _.values(fieldMap),
+                addedColumns: _.keys(fieldMap),
+                rowValues: function(row, outputColumn) {
+                    var sourceColumn = fieldMap[outputColumn];
+                    return dataSource.trustName(row[sourceColumn]);
+                }
+            });
+        },
+        
+        withFY: function(fieldMap) {
+            return this.withOperation({
+                inputColumns: _.values(fieldMap),
+                addedColumns: _.keys(fieldMap),
+                rowValues: function(row, outputColumn) {
+                    var dateColumn = fieldMap[outputColumn];
+                    return util.getFY(row[dateColumn]);
+                }
+            });
+        },
+        
+        withRunningTotal: function(params) {
+            var totalField = params.inField;
+            var summedField = params.field;
+            var groupFields = params.overFields;
+            
+            return this.childOperation({
+                inputColumns: groupFields.concat([summedField]),
+                outputColumns: this.outputColumns.concat([totalField]),
+                transform: function(rows) {
+                    var rowGroups = _.groupBy(rows, function(row) {
+                        return JSON.stringify(_.pick(row, groupFields));
+                    });
+                    
+                    _.each(rowGroups, function(groupRows) {
+                         var total = 0;
+                         _.each(groupRows, function(row) {
+                             total += row[summedField];
+                             row[totalField] = total;
+                         });
+                    });
+                    
+                    return _.flatten(_.values(rowGroups));
+                }
+            });
+        },
+        
+        withDurations: function(columns) {
+            util.checkArgs(arguments, Array.of(
+                {between: String, and: String, in: String}
+            ));
+            
+            var columnMap = util.hashArray("in", columns);
+            
+            return this.withOperation({
+                inputColumns: _.map(columns, "between").concat(_.map(columns, "and")),
+                addedColumns: _.map(columns, "in"),
+                rowValues: function(row, outputColumn) {
+                    var sourceInfo = columnMap[outputColumn];
+                    
+                    var dateFrom = row[sourceInfo.between];
+                    var dateTo = row[sourceInfo.and];
+                    
+                    return moment(dateTo).diff(dateFrom, "d");
+                }
+            });
+        },
+        
+        withTimeTargetRatings: function(params){
+            util.checkArgs(arguments, {
+                partiallyCompleted: Boolean,
+                from: {
+                    expectedDays: String,
+                    actualDays: String,
+                    expectedRecruitment: String,
+                    actualRecruitment: String
+                },
+                in: {
+                    "?percentCompleted": String,
+                    "?targetScore": String,
+                    "?combinedScore": String,
+                    "?rating": String
+                }
+            });
+        
+            function get(row, what) {
+                var column = params.from[what];
+                return row[column];
+            }
+            
+            var measure = {
+                percentCompleted: function(row) {
+                    return get(row, "actualDays") / get(row, "expectedDays");
+                },
+                targetScore: function(row) {
+                    return get(row, "actualRecruitment") / get(row, "expectedRecruitment");
+                },
+                combinedScore: function(row) {
+                    return measure.targetScore(row) / measure.percentCompleted(row);
+                },
+                rating: function(row) {
+                    if (params.partiallyCompleted) {
+                        var score = measure.combinedScore(row);
+                        
+                        if (score < 0.7) {
+                            return "Red";
+                        } else if (score < 1) {
+                            return "Amber";
+                        } else {
+                            return "Green";
+                        }
+                    }
+                }
+            };
+            
+            var outputMap = _.invert(params.in);
+            
+            return this.withOperation({
+                inputColumns: _.values(params.from),
+                addedColumns: _.values(params.in),
+                rowValues: function(row, outputColumn) {
+                    var what = outputMap[outputColumn];
+                    return measure[what](row);
+                }
+            });
+        },
+        
+        justFields: function(fields) {
+            return this.childOperation({
+                inputColumns: fields,
+                outputColumns: fields,
+                transform: function(rows) {
+                    return _.map(rows, function(r) {
+                        return _.pick(r, fields);
+                    });
+                }
+            });
+        },
+        
+        
+        /** Summarizing Operations **/
+    
+        count: function(params) {
+            util.checkArgs(arguments, {
+                valuesFromField: String,
+                inFields: Object,
+                groupBy: Array.of(String)
+            });
+            
+            var valueColumnMap = params.inFields;
+            var countedColumn = params.valuesFromField;
+            
+            return this.summarizeOperation({
+                summarizeColumns: [countedColumn],
+                addedColumns: _.values(valueColumnMap),
+                
+                groupBy: params.groupBy,
+                summarize: function(rows, summary) {
+                    _.each(valueColumnMap, function(column) {
+                        summary[column] = 0;
+                    });
+                    
+                    _.each(rows, function(row) {
+                        var value = row[countedColumn];
+                        var sumColumn = valueColumnMap[value];
+                        
+                        if (sumColumn) {
+                            summary[sumColumn] += 1;
+                            
+                        } else {
+                            console.log(value);
+                            console.log(JSON.stringify(row));
+                            throw new Error(
+                                "Unexpected value " + value + " in column " + countedColumn
+                            );
+                        }
+                    });
+                }
+            });
+        },
+        
+        sum: function(params) {
+            util.checkArgs(arguments, {
+                valuesFromField: String,
+                inField: Object,
+                groupBy: Array.of(String)
+            });
+            
+            var totalColumn = params.inField;
+            var summedColumn = params.valuesFromField;
+            
+            return this.summarizeOperation({
+                summarizeColumns: [summedColumn],
+                addedColumns: [summedColumn],
+                
+                groupBy: params.groupBy,
+                summarize: function(rows, summary) {
+                    function sumField(total, row) {
+                        return total + row[summedColumn];
+                    }
+                    
+                    summary[totalColumn] = _.reduce(rows, sumField, 0);
+                }
+            });
+        },
+        
+        
+        /** Set Operations **/
+        
+        union: function(otherOperation) {
+            return this.childOperation({
+                inputColumns: otherOperation.outputColumns,
+                outputColumns: otherOperation.outputColumns,
+                transform: function(rows) {
+                    return otherOperation.promise.then(function(otherRows) {
+                        return _.union(rows, otherRows);
+                    });
+                }
+            });
+        }
+    }
 });
