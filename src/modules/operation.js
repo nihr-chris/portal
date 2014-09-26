@@ -30,8 +30,10 @@ var Fusion     = require("./fusion.js");
 var operationModule = function(params) {
     util.checkArgs(arguments, {
         imports: [Array, null],
-        operations: {"*": Function}
+        operations: [{"*": Function}, null]
     });
+    
+    _.defaults(params, {imports: [], operations: {}});
     
     var Operation = function(params) {
         util.checkArgs(arguments, {
@@ -45,10 +47,39 @@ var operationModule = function(params) {
         this.promise = params.promise;
     };
     
+    var addOperations = function(map) {
+        _.each(map, function(op, name) {
+            if (Operation.prototype[name] && Operation.prototype[name] !== op) {
+                throw new Error(
+                    "Attempt to add operation " + name
+                    + ", which is already defined in module"
+                );
+            }
+            
+            Operation.prototype[name] = op; 
+        });
+    };
+    
+    _.each(params.imports, function(module) {
+        addOperations(module.prototype);
+    });
+    addOperations(params.operations);
+    
+    /**
+     * Returns a submodule of the module it is called on. Submodules inherit
+     * all operations from their parent, along with any other models passed as
+     * imports.
+     * 
+     * Instead of using prototype inheritance, we just call the function used to
+     * create the root module, merging the inherited operation methods with any
+     * newly-defined ones.
+     */
     Operation.module = function(childParams) {
+        _.defaults(childParams, {imports: [], operations: {}});
+    
         return operationModule({
             imports: params.imports.concat(childParams.imports),
-            operations: util.merge(params.operations, childParams.operations)
+            operations: util.merge([params.operations, childParams.operations])
         });
     };
         
@@ -311,6 +342,8 @@ Operation.prototype.withTrustName = function(fieldMap) {
     });
 };
 
+
+
 Operation.prototype.withFY = function(fieldMap) {
     return this.withOperation({
         inputColumns: _.values(fieldMap),
@@ -515,7 +548,7 @@ Operation.prototype.withTimeTargetRatings = function(params){
         }
     });
 };
-
+    
     return Operation;
 };
 

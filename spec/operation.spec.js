@@ -75,6 +75,131 @@ describe("any Operation", function(){
             });
         });
     });
+    
+    describe("module", function() {
+        var parent, child;
+        
+        beforeEach(function() {
+            var Parent = Operation.module({
+                operations: {
+                    inherited: function() {
+                        return this.childOperation({
+                            inputColumns: [],
+                            outputColumns: [],
+                            transform: function() {
+                                return "inherited!";
+                            }
+                        });
+                    }
+                }
+            });
+            var Imported = Parent.module({
+                operations: {
+                    imported: function() {
+                        return this.childOperation({
+                            inputColumns: [],
+                            outputColumns: [],
+                            transform: function() {
+                                return "imported!";
+                            }
+                        });
+                    }
+                }
+            });
+            var Child = Parent.module({
+                imports: [Imported],
+                operations: {
+                    defined: function() {
+                        return this.childOperation({
+                            inputColumns: [],
+                            outputColumns: [],
+                            transform: function() {
+                                return "defined!";
+                            }
+                        });
+                    }
+                }
+            });
+            
+            parent = mocks.rootOperation([], Parent);
+            child = mocks.rootOperation([], Child);
+        });
+        
+        it("child should inherit the parent module's operations", function() {
+            return child.inherited().onCompleted(function(val) {
+                expect(val).to.eql("inherited!");
+            });
+        });
+        
+        it("child should add its own operations", function() {
+            return child.defined().onCompleted(function(val) {
+                expect(val).to.eql("defined!");
+            });
+        });
+        
+        it("child should add an imported module's operations", function() {
+            return child.imported().onCompleted(function(val) {
+                expect(val).to.eql("imported!");
+            });
+        });
+        
+        it("should raise an error for name clash in imported modules", function() {
+            var A = Operation.module({
+                operations: {
+                    defined: function() {
+                        return this.childOperation({
+                            inputColumns: [],
+                            outputColumns: [],
+                            transform: function() {
+                                return "defined!";
+                            }
+                        });
+                    }
+                }
+            });
+            var B = Operation.module({
+                operations: {
+                    defined: function() {
+                        return this.childOperation({
+                            inputColumns: [],
+                            outputColumns: [],
+                            transform: function() {
+                                return "defined!";
+                            }
+                        });
+                    }
+                }
+            });
+            
+            expect(function() {
+                Operation.module({
+                    imports: [A, B]
+                });
+            }).to.throw(Error);
+        });
+        
+        it("should not raise an error for module imported twice", function() {
+            var A = Operation.module({
+                operations: {
+                    defined: function() {
+                        return this.childOperation({
+                            inputColumns: [],
+                            outputColumns: [],
+                            transform: function() {
+                                return "defined!";
+                            }
+                        });
+                    }
+                }
+            });
+            
+            expect(function() {
+                Operation.module({
+                    imports: [A, A]
+                });
+            }).to.not.throw(Error);
+        });
+    });
 });
 
 describe("Common Operation", function() {

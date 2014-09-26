@@ -67,10 +67,11 @@ var mocks = {
         });
     },
     
-    rootOperation: function(rows) {
+    rootOperation: function(rows, module) {
+        if (!module) module = Operation;
         var columnNames = rows ? _.keys(rows[0]) : [];
         
-        return new Operation({
+        return new module({
             dataSource: mocks.dataSource(),
             outputColumns: columnNames,
             promise: Promise.resolve(rows)
