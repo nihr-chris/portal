@@ -1,41 +1,30 @@
 var Ractive = require("ractive");
-
-require('./components/areachart.js');
-require('./components/dropdown.js');
-require('./components/filter.js');
-require('./components/recruitment.js');
-
-var util = require('./modules/util.js');
-var template = require('template');
+var template = require("template");
 var log = require('loglevel');
 
 log.setLevel("trace");
 
-var reports = [
-    {id: 'overview', title: "Overview"},
-    {id: 'recruitment', title: "Recruitment"},
-    {id: 'timeTarget', title: "Time & Target"}
-];
+require('./components/areachart.js');
+require('./components/dropdown.js');
+require('./components/filter.js');
+require('./components/master-detail.js');
 
-var reportLookup = util.hashArray('id', reports);
-
-var r = new Ractive({
-    el: 'main',
-    template: template("masterDetail"),
+new Ractive.components.masterdetail({
+    el: "#main",
+    template: template("master-detail.html"),
     data: {
-        reports: reports,
-        activeReport: reportLookup['recruitment']
-    },
-    partials: {
-        "timeTarget": template("timeTarget"),
-        "overview": template("overview"),
-        "recruitment": template("recruitment")
-    }
-});
-
-r.on({
-    navbarSelect: function(event) {
-        log.info("selected: " + event.context);
-        this.set('activeReport', event.context);
+        detailElement: "#detail",
+        options: [
+            {
+                title: "Overview", 
+                id: "overview", 
+                component: new Ractive({template: "Overview!"})
+            },
+            {
+                title: "Recruitment", 
+                id: "recruitment", 
+                component: new Ractive({template: "Recruitment!"})
+            }
+        ]
     }
 });

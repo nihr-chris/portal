@@ -14,7 +14,7 @@ module.exports = function(grunt) {
         processhtml: {
             build: {
                 files: {
-                    'build/index.html': ['src/html/main.html']
+                    'build/index.html': ['src/main.html']
                 },
                 options: {
                     includeBase: '.'
@@ -32,7 +32,7 @@ module.exports = function(grunt) {
         },
         browserify: {
             app: {
-                src: ['src/js/main.js'],
+                src: ['src/main.js'],
                 dest: 'build/app.js',
                 options: {
                     alias: ['./build/template.js:template']
