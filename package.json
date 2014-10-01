@@ -22,6 +22,7 @@
     "numeral": "^1.5.3",
     "paths-js": "^0.2.13",
     "promise": "^6.0.0",
+    "ractive": "^0.5.8",
     "simple-filter": "0.0.4",
     "sugar": "^1.4.1",
     "underscore": "^1.7.0"

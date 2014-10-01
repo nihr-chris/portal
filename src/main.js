@@ -1,4 +1,4 @@
-var Ractive = window.Ractive;
+var Ractive = require("ractive");
 
 require('./components/areachart.js');
 require('./components/dropdown.js');

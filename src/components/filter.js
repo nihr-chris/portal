@@ -1,4 +1,4 @@
-var Ractive = window.Ractive;
+var Ractive = require("ractive");
 var template = require("template");
 var log = require("loglevel");
 

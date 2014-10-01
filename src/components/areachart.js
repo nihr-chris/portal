@@ -5,7 +5,7 @@
  * See areachart.model.timeseries.js for a documented example.
  */
  
-var Ractive = window.Ractive;
+var Ractive = require("ractive");
 var template = require("template");
 
 Ractive.components.areachart = Ractive.extend({
