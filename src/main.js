@@ -23,7 +23,7 @@ new Ractive.components.masterdetail({
             {
                 title: "Recruitment", 
                 id: "recruitment", 
-                component: new Ractive({template: "Recruitment!"})
+                component: new Ractive({template: template('recruitment.html')})
             }
         ]
     }
