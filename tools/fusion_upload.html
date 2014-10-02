@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>Upload to NIHR Hub</title>
+        
+        <script>
+            // Replace with Google API key
+            window.APIKey = "AIzaSyApVcaHU-Drez2RpLdOu5AUOZeL6tOq6Lk";
+            window.clientID = "456108084199-keqche7lea1kb1f9m8tmfg17pojul8mc.apps.googleusercontent.com";
+            
+            // Replace with fusion table IDs
+            window.recruitmentTableID = "a";
+            window.studyInfoTableID = "1oCJqdrIiwxSOCnjOirPuWWaFCYJGwMvhNh0ij9hz";
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="col-xs-2"></div>
+            <div class="col-xs-8">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h2>Upload to NIHR portal</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6 dropzone" id="dropRecruitment">
+                        Recruitment
+                    </div>
+                    <div class="col-xs-6 dropzone" id="dropStudyInfo">
+                        Study Info
+                    </div>
+                </div>
+                <div class="row">
+                    <button type="button" class="btn btn-default btn-lg" id="uploadButton" disabled="disabled">
+                        <span class="glyphicon glyphicon-upload"></span>
+                        Upload to Portal
+                    </button>
+                </div>
+            </div>
+            <div class="col-xs-2"></div>
+        </div>
+        
+        <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>  
+        <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
+        <script src="//apis.google.com/js/client.js"></script>
+        
+        <style>
+            .dropzone {
+                height: 100px;
+                background-color: gray;
+            }
+            .dropzone.dropped {
+                background-color: white;
+            }
+        </style>
+        
+        <script>
+            "use strict";
+            
+            var gapi = window.gapi;
+            var pickedFiles = {};
+        
+            function bindFilePicker(elementID, callback) {
+                function handleFileSelect(evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    
+                    var files = evt.dataTransfer.files;
+                    
+                    if (files.length === 1) {
+                        document.getElementById(elementID).classList.add("dropped");
+                        
+                        var reader = new FileReader();
+                        reader.onload = function() {
+                            callback(reader.result);
+                        };
+                        
+                        reader.readAsText(files[0]);
+                    }
+                }
+                
+                function handleDragOver(evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    
+                    var files = evt.dataTransfer.items;
+                    if (files.length === 1) {
+                        evt.dataTransfer.dropEffect = 'copy';
+                    } else {
+                        evt.dataTransfer.dropEffect = 'none';
+                    }
+                }
+                
+                var dropZone = document.getElementById(elementID);
+                
+                dropZone.addEventListener('dragover', handleDragOver, false);
+                dropZone.addEventListener('drop', handleFileSelect, false);
+            }
+            
+            function filePickedHandler(tableID) {
+                return function(dataURL) {
+                    pickedFiles[tableID] = dataURL;
+                    updateUploadButton();
+                };
+            }
+            
+            function updateUploadButton() {
+                if (pickedFiles[window.recruitmentTableID] && pickedFiles[window.studyInfoTableID]) {
+                    var uploadButton = document.getElementById("uploadButton");
+                    uploadButton.disabled = false;
+                    uploadButton.addEventListener('click', uploadClickedHandler);
+                }
+            }
+            
+            function replaceTableContent(auth, table) {
+                console.log(pickedFiles[table]);
+                
+                return gapi.client.request({
+                    path: "fusiontables/v1/query",
+                    method: "POST",
+                    params: {sql: "DELETE FROM " + table}
+                })
+                .then(function() {
+                    return gapi.client.request({
+                        path: "upload/fusiontables/v1/tables/" + table + "/import",
+                        method: "POST",
+                        params: {uploadType: "media", startLine: 1},
+                        headers: {"Content-type": "application/octet-stream"},
+                        body: pickedFiles[table]
+                    });
+                })
+                .then(undefined, function(error) {
+                    console.log(error);
+                    window.alert("update failed");
+                });
+            }
+            
+            function uploadClickedHandler() {
+                authorizeAPICall(function(auth) {
+                    // replaceTableContent(auth, window.recruitmentTableID);
+                    replaceTableContent(auth, window.studyInfoTableID);
+                });
+            }
+            
+            function authorizeAPICall(makeApiCall) {
+                function handleAuthResult(authResult) {
+                    if (authResult && !authResult.error) {
+                        makeApiCall(authResult.access_token);
+                    } else {
+                        window.alert("Failed to authorize request: " + authResult.error);
+                    }
+                }
+                
+                function checkAuth() {
+                    gapi.auth.authorize({
+                        client_id: window.clientID, 
+                        scope: "https://www.googleapis.com/auth/fusiontables", 
+                        immediate: false
+                    }, handleAuthResult);
+                }
+                
+                gapi.client.setApiKey(window.APIKey);
+                window.setTimeout(checkAuth,1);
+            }
+
+            bindFilePicker("dropRecruitment", filePickedHandler(window.recruitmentTableID));
+            bindFilePicker("dropStudyInfo", filePickedHandler(window.studyInfoTableID));
+        </script>
+    </body>
+</html>
