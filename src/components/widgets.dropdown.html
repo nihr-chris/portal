@@ -1,0 +1,17 @@
+<li class="dropdown">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{selected}} <span class="caret"></span></a>
+    <ul class="dropdown-menu" role="menu">
+        {{# items}}
+            {{# this === selected}}
+            <li class="active">
+                <a href="#">this</a>
+            </li>
+            {{/#}}
+            {{# this !== selected}}
+            <li>
+                <a href="#" on-click="select">this</a>
+            </li>
+            {{/#}}
+        {{/#}}
+    </ul>
+</li>

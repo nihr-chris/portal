@@ -5,9 +5,10 @@ var log = require('loglevel');
 log.setLevel("trace");
 
 require('./components/areachart.js');
-require('./components/dropdown.js');
+require('./components/widgets.js');
 require('./components/filter.js');
 require('./components/master-detail.js');
+require('./components/recruitmentPerformance-yy.js');
 
 new Ractive.components.masterdetail({
     el: "#main",
