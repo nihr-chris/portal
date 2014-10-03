@@ -11,56 +11,117 @@
             window.clientID = "456108084199-keqche7lea1kb1f9m8tmfg17pojul8mc.apps.googleusercontent.com";
             
             // Replace with fusion table IDs
-            window.recruitmentTableID = "a";
-            window.studyInfoTableID = "1oCJqdrIiwxSOCnjOirPuWWaFCYJGwMvhNh0ij9hz";
+            window.recruitmentTableID = "1d2jWepLCN4cgsrL1KpMVdqSwQBWbsQdej84ei8Pr";
+            window.studyInfoTableID = "15Hjojdr2KMMR9P50TABJpU-h-4RwniraR-pOINU9";
         </script>
+        
+        <style>
+            .dropzone {
+                height: 100px;
+            }
+            .dropzone.dropped {
+                background-color: white;
+            }
+            .hidden {
+                display: none;
+            }
+            .well {
+                text-align: center;
+            }
+            .status {
+                text-align: right;
+            }
+            .spacer-top {
+                height: 40px;
+            }
+            .well-offset {
+                height: 10px;
+            }
+        </style>
     </head>
     <body>
         <div class="container">
             <div class="col-xs-2"></div>
             <div class="col-xs-8">
-                <div class="row">
-                    <div class="col-xs-12">
-                        <h2>Upload to NIHR portal</h2>
-                    </div>
+                
+                <div class="row spacer-top"></div>
+                
+                <div class="alert alert-danger hidden" id="alert">
+                    Oh no
                 </div>
-                <div class="row">
-                    <div class="col-xs-6 dropzone" id="dropRecruitment">
-                        Recruitment
+            
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <strong>Upload to NIHR portal</strong>
                     </div>
-                    <div class="col-xs-6 dropzone" id="dropStudyInfo">
-                        Study Info
+                    
+                    <div class="panel-body">
+                        <h6 id="prompt">
+                            Drop .csv files onto wells
+                        </h6>
+                        <div class="row well-offset"></div>
+                        <div class="row">
+                            <div class="col-xs-1"></div>
+                            <div class="col-xs-4 dropzone well" id="dropRecruitment">
+                                <span class="glyphicon glyphicon-file"></span>
+                                Recruitment
+                            </div>
+                            <div class="col-xs-2"></div>
+                            <div class="col-xs-4 dropzone well" id="dropStudyInfo">
+                                <span class="glyphicon glyphicon-file"></span>
+                                Study Info
+                            </div>
+                            <div class="col-xs-1" id="dropRecruitment"></div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <button type="button" class="btn btn-primary" id="uploadButton" disabled="disabled">
+                                    <span class="glyphicon glyphicon-upload"></span>
+                                    Upload
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <button type="button" class="btn btn-default btn-lg" id="uploadButton" disabled="disabled">
-                        <span class="glyphicon glyphicon-upload"></span>
-                        Upload to Portal
-                    </button>
                 </div>
             </div>
-            <div class="col-xs-2"></div>
         </div>
         
         <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>  
         <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
         <script src="//apis.google.com/js/client.js"></script>
         
-        <style>
-            .dropzone {
-                height: 100px;
-                background-color: gray;
-            }
-            .dropzone.dropped {
-                background-color: white;
-            }
-        </style>
-        
         <script>
             "use strict";
             
             var gapi = window.gapi;
             var pickedFiles = {};
+            
+            function setVisible(elementID, visible, callback) {
+                var elem = document.getElementById(elementID);
+                
+                if (visible) {
+                    elem.classList.remove("hidden");
+                } else {
+                    elem.classList.add("hidden");
+                }
+                
+                if (callback) callback(elem);
+            }
+            
+            function alert(text) {
+                setVisible("alert", true, function(elem) {
+                    elem.innerHTML = text;
+                });
+            }
+            
+            function hideAlert() {
+                setVisible("alert", false);
+            }
+            
+            function setPrompt(text) {
+                document.getElementById("prompt").textContent = text;
+            }
         
             function bindFilePicker(elementID, callback) {
                 function handleFileSelect(evt) {
@@ -108,6 +169,8 @@
             
             function updateUploadButton() {
                 if (pickedFiles[window.recruitmentTableID] && pickedFiles[window.studyInfoTableID]) {
+                    setPrompt("Ready to upload");
+            
                     var uploadButton = document.getElementById("uploadButton");
                     uploadButton.disabled = false;
                     uploadButton.addEventListener('click', uploadClickedHandler);
@@ -115,41 +178,78 @@
             }
             
             function replaceTableContent(auth, table) {
-                console.log(pickedFiles[table]);
+                function deleteAll() {
+                    return gapi.client.request({
+                        path: "fusiontables/v1/query",
+                        method: "POST",
+                        params: {sql: "DELETE FROM " + table}
+                    });
+                }
                 
-                return gapi.client.request({
-                    path: "fusiontables/v1/query",
-                    method: "POST",
-                    params: {sql: "DELETE FROM " + table}
-                })
-                .then(function() {
+                function insert() {
                     return gapi.client.request({
                         path: "upload/fusiontables/v1/tables/" + table + "/import",
                         method: "POST",
                         params: {uploadType: "media", startLine: 1},
-                        headers: {"Content-type": "application/octet-stream"},
+                        headers: {"Content-Type": "application/octet-stream"},
                         body: pickedFiles[table]
                     });
-                })
-                .then(undefined, function(error) {
-                    console.log(error);
-                    window.alert("update failed");
+                }
+                
+                return gapi.client.request({
+                    path: "fusiontables/v1/query",
+                    params: {sql: "SELECT * FROM " + table}
+                    
+                }).then(function(response){
+                    var result = JSON.parse(response.body);
+                    
+                    if (result.rows.length > 0) {
+                        return insert();
+                    } else {
+                        return deleteAll().then(insert);
+                    }
                 });
             }
             
             function uploadClickedHandler() {
+                hideAlert();
+                setPrompt("Uploading...");
+                
                 authorizeAPICall(function(auth) {
-                    // replaceTableContent(auth, window.recruitmentTableID);
-                    replaceTableContent(auth, window.studyInfoTableID);
+                    Promise.all([
+                        replaceTableContent(auth, window.recruitmentTableID),
+                        replaceTableContent(auth, window.studyInfoTableID)
+                    ]).then(
+                        function() {
+                            setPrompt("Done!");
+                        },
+                        function(error){
+                            console.log(error);
+                            var body = JSON.parse(error.body);
+                            alert(
+                                "<strong>Failed to upload data to hub. </strong>"
+                                + body.error.errors[0].message
+                            );
+                            
+                            setPrompt("Ready to upload...");
+                        }
+                    )
+                    .then(undefined, function() {
+                        alert(
+                            "<strong>Something went wrong. </strong> See console for details"
+                        );
+                    });
                 });
             }
             
             function authorizeAPICall(makeApiCall) {
                 function handleAuthResult(authResult) {
+                    console.log(authResult);
+                    
                     if (authResult && !authResult.error) {
                         makeApiCall(authResult.access_token);
                     } else {
-                        window.alert("Failed to authorize request: " + authResult.error);
+                        throw authResult.error;
                     }
                 }
                 
@@ -167,6 +267,8 @@
 
             bindFilePicker("dropRecruitment", filePickedHandler(window.recruitmentTableID));
             bindFilePicker("dropStudyInfo", filePickedHandler(window.studyInfoTableID));
+            
+            setPrompt("Drop .csv files for each report onto the wells.");
         </script>
     </body>
 </html>
