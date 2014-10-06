@@ -1,5 +1,6 @@
 var Ractive = require("ractive");
 var template = require('template');
+var _ = require("underscore");
 
 Ractive.components.dropdown = Ractive.extend({
     isolated: true,
@@ -12,7 +13,22 @@ Ractive.components.dropdown = Ractive.extend({
             component.set("selected", event.context);
         });
         
-        component.set("selected", component.get("items")[0]);
+        var ensureOneItemIsSelected = function(items) {
+            if (!items) return;
+            
+            var selectedItem = component.get("selected");
+            
+            if (!selectedItem || !_.contains(items, selectedItem)) {
+                component.set("selectedItem", items[0]);
+            }
+        };
+        
+        component.observe("items", ensureOneItemIsSelected);
+        ensureOneItemIsSelected(component.get("items"));
+    },
+    
+    data: {
+        format: function(x){ return x; }
     }
 });
 

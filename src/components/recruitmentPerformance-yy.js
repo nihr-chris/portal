@@ -1,34 +1,30 @@
 var Ractive = require("ractive");
 var template = require("template");
+var _ = require("underscore");
+var timeseries = require("../modules/timeseries.js");
 
 Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     template: template("recruitmentPerformance-yy.html"),
     
-    init: function() {
-        this.on("dropdown.select", function() {
-             
-        });
-    },
-    
     data: {
-        filterTypes: [
-            {label: "By Trust"}, 
-            {label: "By Specialty"}, 
-            {label: "By Division"}
+        filterModeOptions:  [
+            "By Trust",
+            "By Division",
+            "By Specialty"
         ],
-        filterTypeIdx: 0,
+        filterMode: "By Trust",
         
-        commercialOptions: [
-            {label: "Commercial"}, 
-            {label: "Noncommercial"}, 
-            {label: "Both"}
+        commercialOptions:  [
+            "Commercial & Noncommercial",
+            "Commercial Only",
+            "Noncommercial Only"
         ],
-        commercialOptionIdx: 0,
+        commercial: "Commercial & Noncommercial",
         
-        weightingOptions: [
-            {label: "Unweighted"}, 
-            {label: "Weighted"}
-        ],
-        weightingOptionIdx: 0
+        weighted: true,
+        
+        fetchData: function() {
+            return timeseries([])
+        },
     }
 });

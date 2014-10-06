@@ -1,7 +1,14 @@
-<ul class="nav nav-pills">
-    <dropdown items='{{ ["a", "b", "c"] }}' selected='a'></dropdown>
-    <dropdown items='{{ ["a", "b", "c"] }}' selected='a'></dropdown>
-    <toggle label="toggle"></toggle>
-</ul>
-
-<areachart data="{{ fetchData() }}"
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Annual recruitment performance
+    </div>
+    <div class="panel-body">
+        <ul class="nav nav-pills">
+            <dropdown items="{{filterModeOptions}}" selected="{{filterMode}}"></dropdown>
+            <dropdown items="{{commercialOptions}}" selected="{{commercial}}"></dropdown>
+            <toggle label="Weighted" value="{{weighted}}"></toggle>
+        </ul>
+        
+        <areachart data="{{ fetchData(chartFilter, weighted) }}"></areachart>
+    </div>
+</div>
