@@ -1,14 +1,21 @@
-<div class="panel panel-default">
-    <div class="panel-heading">
-        Annual recruitment performance
-    </div>
-    <div class="panel-body">
-        <ul class="nav nav-pills">
-            <dropdown items="{{filterModeOptions}}" selected="{{filterMode}}"></dropdown>
-            <dropdown items="{{commercialOptions}}" selected="{{commercial}}"></dropdown>
-            <toggle label="Weighted" value="{{weighted}}"></toggle>
-        </ul>
+<panel title="Annual recruitment performance">
+    <controlbar>
+        <dropdown items="{{filterModeOptions}}" selected="{{filterMode}}"></dropdown>
+        <dropdown items="{{commercialOptions}}" selected="{{commercial}}"></dropdown>
+        <toggle label="Weighted" value="{{weighted}}"></toggle>
+    </controlbar>
+    
+    <style>
         
-        <areachart data="{{ fetchData(chartFilter, weighted) }}"></areachart>
-    </div>
-</div>
+        text: {
+          font-family: sans-serif;
+        }
+    </style>
+    
+    <barchart
+        data='{{exampledata}}'
+        y-label=''
+        group-spacing='10'>
+        
+    </barchart>
+</panel>

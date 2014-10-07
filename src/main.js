@@ -4,28 +4,12 @@ var log = require('loglevel');
 
 log.setLevel("trace");
 
-require('./components/areachart.js');
 require('./components/widgets.js');
 require('./components/filter.js');
 require('./components/master-detail.js');
+require('./components/groupedbar.js');
 require('./components/recruitmentPerformance-yy.js');
 
-new Ractive.components.masterdetail({
-    el: "#main",
-    template: template("master-detail.html"),
-    data: {
-        detailElement: "#detail",
-        options: [
-            {
-                title: "Overview", 
-                id: "overview", 
-                component: new Ractive({template: template('overview.html')})
-            },
-            {
-                title: "Recruitment", 
-                id: "recruitment", 
-                component: new Ractive({template: template('recruitment.html')})
-            }
-        ]
-    }
+new Ractive.components.recruitmentPerformanceYY({
+    el: "#main"
 });

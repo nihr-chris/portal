@@ -50,3 +50,19 @@ Ractive.components.toggle = Ractive.extend({
         label: ""
     }
 });
+
+Ractive.components.panel = Ractive.extend({
+    template: template("widgets.panel.html")
+});
+
+Ractive.components.controlbar = Ractive.extend({
+    template: "<ul class='nav nav-pills'> {{yield}} </ul>"
+});
+
+Ractive.components.row = Ractive.extend({
+    template: "<div class='row'> {{yield}} </div>"
+});
+
+Ractive.components.column = Ractive.extend({
+    template: "<div class='column-xs-{{size ? size : 12}}'> {{yield}} </div>"
+});
