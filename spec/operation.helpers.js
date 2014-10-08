@@ -18,7 +18,7 @@ module.exports = {
         }
         
         function expectation(input, query, tableName, stubValues, expectedResult, expectedError) {
-            var parent = mocks.rootOperation(input);
+            var parent = mocks.rootOperation(input, module);
             
             if (tableName && stubValues) {
                 var stubParams = _.clone(query);

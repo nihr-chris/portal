@@ -7,49 +7,46 @@ var Fusion      = require("./fusion.js");
 module.exports = Operation.module({
     operations: {
     
-        /** Fetch total monthly recruitment plus weighting information,
-         *  by division, specialty or trust. */
+        /** Fetch total monthly recruitment by study banding, also grouped by
+         *  by division, specialty or trust. 
+         * 
+         *  Primarily useful for producing reports on weighted recruitment.
+         */
          
-        fetchRecruitment: function(params) {
+        fetchBandedRecruitment: function(params) {
             util.checkArgs(arguments, {
                 by: ["division", "specialty", "trust"],
                 commercialStudies: [Boolean, null]
             });
+                    
+            var groupBy = [
+                "Banding",
+                "MonthEndDate"
+            ];
+                    
+            switch (params.by) {
+                case "division":    groupBy.push("MainReportingDivision"); break;
+                case "specialty":   groupBy.push("MainSpecialty"); break;
+                case "trust":       groupBy.push("TrustGroupName"); break;
+            }
             
             var filter = [];
             if (!_.isNull(params.commercialStudies) && !_.isUndefined(params.commercialStudies)) {
                 filter.push(params.commercialStudies ? Fusion.eql("Commercial", 1) : Fusion.eql("Commercial", 0));
             }
             
-            var groupColumn;
-            switch (params.by) {
-                case "division":    groupColumn = "MainReportingDivision"; break;
-                case "specialty":   groupColumn = "MainSpecialty"; break;
-                case "trust":       groupColumn = "TrustGroupName"; break;
-            }
-            
-            var relevantColumns = [
-                "Banding",
-                "MonthEndDate",
-                "TrustGroupName",
-                "Commercial",
-                "FullTitle",
-                "MainSpecialty",
-                "MainReportingDivision"
-            ];
-            
-            var unaggregatedColumns = _.without(relevantColumns, groupColumn);
-            
-            return this.query({
-                    select: unaggregatedColumns.concat(["SUM(Recruitment) AS MonthRecruitment"]),
-                    where: filter,
-                    from: this.recruitmentPerformanceViewID,
-                    groupBy: unaggregatedColumns
-                })
-                .withFieldValues({
-                    "Grouping": groupColumn
-                })
-                ;
+            var dataSource = this.dataSource;
+            return this.childOperation({
+                inputColumns: [],
+                outputColumns: groupBy.concat(["MonthRecruitment"]),
+                transform: function() {
+                        return dataSource.recruitmentTable.fetch({
+                        select: groupBy.concat(["SUM(Recruitment) AS MonthRecruitment"]),
+                        where: filter,
+                        groupBy: groupBy
+                    });
+                }
+            });
         },
         
         performanceDataYY: function(weighted) {
