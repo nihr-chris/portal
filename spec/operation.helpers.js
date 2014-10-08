@@ -51,7 +51,7 @@ module.exports = {
                         andReturnQueryResults: function() {
                             return expectation(input, query, table, result, result);
                         },
-                        andReturnResult: function(expectedResult) {
+                        andReturn: function(expectedResult) {
                             return expectation(input, query, table, result, expectedResult);
                         }
                     };

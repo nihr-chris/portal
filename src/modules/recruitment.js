@@ -18,17 +18,18 @@ module.exports = Operation.module({
                 by: ["division", "specialty", "trust"],
                 commercialStudies: [Boolean, null]
             });
-                    
-            var groupBy = [
+              
+            var mainGroupingColumn;
+            switch (params.by) {
+                case "division":    mainGroupingColumn = "MainReportingDivision"; break;
+                case "specialty":   mainGroupingColumn = "MainSpecialty"; break;
+                case "trust":       mainGroupingColumn = "TrustGroupName"; break;
+            }
+            
+            var groupBy = [mainGroupingColumn].concat([
                 "Banding",
                 "MonthEndDate"
-            ];
-                    
-            switch (params.by) {
-                case "division":    groupBy.push("MainReportingDivision"); break;
-                case "specialty":   groupBy.push("MainSpecialty"); break;
-                case "trust":       groupBy.push("TrustGroupName"); break;
-            }
+            ]);
             
             var filter = [];
             if (!_.isNull(params.commercialStudies) && !_.isUndefined(params.commercialStudies)) {
@@ -46,10 +47,14 @@ module.exports = Operation.module({
                         groupBy: groupBy
                     });
                 }
-            });
+            })
+            .withFieldValues({
+                Grouping: mainGroupingColumn
+            })
+            .justFields(["MonthRecruitment", "Banding", "MonthEndDate", "Grouping"]);
         },
         
-        performanceDataYY: function(weighted) {
+        recruitmentPerformanceData: function(weighted) {
             return this.withFY({
                 FY: "MonthEndDate"
                 
