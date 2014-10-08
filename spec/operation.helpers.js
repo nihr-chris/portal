@@ -49,7 +49,6 @@ module.exports = {
                 onTable: function(table) {
                     return {
                         andReturnQueryResults: function() {
-                            var result = "RESULT";
                             return expectation(input, query, table, result, result);
                         },
                         andReturnResult: function(expectedResult) {
@@ -63,7 +62,11 @@ module.exports = {
         function operationExpectationWithInput(input) {
             return {
                 toMakeQuery: function(query) {
-                    return expectOperationWithInputToMakeQuery(input, query);
+                    var next = expectOperationWithInputToMakeQuery(input, query, "RESULT");
+                    next.withStubbedResult = function(result) {
+                        return expectOperationWithInputToMakeQuery(input, query, result);
+                    };
+                    return next;
                 },
                 toReturn: function(value) {
                     return expectation(input, null, null, null, value);
