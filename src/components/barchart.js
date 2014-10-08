@@ -28,8 +28,8 @@ Ractive.components.barchart = Ractive.extend({
         var yPad = 60;
         
         var allBarData = _.flatten(_.map(data, "values"), true);
-        var allXValues = _.uniq(_.map(allBarData, function(pair){ return pair[0] }));
-        var allYValues = _.uniq(_.map(allBarData, function(pair){ return pair[1] }));
+        var allXValues = _.uniq(_.map(allBarData, function(d){ return d.key }));
+        var allYValues = _.uniq(_.map(allBarData, function(d){ return _.reduce(d.values, function(memo, x){ return memo + x.value }, 0) }));
         
         var width = this.get("width");
         var height = this.get("height");
@@ -104,22 +104,44 @@ Ractive.components.barchart = Ractive.extend({
         
         group.selectAll("rect")
             .data(function(d){ return d.values})
-            .enter()
-                .append("rect")
+            .enter().append("rect")
                 .attr("class", "bar")
                 .attr("x", function(d) { 
-                    return x1(d[0]);
+                    return x1(d.key);
                 })
                 .attr("y", function(d){ 
-                    return y(d[1]);
+                    return y(d.values[0].value);
                 })
                 .attr("width", function(){
                     return x1.rangeBand();
                 })
                 .attr("height", function(d){ 
-                    return height - y(d[1]);
+                    return height - y(d.values[0].value);
                 })
             ;
+            
+        // var legend = chart.selectAll(".legend")
+        //     .data(series.slice().reverse())
+        //     .enter().append("g")
+        //         .attr("class", "legend")
+        //         .attr("transform", function(d, i) {
+        //             return "translate(0," + i * 20 + ")";
+        //         });
+
+        // legend.append("rect")
+        //     .attr("x", width - 18)
+        //     .attr("width", 18)
+        //     .attr("height", 18)
+        //     .style("fill", color);
+
+        // legend.append("text")
+        //     .attr("x", width - 24)
+        //     .attr("y", 9)
+        //     .attr("dy", ".35em")
+        //     .style("text-anchor", "end")
+        //     .text(function(d) {
+        //         return d;
+        //     });
     },
     
     data: {

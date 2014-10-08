@@ -7,7 +7,7 @@ log.setLevel("trace");
 require('./components/widgets.js');
 require('./components/filter.js');
 require('./components/master-detail.js');
-require('./components/groupedbar.js');
+require('./components/barchart.js');
 require('./components/recruitmentPerformance-yy.js');
 
 new Ractive.components.recruitmentPerformanceYY({

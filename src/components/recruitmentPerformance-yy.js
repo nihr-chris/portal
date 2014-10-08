@@ -24,9 +24,39 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
         weighted: true,
         
         exampledata: [
-            {key: "Guy's", values: [[2001, 1], [2002, 2], [2003, 3]]},
-            {key: "Kings", values: [[2001, 5], [2002, 4], [2003, 3]]},
-            {key: "Croydon", values: [[2001, 2], [2002, 2], [2003, 3]]}
+            {
+                key: "Guy's", 
+                values: [
+                    {
+                        key: 2001,
+                        values: [
+                            {color: "#000", value: 5},
+                        ]
+                    },
+                    {
+                        key: 2002,
+                        values: [
+                            {color: "#000", value: 8},
+                        ]
+                    },
+                ]
+            }, {
+                key: "King's", 
+                values: [
+                    {
+                        key: 2001,
+                        values: [
+                            {color: "#000", value: 2},
+                        ]
+                    },
+                    {
+                        key: 2002,
+                        values: [
+                            {color: "#000", value: 1},
+                        ]
+                    },
+                ]
+            }
         ]
     }
 });
