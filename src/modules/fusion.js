@@ -56,6 +56,8 @@ Fusion.prototype.fetch = function(query) {
     });
 };
 
+Fusion.recruitmentTable = "__recruitmentTable__";
+
 Fusion.eql = function(field, x) {
     return field + " = " + encodeQueryParam(x);
 };

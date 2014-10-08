@@ -2,10 +2,21 @@ var expect      = require('chai').expect;
 var assert      = require('chai').assert;
 var _           = require("underscore");
 
+var Operation   = require("../src/modules/operation.js");
 var mocks       = require("./mocks.js");
 
 module.exports = {
-    expectOperation: function (makeOperation) {
+    expectOperation: function () {
+        var makeOperation, module;
+            
+        if (arguments.length == 1) {
+            module = Operation;
+            makeOperation = arguments[0];
+        } else {
+            module = arguments[0];
+            makeOperation = arguments[1];
+        }
+        
         function expectation(input, query, tableName, stubValues, expectedResult, expectedError) {
             var parent = mocks.rootOperation(input);
             
@@ -33,38 +44,40 @@ module.exports = {
             }
         }
         
-        function expectOperationWithInputToMakeQuery(input, query) {
+        function expectOperationWithInputToMakeQuery(input, query, result) {
             return {
                 onTable: function(table) {
                     return {
                         andReturnQueryResults: function() {
                             var result = "RESULT";
                             return expectation(input, query, table, result, result);
+                        },
+                        andReturnResult: function(expectedResult) {
+                            return expectation(input, query, table, result, expectedResult);
                         }
                     };
                 }
             };
         }
         
-        // Todo: these functions are chained to customize the expectation.
-        // Could probably be made less ugly.
-        return {
-            toMakeQuery: function(query) {
-                return expectOperationWithInputToMakeQuery(null, query);
-            },
-            withInput: function(input) {
-                return {
-                    toMakeQuery: function(query) {
-                        return expectOperationWithInputToMakeQuery(input, query);
-                    },
-                    toReturn: function(value) {
-                        return expectation(input, null, null, null, value);
-                    },
-                    toFailWithError: function(error) {
-                        return expectation(input, null, null, null, null, error);
-                    }
+        function operationExpectationWithInput(input) {
+            return {
+                toMakeQuery: function(query) {
+                    return expectOperationWithInputToMakeQuery(input, query);
+                },
+                toReturn: function(value) {
+                    return expectation(input, null, null, null, value);
+                },
+                toFailWithError: function(error) {
+                    return expectation(input, null, null, null, null, error);
                 }
-            }
+            };
+        }
+        
+        var next = operationExpectationWithInput([]);
+        next.withInput = function(input) {
+            return operationExpectationWithInput(input);
         };
+        return next;
     }
 };
