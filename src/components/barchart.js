@@ -4,26 +4,27 @@ var _ = require('underscore');
 var util = require ('../modules/util.js');
 
 Ractive.components.barchart = Ractive.extend({
-    template: "<div class='multibar' id='multibar{{ makeID() }}'></div>",
+    template: "<div class='chart barchart' id='multibar{{ makeID() }}'></div>",
     
     init: function() {
         var component = this;
         var observedKeys ='data height group-spacing x-format y-format stacked';
         
         component.observe(observedKeys, function(oldval, newval) {
-            if (newval) {
-                component.update(component.get("data"));
-            }
+            if (newval && oldval) component.renderGraph();
         });
         
-        component.renderGraph(component.get("data"));
+        component.renderGraph();
     },
     
     elementID: function() {
         return _.keys(this.nodes)[0];
     },
     
-    renderGraph: function(data) {
+    renderGraph: function() {
+        var data = this.get("data") || [];
+        var legendData = this.get("legend") || [];
+        
         var xPad = 50;
         var yPad = 60;
         
@@ -60,7 +61,7 @@ Ractive.components.barchart = Ractive.extend({
             .domain(allXValues)
             .rangeRoundBands([0, x0.rangeBand()])
             ;
-            
+        
         
         // Axes
         
@@ -118,35 +119,37 @@ Ractive.components.barchart = Ractive.extend({
                 .attr("height", function(d){ 
                     return height - y(d.values[0].value);
                 })
+                .style("fill", function(d){ return d.values[0].color; })
             ;
             
-        // var legend = chart.selectAll(".legend")
-        //     .data(series.slice().reverse())
-        //     .enter().append("g")
-        //         .attr("class", "legend")
-        //         .attr("transform", function(d, i) {
-        //             return "translate(0," + i * 20 + ")";
-        //         });
+            
+        // Legend
+            
+        var legend = chart.selectAll(".legend")
+            .data(legendData)
+            .enter().append("g")
+                .attr("class", "legend")
+                .attr("transform", function(d, i) {
+                    return "translate(0," + i * 20 + ")";
+                });
 
-        // legend.append("rect")
-        //     .attr("x", width - 18)
-        //     .attr("width", 18)
-        //     .attr("height", 18)
-        //     .style("fill", color);
+        legend.append("rect")
+            .attr("x", width - 18)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", function(d){ return d.color; });
 
-        // legend.append("text")
-        //     .attr("x", width - 24)
-        //     .attr("y", 9)
-        //     .attr("dy", ".35em")
-        //     .style("text-anchor", "end")
-        //     .text(function(d) {
-        //         return d;
-        //     });
+        legend.append("text")
+            .attr("x", width - 24)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text(function(d){ return d.key });
     },
     
     data: {
         width: 600,
-        height: 100,
+        height: 200,
         'y-label': "",
         'x-format': _.identity,
         'y-format': _.identity,

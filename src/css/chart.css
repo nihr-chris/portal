@@ -1,15 +1,14 @@
-.bar {
-  fill: steelblue;
+.chart .bar {
   shape-rendering: crispEdges;
 }
 
-.domain {
+.chart .domain {
     fill: none;
     shape-rendering: crispEdges;
     stroke: black;
     stroke-width: 1px;
 }
 
-svg text {
+.chart text {
   font-size: 10px;
 }

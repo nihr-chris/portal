@@ -23,6 +23,10 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
         
         weighted: true,
         
+        examplelegend: [
+            {key: 2001, color: "#98abc5"},
+            {key: 2002, color: "#8a89a6"}
+        ],
         exampledata: [
             {
                 key: "Guy's", 
@@ -30,13 +34,13 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
                     {
                         key: 2001,
                         values: [
-                            {color: "#000", value: 5},
+                            {color: "#98abc5", value: 5},
                         ]
                     },
                     {
                         key: 2002,
                         values: [
-                            {color: "#000", value: 8},
+                            {color: "#8a89a6", value: 8},
                         ]
                     },
                 ]
@@ -46,13 +50,13 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
                     {
                         key: 2001,
                         values: [
-                            {color: "#000", value: 2},
+                            {color: "#98abc5", value: 2},
                         ]
                     },
                     {
                         key: 2002,
                         values: [
-                            {color: "#000", value: 1},
+                            {color: "#8a89a6", value: 1},
                         ]
                     },
                 ]
