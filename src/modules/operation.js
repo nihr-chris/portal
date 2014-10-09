@@ -480,6 +480,14 @@ module.exports = operationModule({
             });
         },
         
+        format: function(transform) {
+            return this.childOperation({
+                inputColumns: [],
+                outputColumns: [],
+                transform: transform
+            });
+        },
+        
         
         /** Summarizing Operations **/
     

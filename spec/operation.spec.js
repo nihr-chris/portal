@@ -501,6 +501,18 @@ describe("any Operation", function(){
              });
          });
          
+        describe("format", function() {
+            it("should return transformed rows", function() {
+                return expectOperation(function(parent) {
+                    return parent.format(function(rows) {
+                        return rows[0];
+                    });
+                })
+                .withInput([1, 2, 3])
+                .toReturn(1);
+            });
+        });
+         
         describe("sum", function() {
             it("should group with sum", function() {
                 return expectOperation(function(parent) {

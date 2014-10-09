@@ -69,4 +69,98 @@ describe("recruitment", function() {
             ]);
         });
     });
+    
+    describe("performanceBarGraph", function(){
+        var colors = [
+            {Interventional: "color2001-Int", Observational: "color2001-Obs", Large: "color2001-Large", Merged: "color2001-Merged"},
+            {Interventional: "color2000-Int", Observational: "color2000-Obs", Large: "color2000-Large", Merged: "color2000-Merged"}
+        ];
+        
+        var sampleInput = [
+            {MonthRecruitment: 1, MonthEndDate: new Date("2001-1-1"), Banding: "Interventional", Grouping: "Division 1"},
+            {MonthRecruitment: 2, MonthEndDate: new Date("2001-2-1"), Banding: "Interventional", Grouping: "Division 1"},
+            {MonthRecruitment: 3, MonthEndDate: new Date("2001-1-1"), Banding: "Observational", Grouping: "Division 1"},
+            {MonthRecruitment: 4, MonthEndDate: new Date("2001-1-1"), Banding: "Large", Grouping: "Division 1"},
+            {MonthRecruitment: 5, MonthEndDate: new Date("2001-4-1"), Banding: "Observational", Grouping: "Division 1"},
+            {MonthRecruitment: 6, MonthEndDate: new Date("2001-4-1"), Banding: "Observational", Grouping: "Division 2"}
+        ];
+        
+        it("should produce weighted bar chart", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.performanceBarGraph({
+                    colors: colors,
+                    weighted: true
+                });
+            })
+            .withInput(sampleInput)
+            .toReturn([
+                {
+                    key: "Division 1",
+                    values: [
+                        {
+                            key: "2000",
+                            values: [
+                                {color: "color2000-Int", value: 3},
+                                {color: "color2000-Obs", value: 3},
+                                {color: "color2000-Large", value: 4}
+                            ]
+                        }, {
+                            key: "2001",
+                            values: [
+                                {color: "color2001-Obs", value: 5},
+                            ]
+                        }
+                    ]
+                }, {
+                    key: "Division 2",
+                    values: [
+                        {
+                            key: "2001",
+                            values: [
+                                {color: "color2001-Obs", value: 6},
+                            ]
+                        }
+                    ]
+                }
+            ]);
+        });
+        
+        it("should produce unweighted bar chart", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.performanceBarGraph({
+                    colors: colors,
+                    weighted: false
+                });
+            })
+            .withInput(sampleInput)
+            .toReturn([
+                {
+                    key: "Division 1",
+                    values: [
+                        {
+                            key: "2000",
+                            values: [
+                                {color: "color2000-Merged", value: 10}
+                            ]
+                        }, {
+                            key: "2001",
+                            values: [
+                                {color: "color2001-Merged", value: 5},
+                            ]
+                        }
+                    ]
+                }, {
+                    key: "Division 2",
+                    values: [
+                        {
+                            key: "2001",
+                            values: [
+                                {color: "color2001-Merged", value: 6},
+                            ]
+                        }
+                    ]
+                }
+            ]);
+        });
+    });
 });
