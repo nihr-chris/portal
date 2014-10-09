@@ -1,10 +1,43 @@
-var Ractive = require("ractive");
-var template = require("template");
-var _ = require("underscore");
-var timeseries = require("../modules/timeseries.js");
+var Ractive     = require("ractive");
+var template    = require("template");
+var _           = require("underscore");
+
+var DataSource  = require("../modules/datasource.js");
+var Recruitment = require("../modules/recruitment.js");
+
+var recruitment = new Recruitment({
+    dataSource: DataSource.main(),
+    outputColumns: [],
+    promise: Promise.resolve()
+});
 
 Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     template: template("recruitmentPerformance-yy.html"),
+    
+    init: function() {
+        var component = this;
+        component.observe("filterMode commercial weighted", function(newval) {
+            var modeMap = {
+                "By Trust":     "trust",
+                "By Division":  "division",
+                "By Specialty": "specialty"
+            };
+            
+            var commercialMap = {
+                "Commercial Only": true,
+                "Noncommercial Only": false
+            };
+            
+            component.annualRecruitmentData = recruitment.fetchBandedRecruitment({
+                by: modeMap[component.get("filterMode")],
+                commercialStudies: commercialMap[component.get("commercial")]
+            })
+            .performanceBarGraph({
+                colors: [],
+                weighted: component.get("weighted")
+            });
+        });
+    },
     
     data: {
         filterModeOptions:  [
