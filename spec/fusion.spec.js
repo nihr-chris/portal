@@ -101,4 +101,21 @@ describe("Fusion", function() {
             ]);
         });
     });
+    
+    it("should convert date strings into JS dates", function() {
+        handleRequest = function(req, next) {
+            next(null, null, {
+                columns: ["d"],
+                rows: [
+                    ["28/02/2013 00:00:00"]
+                ]
+            });
+        };
+        
+        return subject.fetch().then(function(result) {
+            expect(result).to.eql([
+                {d: new Date("2013-02-28")}
+            ]);
+        });
+    });
 });

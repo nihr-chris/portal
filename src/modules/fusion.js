@@ -1,6 +1,6 @@
-var Promise = require('promise');
-var moment = require('moment');
-var _ = require('underscore');
+var Promise     = require('promise');
+var moment      = require('moment');
+var _           = require('underscore');
 
 var encodeQueryParam = function(x) {
     if (_.isString(x)) {
@@ -57,6 +57,10 @@ Fusion.prototype.fetch = function(query) {
                 fulfill(_.map(body.rows, function(rowIn) {
                     var rowOut = {};
                     _.each(rowIn, function(x, i) {
+                        if (_.isString(x) && /\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}/.test(x)) {
+                            x = moment(x, "DD/MM/YYYY HH:mm:ss").toDate();
+                        }
+                        
                         var col = body.columns[i];
                         rowOut[col] = x;
                     });

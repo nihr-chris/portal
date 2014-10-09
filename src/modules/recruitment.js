@@ -65,26 +65,6 @@ module.exports = Operation.module({
                 weighted: Boolean
             });
             
-            var colorAllocations = {};
-            var unusedColors = _.clone(params.colors);
-            function getColor(horizontalGroup, verticalGroup) {
-                var colors = colorAllocations[horizontalGroup];
-                
-                if (!colors) {
-                    colors = unusedColors.pop() || "steelblue";
-                    colorAllocations[horizontalGroup] = colors;
-                }
-                
-                var color = colors[verticalGroup];
-                if (!color) {
-                    throw new Error(
-                        "No color defined for banding " + horizontalGroup + "\n"
-                        + "Defined bandings are: " + JSON.stringify(_.keys(colors))
-                    );
-                }
-                return color;
-            }
-            
             return this.withFY({
                 FY: "MonthEndDate"
             })
@@ -97,6 +77,32 @@ module.exports = Operation.module({
             .format(function(rows) {
                 // UNCLEAN!!! UNCLEAN!!!
                 // [todo] - tidy it up.
+                
+                var colorAllocations = {};
+                var unusedColors = _.clone(params.colors);
+                function getColor(horizontalGroup, verticalGroup) {
+                    var colors = colorAllocations[horizontalGroup];
+                    var defaultColor = {
+                        Interventional: "steelblue", 
+                        Observational: "steelblue", 
+                        Large: "steelblue", 
+                        Merged: "steelblue"
+                    };
+                    
+                    if (!colors) {
+                        colors = unusedColors.pop() || defaultColor;
+                        colorAllocations[horizontalGroup] = colors;
+                    }
+                    
+                    var color = colors[verticalGroup];
+                    if (!color) {
+                        throw new Error(
+                            "No color defined for banding " + verticalGroup + "\n"
+                            + "Defined bandings are: " + JSON.stringify(_.keys(colors))
+                        );
+                    }
+                    return color;
+                }
                 
                 return _.map(_.groupBy(rows, "Grouping"), function(rows, grouping) {
                     return {

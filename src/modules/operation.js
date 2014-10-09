@@ -19,12 +19,13 @@
  * Operations should generally do one well-defined task.
  */
  
-var _          = require('underscore');
-var Promise    = require('promise');
-var moment     = require('moment');
+var _           = require('underscore');
+var Promise     = require('promise');
+var moment      = require('moment');
+var log         = require('loglevel')
 
-var util       = require("./util.js");
-var Fusion     = require("./fusion.js");
+var util        = require("./util.js");
+var Fusion      = require("./fusion.js");
 
 var operationModule = function(params) {
     util.checkArgs(arguments, {
@@ -139,7 +140,14 @@ var operationModule = function(params) {
         
         return new Operation({
             outputColumns: params.outputColumns,
-            promise: this.promise.then(params.transform),
+            promise: this.promise.then(function(value) {
+                // break here to catch values from operations
+                return params.transform(value);
+                
+            }, function(error) {
+                // break here to catch errors from operations
+                throw error;
+            }),
             references: this.references
         });
     };
