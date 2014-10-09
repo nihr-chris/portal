@@ -1,7 +1,7 @@
 var Ractive = require("ractive");
-var template = require("template");
-var log = require('loglevel');
+require("ractive-promise-alt");
 
+var log = require('loglevel');
 log.setLevel("trace");
 
 require('./components/widgets.js');

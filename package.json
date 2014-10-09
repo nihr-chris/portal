@@ -22,6 +22,7 @@
     "numeral": "^1.5.3",
     "promise": "^6.0.0",
     "ractive": "^0.5.8",
+    "ractive-promise-alt": "^0.5.1",
     "underscore": "^1.7.0"
   }
 }
