@@ -95,6 +95,9 @@ module.exports = Operation.module({
                 groupBy: ["Grouping", "FY", "Banding"]
             })
             .format(function(rows) {
+                // UNCLEAN!!! UNCLEAN!!!
+                // [todo] - tidy it up.
+                
                 return _.map(_.groupBy(rows, "Grouping"), function(rows, grouping) {
                     return {
                         key: grouping,
