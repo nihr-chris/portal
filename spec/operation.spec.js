@@ -34,7 +34,7 @@ describe("any Operation", function(){
         });
         
         it("should resolve to value", function(done) {
-            rootOperation.onCompleted(function(x) {
+            rootOperation.then(function(x) {
                 expect(x).to.eql("result");
                 done();
             });
@@ -69,7 +69,7 @@ describe("any Operation", function(){
         });
         
         it("should resolve to value", function(done) {
-            childOperation.onCompleted(function(x) {
+            childOperation.then(function(x) {
                 expect(x).to.eql("RESULT");
                 done();
             });
@@ -158,19 +158,19 @@ describe("any Operation", function(){
         });
         
         it("child should inherit the parent module's operations", function() {
-            return child.inherited().onCompleted(function(val) {
+            return child.inherited().then(function(val) {
                 expect(val).to.eql("inherited!");
             });
         });
         
         it("child should add its own operations", function() {
-            return child.defined().onCompleted(function(val) {
+            return child.defined().then(function(val) {
                 expect(val).to.eql("defined!");
             });
         });
         
         it("child should add an imported module's operations", function() {
-            return child.imported().onCompleted(function(val) {
+            return child.imported().then(function(val) {
                 expect(val).to.eql("imported!");
             });
         });

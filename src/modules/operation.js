@@ -213,9 +213,12 @@ var operationModule = function(params) {
         });
     };
     
-    
-    Operation.prototype.onCompleted = function(completionHandler, errorHandler) {
+    Operation.prototype.then = function(completionHandler, errorHandler) {
         return this.promise.then(completionHandler, errorHandler);
+    };
+    
+    Operation.prototype.catch = function(handler) {
+        return this.promise.catch(handler);
     };
     
     return Operation;

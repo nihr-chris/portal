@@ -31,14 +31,14 @@ module.exports = {
             var operation = makeOperation(parent);
                 
             if (expectedError) {
-                return operation.onCompleted(function(results) {
+                return operation.then(function(results) {
                     assert.fail(null, null, "Expected operation to fail.");
                 }, function(error) {
                     expect(error.message).to.have.string(expectedError);
                 });
                 
             } else {
-                return operation.onCompleted(function(results) {
+                return operation.then(function(results) {
                     expect(results).to.eql(expectedResult);
                 });
             }
