@@ -73,7 +73,7 @@ var operationModule = function(params) {
             promise: Promise.resolve(),
             references: {
                 studyTable: new Fusion("15Hjojdr2KMMR9P50TABJpU-h-4RwniraR-pOINU9"),
-                recruitmentTable: new Fusion("1TyDE916aCWd4zoiqR3tb-GHt7wpWRdtT1jx4LZUU")
+                recruitmentTable: new Fusion("1K07pgbXNV_U1nA_ZyASULcTw4Aww3NHUO9zWf5Zj")
             }
         });
     };

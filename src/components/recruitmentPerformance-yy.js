@@ -4,11 +4,6 @@ var _           = require("underscore");
 
 var Recruitment = require("../modules/recruitment.js");
 
-var recruitment = new Recruitment({
-    outputColumns: [],
-    promise: Promise.resolve()
-});
-
 Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     template: template("recruitmentPerformance-yy.html"),
     
