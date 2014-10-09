@@ -6,29 +6,23 @@ var Promise         = require("promise");
 var moment          = require("moment");
 
 var Fusion          = require("../src/modules/fusion.js");
-var DataSource      = require("../src/modules/datasource.js");
 var Operation       = require("../src/modules/operation.js");
 var mocks           = require("./mocks.js");
 var expectOperation = require("./operation.helpers.js").expectOperation;
 
 
 describe("any Operation", function(){
-    var data = mocks.dataSource();
-    
     var rootOperation;
     
     beforeEach(function(){
         rootOperation = new Operation({
-            dataSource: data,
             outputColumns: ["A", "B"],
-            promise: Promise.resolve("result")
+            promise: Promise.resolve("result"),
+            references: {a: 1, b: 2}
         });
     });
     
     describe("a root operation", function() {
-        it("should vend the DataSource", function() {
-            expect(rootOperation.dataSource).to.equal(data);
-        });
         it("should vend the outputColumns", function() {
             expect(rootOperation.outputColumns).to.eql(["A", "B"]);
         });
@@ -38,6 +32,11 @@ describe("any Operation", function(){
                 expect(x).to.eql("result");
                 done();
             });
+        });
+        
+        it("should vend references", function() {
+            expect(rootOperation.a).to.eql(1);
+            expect(rootOperation.b).to.eql(2);
         });
     });
     
@@ -64,15 +63,16 @@ describe("any Operation", function(){
             });
         });
         
-        it("should vend the DataSource", function() {
-            expect(childOperation.dataSource).to.equal(data);
-        });
-        
         it("should resolve to value", function(done) {
             childOperation.then(function(x) {
                 expect(x).to.eql("RESULT");
                 done();
             });
+        });
+        
+        it("should inherit parent's references", function() {
+            expect(childOperation.a).to.eql(1);
+            expect(childOperation.b).to.eql(2);
         });
     });
      
@@ -407,21 +407,6 @@ describe("any Operation", function(){
                 .toReturn([
                     {a: 1, b: 1}, 
                     {a: 2, b: 2}
-                ]);
-             });
-         });
-         
-         describe("withTrustName", function() {
-             it("should add trust name", function() {
-                return expectOperation(function(parent){
-                    return parent.withTrustName({
-                        trustName: "trustID"
-                    });
-                })
-                .withInput([{trustID: 1}, {trustID: 2}])
-                .toReturn([
-                    {trustID: 1, trustName: "Org1"}, 
-                    {trustID: 2, trustName: "Org2"}
                 ]);
              });
          });

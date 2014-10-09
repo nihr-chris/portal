@@ -2,11 +2,9 @@ var Ractive     = require("ractive");
 var template    = require("template");
 var _           = require("underscore");
 
-var DataSource  = require("../modules/datasource.js");
 var Recruitment = require("../modules/recruitment.js");
 
 var recruitment = new Recruitment({
-    dataSource: DataSource.main(),
     outputColumns: [],
     promise: Promise.resolve()
 });
@@ -28,7 +26,8 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
                 "Noncommercial Only": false
             };
             
-            component.annualRecruitmentData = recruitment.fetchBandedRecruitment({
+            component.annualRecruitmentData = Recruitment.operation()
+            .fetchBandedRecruitment({
                 by: modeMap[component.get("filterMode")],
                 commercialStudies: commercialMap[component.get("commercial")]
             })

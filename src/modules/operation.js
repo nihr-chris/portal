@@ -24,7 +24,6 @@ var Promise    = require('promise');
 var moment     = require('moment');
 
 var util       = require("./util.js");
-var DataSource = require("./datasource.js");
 var Fusion     = require("./fusion.js");
 
 var operationModule = function(params) {
@@ -37,14 +36,24 @@ var operationModule = function(params) {
     
     var Operation = function(params) {
         util.checkArgs(arguments, {
-            dataSource: DataSource,
             outputColumns: Array.of(String),
-            promise: Promise
+            promise: Promise,
+            references: Object,
         });
         
-        this.dataSource = params.dataSource;
-        this.outputColumns = params.outputColumns;
-        this.promise = params.promise;
+        var op = this;
+        
+        op.outputColumns = params.outputColumns;
+        op.promise = params.promise;
+        op.references = params.references;
+        
+        _.each(params.references, function(val, key) {
+            if (op[key]) {
+                throw new Error("operation reference " + key 
+                + " clashes with existing property: " + JSON.stringify(op[key]));
+            }
+            op[key] = val;
+        });
     };
     
     var addOperations = function(map) {
@@ -107,9 +116,9 @@ var operationModule = function(params) {
         }
         
         return new Operation({
-            dataSource: this.dataSource,
             outputColumns: params.outputColumns,
-            promise: this.promise.then(params.transform)
+            promise: this.promise.then(params.transform),
+            references: this.references
         });
     };
     
@@ -241,7 +250,7 @@ module.exports = operationModule({
             });
             
             var groupByColumns = params.forEach;
-            var recruitment = this.dataSource.recruitmentTable;
+            var recruitment = this.recruitmentTable;
             
             return this.childOperation({
                 inputColumns: ["StudyID"],
@@ -263,7 +272,7 @@ module.exports = operationModule({
         },
         
         getHLO1Studies: function(params) {
-            var studyTable = this.dataSource.studyTable;
+            var studyTable = this.studyTable;
             var fields = ["StudyID"];
             
             return this.childOperation({
@@ -284,7 +293,7 @@ module.exports = operationModule({
         
         getHLO2Studies: function(params) {
             var columns = ["StudyID", "TrustID", "FullTitle", "Banding", "ActualStartDate", "ExpectedEndDate", "ActualEndDate"];
-            var studyTable = this.dataSource.studyTable;
+            var studyTable = this.studyTable;
             
             var conditions = [
                 Fusion.gte("PortfolioQualificationDate", new Date(2010, 3, 1)),
@@ -337,19 +346,6 @@ module.exports = operationModule({
                 rowValues: function(row, outputColumn) {
                     var sourceColumn = fieldMap[outputColumn];
                     return row[sourceColumn];
-                }
-            });
-        },
-        
-        withTrustName: function(fieldMap) {
-            var dataSource = this.dataSource;
-            
-            return this.withOperation({
-                inputColumns: _.values(fieldMap),
-                addedColumns: _.keys(fieldMap),
-                rowValues: function(row, outputColumn) {
-                    var sourceColumn = fieldMap[outputColumn];
-                    return dataSource.trustName(row[sourceColumn]);
                 }
             });
         },

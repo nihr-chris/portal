@@ -37,12 +37,12 @@ module.exports = Operation.module({
                 filter.push(params.commercialStudies ? Fusion.eql("Commercial", 1) : Fusion.eql("Commercial", 0));
             }
             
-            var dataSource = this.dataSource;
+            var table = this.recruitmentTable;
             return this.childOperation({
                 inputColumns: [],
                 outputColumns: groupBy.concat(["MonthRecruitment"]),
                 transform: function() {
-                        return dataSource.recruitmentTable.fetch({
+                    return table.fetch({
                         select: groupBy.concat(["SUM(Recruitment) AS MonthRecruitment"]),
                         where: filter,
                         groupBy: groupBy

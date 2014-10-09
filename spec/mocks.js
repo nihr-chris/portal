@@ -2,7 +2,6 @@ var _           = require('underscore');
 var Promise     = require('promise');
 
 var Fusion      = require("../src/modules/fusion.js");
-var DataSource  = require("../src/modules/datasource.js");
 var Operation   = require("../src/modules/operation.js");
 
 var mocks = {
@@ -59,22 +58,17 @@ var mocks = {
         return table;
     },
     
-    dataSource: function() {
-        return new DataSource({
-            trustTable: mocks.trustTable(),
-            recruitmentTable: mocks.fusionTable(),
-            studyTable: mocks.fusionTable()
-        });
-    },
-    
     rootOperation: function(rows, module) {
         if (!module) module = Operation;
         var columnNames = rows ? _.keys(rows[0]) : [];
         
         return new module({
-            dataSource: mocks.dataSource(),
             outputColumns: columnNames,
-            promise: Promise.resolve(rows)
+            promise: Promise.resolve(rows),
+            references: {
+                recruitmentTable: mocks.fusionTable(),
+                studyTable: mocks.trustTable()
+            }
         });
     }
 };

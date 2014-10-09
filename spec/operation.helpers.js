@@ -24,7 +24,7 @@ module.exports = {
                 var stubParams = _.clone(query);
                 stubParams.values = stubValues;
             
-                var table = parent.dataSource[tableName];
+                var table = parent[tableName];
                 table.stub(stubParams);
             }
             
