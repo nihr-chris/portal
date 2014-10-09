@@ -34,6 +34,14 @@ var operationModule = function(params) {
     
     _.defaults(params, {imports: [], operations: {}});
     
+    /**
+     * Constructor.
+     * 
+     * Typically, "real" code outside of this module will use the .operation() 
+     * static method, or the .childOperation() instance method. The constructor
+     * is called by those methods, and also by test code that needs to inject
+     * stubbed table objects.
+     */
     var Operation = function(params) {
         util.checkArgs(arguments, {
             outputColumns: Array.of(String),
@@ -53,6 +61,20 @@ var operationModule = function(params) {
                 + " clashes with existing property: " + JSON.stringify(op[key]));
             }
             op[key] = val;
+        });
+    };
+    
+    /**
+     * Creates and returns the root of a new operation stream.
+     */
+    Operation.operation = function() {
+        return new Operation({
+            outputColumns: [],
+            promise: Promise.resolve(),
+            references: {
+                studyTable: new Fusion("15Hjojdr2KMMR9P50TABJpU-h-4RwniraR-pOINU9"),
+                recruitmentTable: new Fusion("1TyDE916aCWd4zoiqR3tb-GHt7wpWRdtT1jx4LZUU")
+            }
         });
     };
     

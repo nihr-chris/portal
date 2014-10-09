@@ -1,5 +1,5 @@
 var expect          = require('chai').expect;
-var describe        = global.describe, it = global.it, beforeEach = global.beforeEach;
+var describe        = global.describe, it = global.it, beforeEach = global.beforeEach, afterEach = global.afterEach;
 
 var _               = require("underscore");
 var Promise         = require("promise");
@@ -19,6 +19,19 @@ describe("any Operation", function(){
             outputColumns: ["A", "B"],
             promise: Promise.resolve("result"),
             references: {a: 1, b: 2}
+        });
+    });
+    
+    describe("rootOperation", function() {
+        beforeEach(function() {
+            Fusion.HTTPClient = {};
+        });
+        afterEach(function() {
+            delete Fusion.HTTPClient;
+        });
+        
+        it("should return a root operation", function() {
+            expect(Operation.operation()).to.be.an.instanceof(Operation);
         });
     });
     
