@@ -29,6 +29,10 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
             .performanceBarGraph({
                 colors: [],
                 weighted: component.get("weighted")
+            })
+            .then(function(x) {
+                console.log(x);
+                return x;
             });
         });
     },

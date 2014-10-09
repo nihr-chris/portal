@@ -5,11 +5,12 @@ var Fusion = require("../src/modules/fusion.js");
 
 describe("Fusion", function() {
     Fusion.APIKey = "myKey";
-    var req, cb, subject;
+    var subject, req, handleRequest;
     
     beforeEach(function() {
-        subject = new Fusion("MyTable", function(r, c) {
-            req = r; cb = c;
+        subject = new Fusion("MyTable", function(r, next) {
+            req = r;
+            handleRequest(r, next);
         }); 
     });
     
@@ -80,5 +81,24 @@ describe("Fusion", function() {
             + "sql=" + encodeURIComponent("SELECT * FROM MyTable")
             + "&key=myKey"
         );
+    });
+    
+    it("should convert result rows into array of maps", function() {
+        handleRequest = function(req, next) {
+            next(null, null, {
+                columns: ["c1", "c2", "c3"],
+                rows: [
+                    [1, 2, 3],
+                    [4, 5, 6]
+                ]
+            });
+        };
+        
+        return subject.fetch().then(function(result) {
+            expect(result).to.eql([
+                {c1: 1, c2: 2, c3: 3},
+                {c1: 4, c2: 5, c3: 6}
+            ]);
+        });
     });
 });

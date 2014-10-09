@@ -50,8 +50,19 @@ Fusion.prototype.fetch = function(query) {
     
     return new Promise(function(fulfill, reject) {
         makeRequest({uri: url, json: true}, function(error, response, body) {
-            if (error) reject(error);
-            else fulfill(body);
+            if (error) {
+                reject(error);
+            }
+            else {
+                fulfill(_.map(body.rows, function(rowIn) {
+                    var rowOut = {};
+                    _.each(rowIn, function(x, i) {
+                        var col = body.columns[i];
+                        rowOut[col] = x;
+                    });
+                    return rowOut;
+                }));
+            }
         });
     });
 };
