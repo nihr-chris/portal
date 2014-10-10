@@ -118,4 +118,38 @@ describe("Fusion", function() {
             ]);
         });
     });
+    
+    it("should convert numeric strings into JS numbers", function() {
+        handleRequest = function(req, next) {
+            next(null, null, {
+                columns: ["d"],
+                rows: [
+                    ["123"]
+                ]
+            });
+        };
+        
+        return subject.fetch().then(function(result) {
+            expect(result).to.eql([
+                {d: 123}
+            ]);
+        });
+    });
+    
+    it("should keep strings as JS strings", function() {
+        handleRequest = function(req, next) {
+            next(null, null, {
+                columns: ["d"],
+                rows: [
+                    ["a"]
+                ]
+            });
+        };
+        
+        return subject.fetch().then(function(result) {
+            expect(result).to.eql([
+                {d: "a"}
+            ]);
+        });
+    });
 });

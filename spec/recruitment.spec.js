@@ -18,22 +18,22 @@ describe("recruitment", function() {
             .toMakeQuery({
                 select: [
                     "SUM(Recruitment) AS MonthRecruitment",
-                    "MonthEndDate",
+                    "Month",
                     "Banding",
                     "MainReportingDivision"
                 ],
                 groupBy: [
-                    "MonthEndDate",
+                    "Month",
                     "Banding",
                     "MainReportingDivision"
                 ]
             })
             .withStubbedResult([
-                {MonthRecruitment: 1, MonthEndDate: "1/1/01", Banding: "Interventional", MainReportingDivision: "Division 1"}
+                {MonthRecruitment: 1, Month: "1/1/01", Banding: "Interventional/Both", MainReportingDivision: "Division 1"}
             ])
             .onTable("recruitmentTable")
             .andReturn([
-                {MonthRecruitment: 1, MonthEndDate: "1/1/01", Banding: "Interventional", Grouping: "Division 1"}
+                {MonthRecruitment: 1, Month: "1/1/01", Banding: "Interventional/Both", Grouping: "Division 1"}
             ]);
         });
         
@@ -47,42 +47,42 @@ describe("recruitment", function() {
             .toMakeQuery({
                 select: [
                     "SUM(Recruitment) AS MonthRecruitment",
-                    "MonthEndDate",
+                    "Month",
                     "Banding",
                     "MainReportingDivision"
                 ],
                 where: [
-                    Fusion.eql("Commercial", 0)
+                    Fusion.eql("CommercialStudy", "Non-Commercial")
                 ],
                 groupBy: [
-                    "MonthEndDate",
+                    "Month",
                     "Banding",
                     "MainReportingDivision"
                 ]
             })
             .withStubbedResult([
-                {MonthRecruitment: 1, MonthEndDate: "1/1/01", Banding: "Interventional", MainReportingDivision: "Division 1"}
+                {MonthRecruitment: 1, Month: "1/1/01", Banding: "Interventional/Both", MainReportingDivision: "Division 1"}
             ])
             .onTable("recruitmentTable")
             .andReturn([
-                {MonthRecruitment: 1, MonthEndDate: "1/1/01", Banding: "Interventional", Grouping: "Division 1"}
+                {MonthRecruitment: 1, Month: "1/1/01", Banding: "Interventional/Both", Grouping: "Division 1"}
             ]);
         });
     });
     
     describe("performanceBarGraph", function(){
         var colors = [
-            {Interventional: "color2001-Int", Observational: "color2001-Obs", Large: "color2001-Large", Merged: "color2001-Merged"},
-            {Interventional: "color2000-Int", Observational: "color2000-Obs", Large: "color2000-Large", Merged: "color2000-Merged"}
+            {"Interventional/Both": "color2001-Int", Observational: "color2001-Obs", Large: "color2001-Large", Merged: "color2001-Merged"},
+            {"Interventional/Both": "color2000-Int", Observational: "color2000-Obs", Large: "color2000-Large", Merged: "color2000-Merged"}
         ];
         
         var sampleInput = [
-            {MonthRecruitment: 1, MonthEndDate: new Date("2001-1-1"), Banding: "Interventional", Grouping: "Division 1"},
-            {MonthRecruitment: 2, MonthEndDate: new Date("2001-2-1"), Banding: "Interventional", Grouping: "Division 1"},
-            {MonthRecruitment: 3, MonthEndDate: new Date("2001-1-1"), Banding: "Observational", Grouping: "Division 1"},
-            {MonthRecruitment: 4, MonthEndDate: new Date("2001-1-1"), Banding: "Large", Grouping: "Division 1"},
-            {MonthRecruitment: 5, MonthEndDate: new Date("2001-4-1"), Banding: "Observational", Grouping: "Division 1"},
-            {MonthRecruitment: 6, MonthEndDate: new Date("2001-4-1"), Banding: "Observational", Grouping: "Division 2"}
+            {MonthRecruitment: 1, Month: new Date("2001-1-1"), Banding: "Interventional/Both", Grouping: "Division 1"},
+            {MonthRecruitment: 2, Month: new Date("2001-2-1"), Banding: "Interventional/Both", Grouping: "Division 1"},
+            {MonthRecruitment: 3, Month: new Date("2001-1-1"), Banding: "Observational", Grouping: "Division 1"},
+            {MonthRecruitment: 4, Month: new Date("2001-1-1"), Banding: "Large", Grouping: "Division 1"},
+            {MonthRecruitment: 5, Month: new Date("2001-4-1"), Banding: "Observational", Grouping: "Division 1"},
+            {MonthRecruitment: 6, Month: new Date("2001-4-1"), Banding: "Observational", Grouping: "Division 2"}
         ];
         
         it("should produce weighted bar chart", function() {

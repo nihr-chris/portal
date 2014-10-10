@@ -9,32 +9,39 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     
     init: function() {
         var component = this;
-        component.observe("filterMode commercial weighted", function(newval) {
-            var modeMap = {
-                "By Trust":     "trust",
-                "By Division":  "division",
-                "By Specialty": "specialty"
-            };
-            
-            var commercialMap = {
-                "Commercial Only": true,
-                "Noncommercial Only": false
-            };
-            
-            component.annualRecruitmentData = Recruitment.operation()
+        component.observe("filterMode commercial weighted", function(newval, oldval) {
+            if (newval && oldval) component.load();
+        });
+        component.load();
+    },
+    
+    load: function() {
+        var modeMap = {
+            "By Trust":     "trust",
+            "By Division":  "division",
+            "By Specialty": "specialty"
+        };
+        
+        var commercialMap = {
+            "Commercial Only": true,
+            "Noncommercial Only": false
+        };
+        
+        this.set("annualRecruitmentData", 
+            Recruitment.operation()
             .fetchBandedRecruitment({
-                by: modeMap[component.get("filterMode")],
-                commercialStudies: commercialMap[component.get("commercial")]
+                by: modeMap[this.get("filterMode")],
+                commercialStudies: commercialMap[this.get("commercial")]
             })
             .performanceBarGraph({
                 colors: [],
-                weighted: component.get("weighted")
+                weighted: this.get("weighted")
             })
             .then(function(x) {
-                console.log(x);
+                // Break here to catch chart data
                 return x;
-            });
-        });
+            })
+        );
     },
     
     data: {

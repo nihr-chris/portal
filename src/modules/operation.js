@@ -74,7 +74,7 @@ var operationModule = function(params) {
             promise: Promise.resolve(),
             references: {
                 studyTable: new Fusion("15Hjojdr2KMMR9P50TABJpU-h-4RwniraR-pOINU9"),
-                recruitmentTable: new Fusion("1K07pgbXNV_U1nA_ZyASULcTw4Aww3NHUO9zWf5Zj")
+                recruitmentTable: new Fusion("1S5VGpvqa3s5EknoDXTUYt-k2SkuhT7n3BhKJIrKM")
             }
         });
     };

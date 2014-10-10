@@ -1,5 +1,4 @@
 var Ractive = require("ractive");
-require("ractive-promise-alt");
 
 var log = require('loglevel');
 log.setLevel("trace");

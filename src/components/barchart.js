@@ -8,22 +8,28 @@ Ractive.components.barchart = Ractive.extend({
     
     init: function() {
         var component = this;
-        var observedKeys ='data height group-spacing x-format y-format stacked';
+        var observedKeys = ['data', 'height', 'group-spacing', 'x-format', 'y-format', 'stacked'];
         
-        component.observe(observedKeys, function(oldval, newval) {
-            if (newval && oldval) component.renderGraph();
+        component.observe(observedKeys.join(" "), function(newval, oldval) {
+            if (!_.isUndefined(oldval)) component.load();
         });
         
-        component.renderGraph();
+        component.load();
     },
     
     elementID: function() {
         return _.keys(this.nodes)[0];
     },
     
-    renderGraph: function() {
-        var data = this.get("data") || [];
-        var legendData = this.get("legend") || [];
+    load: function() {
+        var component = this;
+        Promise.resolve(this.get("data")).then(function(data) {
+            if (data) component.renderGraph(data);
+        });
+    },
+        
+    renderGraph: function(data) {
+        var legendData = [];
         
         var xPad = 50;
         var yPad = 60;
@@ -79,7 +85,7 @@ Ractive.components.barchart = Ractive.extend({
         var yAxis = d3.svg.axis()
             .scale(y)
             .orient("left")
-            .ticks(maxY)
+            .ticks(10)
             ;
 
         chart.append("g")

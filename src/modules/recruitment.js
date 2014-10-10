@@ -24,17 +24,21 @@ module.exports = Operation.module({
             switch (params.by) {
                 case "division":    mainGroupingColumn = "MainReportingDivision"; break;
                 case "specialty":   mainGroupingColumn = "MainSpecialty"; break;
-                case "trust":       mainGroupingColumn = "TrustGroupName"; break;
+                case "trust":       mainGroupingColumn = "MemberOrg"; break;
             }
             
             var groupBy = [mainGroupingColumn].concat([
                 "Banding",
-                "MonthEndDate"
+                "Month"
             ]);
             
             var filter = [];
             if (!_.isNull(params.commercialStudies) && !_.isUndefined(params.commercialStudies)) {
-                filter.push(params.commercialStudies ? Fusion.eql("Commercial", 1) : Fusion.eql("Commercial", 0));
+                filter.push(
+                    params.commercialStudies 
+                    ? Fusion.eql("CommercialStudy", "Commercial") 
+                    : Fusion.eql("CommercialStudy", "Non-Commercial")
+                );
             }
             
             var table = this.recruitmentTable;
@@ -52,7 +56,7 @@ module.exports = Operation.module({
             .withFieldValues({
                 Grouping: mainGroupingColumn
             })
-            .justFields(["MonthRecruitment", "Banding", "MonthEndDate", "Grouping"]);
+            .justFields(["MonthRecruitment", "Banding", "Month", "Grouping"]);
         },
         
         
@@ -61,12 +65,12 @@ module.exports = Operation.module({
          */
         performanceBarGraph: function(params) {
             util.checkArgs(arguments, {
-                colors: Array.of({Interventional: String, Observational: String, Large: String, Merged: String}),
+                colors: Array.of({"Interventional/Both": String, Observational: String, Large: String, Merged: String}),
                 weighted: Boolean
             });
             
             return this.withFY({
-                FY: "MonthEndDate"
+                FY: "Month"
             })
             .justFields(["FY", "Grouping", "MonthRecruitment", "Banding"])
             .sum({
@@ -83,7 +87,7 @@ module.exports = Operation.module({
                 function getColor(horizontalGroup, verticalGroup) {
                     var colors = colorAllocations[horizontalGroup];
                     var defaultColor = {
-                        Interventional: "steelblue", 
+                        "Interventional/Both": "steelblue", 
                         Observational: "steelblue", 
                         Large: "steelblue", 
                         Merged: "steelblue"

@@ -48,6 +48,29 @@ Fusion.prototype.fetch = function(query) {
     var url = encodeQueryURL(this._ID, query.select, query.where, query.groupBy, Fusion.APIKey);
     var makeRequest = this._makeRequest;
     
+    function convertToJSType(x) {
+        if (!_.isString(x)) return x;
+    
+        // Despite being documented to return typed JSON data,
+        // the Fusion API appears to return everything as a
+        // string, which causes much hilarity when you attempt to
+        // do arithmetic.
+        //
+        // Check what datatype the returned value resembles here
+        // and convert to the appropriate JS type.
+        
+        if (/\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}/.test(x)) {
+            return moment(x, "DD/MM/YYYY HH:mm:ss").toDate();
+        }
+        
+        var asNumber = Number(x);
+        if (!_.isNaN(asNumber)) {
+            return asNumber;
+        }
+        
+        return x;
+    }
+    
     return new Promise(function(fulfill, reject) {
         makeRequest({uri: url, json: true}, function(error, response, body) {
             if (error) {
@@ -57,12 +80,8 @@ Fusion.prototype.fetch = function(query) {
                 fulfill(_.map(body.rows, function(rowIn) {
                     var rowOut = {};
                     _.each(rowIn, function(x, i) {
-                        if (_.isString(x) && /\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}/.test(x)) {
-                            x = moment(x, "DD/MM/YYYY HH:mm:ss").toDate();
-                        }
-                        
                         var col = body.columns[i];
-                        rowOut[col] = x;
+                        rowOut[col] = convertToJSType(x);
                     });
                     return rowOut;
                 }));
