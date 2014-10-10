@@ -14,45 +14,53 @@ Ractive.components.barchart = Ractive.extend({
             if (!_.isUndefined(oldval)) component.load();
         });
         
+        component.setupGraph();
         component.load();
     },
     
-    elementID: function() {
-        return _.keys(this.nodes)[0];
+    containerElement: function() {
+        var id = _.keys(this.nodes)[0];
+        return d3.select("#" + id);
     },
     
     load: function() {
         var component = this;
         Promise.resolve(this.get("data")).then(function(data) {
-            if (data) component.renderGraph(data);
+            if (data) component.updateGraph(data);
         });
     },
+    
+    xPad: 50,
+    yPad: 60,
+    
+    setupGraph: function() {
+        var chart = this.containerElement().append("svg");
         
-    renderGraph: function(data) {
-        var legendData = [];
-        
-        var xPad = 50;
-        var yPad = 60;
-        
+        chart.append("g")
+            .attr("class", "dataView")
+            .attr("transform", "translate(" + this.xPad + "," + this.yPad + ")");
+            
+        chart.append("g")
+            .attr("class", "x axis");
+
+        chart.append("g")
+            .attr("class", "y axis")
+            .append("text")
+            ;
+    },
+    
+    updateGraph: function(data) {
         var allBarData = _.flatten(_.map(data, "values"), true);
         var allXValues = _.uniq(_.map(allBarData, function(d){ return d.key }));
         var allYValues = _.uniq(_.map(allBarData, function(d){ return _.reduce(d.values, function(memo, x){ return memo + x.value }, 0) }));
         
+        var maxY = _.max(allYValues);
         var width = this.get("width");
         var height = this.get("height");
-        var maxY = _.max(allYValues);
         
-        var chart = d3.select("#" + this.elementID())
-            .append("svg")
-            .attr("width", width + xPad * 2)
-            .attr("height", height + yPad * 2)
-            .append("g")
-            .attr("transform", "translate(" + xPad + "," + yPad + ")")
-            ;
-            
-            
+        
         // Scales
-            
+        
         var y = d3.scale.linear()
             .domain([0, maxY])
             .range([height, 0])
@@ -67,31 +75,38 @@ Ractive.components.barchart = Ractive.extend({
             .domain(allXValues)
             .rangeRoundBands([0, x0.rangeBand()])
             ;
+            
+            
+        // Chart
         
+        var chart = this.containerElement().select("svg");
+        var dataView = chart.select(".dataView").select("svg");
         
+        chart.attr("width", width + (this.xPad * 2))
+            .attr("height", height + (this.yPad * 2));
+            
+            
         // Axes
-        
+            
         var xAxis = d3.svg.axis()
             .scale(x0)
             .orient("bottom")
             ;
             
-        chart.append("g")
-            .attr("class", "x axis")
+        chart.select(".x.axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis)
             ;
-        
+            
         var yAxis = d3.svg.axis()
             .scale(y)
             .orient("left")
             .ticks(10)
             ;
-
-        chart.append("g")
-            .attr("class", "y axis")
+            
+        chart.select(".y.axis")
             .call(yAxis)
-            .append("text")
+            .select("text")
                 .attr("transform", "rotate(-90)")
                 .attr("y", 6)
                 .attr("dy", ".71em")
@@ -102,55 +117,66 @@ Ractive.components.barchart = Ractive.extend({
             
         // Data Representations
             
-        var group = chart.selectAll(".group")
-            .data(data)
-            .enter()
-                .append("g")
-                .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
-            ;
+        var groupRepresentation = chart.selectAll("g.group")
+            .data(data, function(d){ return d.key });
         
-        group.selectAll("rect")
-            .data(function(d){ return d.values})
-            .enter().append("rect")
-                .attr("class", "bar")
-                .attr("x", function(d) { 
-                    return x1(d.key);
-                })
-                .attr("y", function(d){ 
-                    return y(d.values[0].value);
-                })
-                .attr("width", function(){
-                    return x1.rangeBand();
-                })
-                .attr("height", function(d){ 
-                    return height - y(d.values[0].value);
-                })
-                .style("fill", function(d){ return d.values[0].color; })
+        groupRepresentation.enter()
+            .append("g")
+            .attr("class", "group")
+            .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
             ;
             
+        groupRepresentation.exit().remove();
+        
+        
+        var barRepresentation = groupRepresentation.selectAll("rect.bar")
+            .data(
+                function(d){ return d.values },
+                function(d){ return d.key; }
+            );
+        
+        barRepresentation.enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function(d) { 
+                return x1(d.key);
+            })
+            .attr("y", function(d){ 
+                return y(d.values[0].value);
+            })
+            .attr("width", function(){
+                return x1.rangeBand();
+            })
+            .attr("height", function(d){ 
+                return height - y(d.values[0].value);
+            })
+            .style("fill", function(d){ return d.values[0].color; })
+            ;
             
-        // Legend
+        barRepresentation.exit().remove();
             
-        var legend = chart.selectAll(".legend")
-            .data(legendData)
-            .enter().append("g")
-                .attr("class", "legend")
-                .attr("transform", function(d, i) {
-                    return "translate(0," + i * 20 + ")";
-                });
+            
+        // // Legend
+            
+        // var legend = chart.selectAll(".legend")
+        //     .data(legendData)
+        //     .enter().append("g")
+        //         .attr("class", "legend")
+        //         .attr("transform", function(d, i) {
+        //             return "translate(0," + i * 20 + ")";
+        //         });
 
-        legend.append("rect")
-            .attr("x", width - 18)
-            .attr("width", 18)
-            .attr("height", 18)
-            .style("fill", function(d){ return d.color; });
+        // legend.append("rect")
+        //     .attr("x", width - 18)
+        //     .attr("width", 18)
+        //     .attr("height", 18)
+        //     .style("fill", function(d){ return d.color; });
 
-        legend.append("text")
-            .attr("x", width - 24)
-            .attr("y", 9)
-            .attr("dy", ".35em")
-            .style("text-anchor", "end")
-            .text(function(d){ return d.key });
+        // legend.append("text")
+        //     .attr("x", width - 24)
+        //     .attr("y", 9)
+        //     .attr("dy", ".35em")
+        //     .style("text-anchor", "end")
+        //     .text(function(d){ return d.key });
     },
     
     data: {
