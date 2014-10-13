@@ -15,32 +15,27 @@ describe("Fusion", function() {
     });
     
     it("should encode equals number condition", function() {
-        expect(Fusion.eql("f1", "1")).to.eql('f1 = "1"');
+        expect(Fusion.eql("f1", "1")).to.eql("f1 = '1'");
     });
     
     it("should encode between condition", function() {
-        expect(Fusion.between("f1", "a", "b")).to.eql('f1 >= "a" AND f1 < "b"');
+        expect(Fusion.between("f1", "a", "b")).to.eql("f1 >= 'a' AND f1 < 'b'");
     });
     
     it("should encode lt condition", function() {
-        expect(Fusion.lt("f1", "1")).to.eql('f1 < "1"');
+        expect(Fusion.lt("f1", "1")).to.eql("f1 < '1'");
     });
     
     it("should encode gte condition", function() {
-        expect(Fusion.gte("f1", "1")).to.eql('f1 >= "1"');
-    });
-    
-    it("should encode or condition", function() {
-        expect(Fusion.or("a", "b")).to.eql('(a OR b)');
-        expect(Fusion.or("a", "b", "c")).to.eql('((a OR b) OR c)');
+        expect(Fusion.gte("f1", "1")).to.eql("f1 >= '1'");
     });
     
     it("should encode in condition", function() {
-        expect(Fusion.in("f1", ["a", "b"])).to.eql('f1 IN ("a", "b")');
+        expect(Fusion.in("f1", ["a", "b"])).to.eql("f1 IN ('a', 'b')");
     });
     
     it("should encode not in condition", function() {
-        expect(Fusion.notIn("f1", ["a", "b"])).to.eql('NOT (f1 IN ("a", "b"))');
+        expect(Fusion.notIn("f1", ["a", "b"])).to.eql("NOT (f1 IN ('a', 'b'))");
     });
     
     it("should encode equals date condition", function() {
@@ -52,11 +47,11 @@ describe("Fusion", function() {
     });
     
     it("should encode equals string condition", function() {
-        expect(Fusion.eql("f1", "1")).to.eql('f1 = "1"');
+        expect(Fusion.eql("f1", "1")).to.eql("f1 = '1'");
     });
     
-    it("should fail for double-quoted string", function() {
-        expect(function(){ Fusion.eql("f1", '"')}).to.throw();
+    it("should escape strings", function() {
+        expect(Fusion.eql("f1", "'")).to.eql("f1 = '\\''");
     });
     
     it("should construct fetch request with filters, fields and groupings", function() {

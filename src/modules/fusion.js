@@ -4,8 +4,7 @@ var _           = require('underscore');
 
 var encodeQueryParam = function(x) {
     if (_.isString(x)) {
-        if (x.indexOf('"') !== -1) throw new Error("Cannot include double-quotes in query");
-        else return '"' + x + '"';
+        return "'" + x.replace("'", "\\'") + "'";
     }
     else if (_.isNumber(x)) {
         return x;
@@ -115,12 +114,6 @@ Fusion.notIn = function(field, options) {
         + _.map(options.sort(), encodeQueryParam).join(", ")
         + "))"
     );
-};
-
-Fusion.or = function() {
-    return _.reduce(arguments, function(last, x) {
-        return "(" + last + " OR " + x + ")";
-    });
 };
 
 Fusion.gte = function(field, x) {
