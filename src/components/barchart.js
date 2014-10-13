@@ -50,12 +50,18 @@ Ractive.components.barchart = Ractive.extend({
     },
     
     updateGraph: function(data) {
+        console.log(data);
+        
         var allBarData = _.flatten(_.map(data, "values"), true);
         var allXValues = _.map(allBarData, function(d){ return d.key });
         var allYValues = _.map(allBarData, function(d){ return _.reduce(d.values, function(memo, x){ return memo + x.value }, 0) });
         
         var maxY = _.max(allYValues);
-        var width = this.get("barWidth") * allXValues.length;
+        
+        var biggestGroup = _.max(data, function(d){ return d.values.length });
+        var numBars = biggestGroup.values.length * data.length;
+        
+        var width = this.get("barWidth") * numBars;
         var height = this.get("height");
         
         
@@ -72,7 +78,7 @@ Ractive.components.barchart = Ractive.extend({
             ;
         
         var x1 = d3.scale.ordinal()
-            .domain(allXValues)
+            .domain(_.uniq(allXValues).sort())
             .rangeRoundBands([0, x0.rangeBand()])
             ;
             
@@ -128,23 +134,27 @@ Ractive.components.barchart = Ractive.extend({
         groupRepresentation.enter()
             .append("g")
                 .attr("class", "group")
-                .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
                 .append("g")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(x1Axis)
-                ;
+                    .attr("class", "x1 axis");
+        
+        groupRepresentation
+            .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
+            .select("g.x1")
+                .attr("transform", "translate(0," + height + ")")
+                .call(x1Axis);
             
         groupRepresentation.exit().remove();
         
         
-        var barRepresentation = groupRepresentation.selectAll("rect.bar")
+        var barRepresentation = groupRepresentation.selectAll("g.bar")
             .data(
                 function(d){ return d.values },
                 function(d){ return d.key; }
             );
         
-        barRepresentation.enter().append("g")
-            .attr("class", "bar")
+        barRepresentation.enter().append("g").attr("class", "bar");
+            
+        barRepresentation
             .attr("transform", function(d) { return "translate(" + x1(d.key) + ",0)"; })
             ;
             
@@ -166,14 +176,19 @@ Ractive.components.barchart = Ractive.extend({
             return result;
         }
         
-        var stackedBitRepresentation = barRepresentation.selectAll("g.bar")
+        var stackedBitRepresentation = barRepresentation.selectAll("rect.stackBit")
             .data(
-                function(d){ return stackedBitPresentationData(d.values); },
-                undefined //todo: use color
+                function(d){ return stackedBitPresentationData(d.values) },
+                function(d){ return d.color }
             );
             
         stackedBitRepresentation.enter().append("rect")
-            .style("fill", function(d){ return d.color; })
+            .attr("class", "stackBit");
+            
+        stackedBitRepresentation
+            .style("fill", function(d){ 
+                return d.color; 
+            })
             .attr("width", function(){
                 return x1.rangeBand() - 1;
             })

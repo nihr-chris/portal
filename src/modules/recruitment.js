@@ -1,4 +1,5 @@
 var _           = require("underscore");
+var moment      = require("moment");
 
 var util        = require("./util.js");
 var Operation   = require("./operation.js");
@@ -120,5 +121,54 @@ module.exports = Operation.module({
                 });
             });
         },
+        
+        timeTargetInfo: function() {
+            var currentDate = moment(this.currentDate);
+            
+            return this.childOperation({
+                outputColumns: this.outputColumns.concat(["ExpectedDays", "ActualDays", "PercentProgress", "PercentTargetMet", "Open"]),
+                inputColumns: ["ExpectedStartDate", "ExpectedEndDate", "ActualStartDate", "ActualEndDate", "ExpectedRecruitment", "ActualRecruitment"],
+                transform: function(rows) {
+                    return _.map(rows, function(input) {
+                        var output = _.clone(input);
+                        
+                        var expStart = moment(input.ExpectedStartDate);
+                        var expEnd = moment(input.ExpectedEndDate);
+                        var actStart = moment(input.ActualStartDate);
+                        var actEnd = moment(input.ActualEndDate);
+                        
+                        if (!expStart.isValid()
+                            || !expEnd.isValid()
+                            || !_.isNumber(input.ExpectedRecruitment)) {
+                                
+                            output.IncompleteInformation = true;
+                            return output;
+                        } else {
+                            output.IncompleteInformation = false;
+                        }
+                        
+                        output.ExpectedDays = expEnd.diff(expStart, "days");
+                        
+                        if (!actStart.isValid()) {
+                            output.ActualDays = 0;
+                            
+                        } else {
+                            if (actEnd.isValid()) {
+                                output.ActualDays = actEnd.diff(actStart, "days");
+                                output.Open = false;
+                            } else {
+                                output.ActualDays = currentDate.diff(actStart, "days");
+                                output.Open = true;
+                            }
+                        }
+                        
+                        output.PercentProgress = output.ActualDays / output.ExpectedDays;
+                        output.PercentTargetMet = output.ActualRecruitment / output.ExpectedRecruitment;
+                        
+                        return output;
+                    });
+                }
+            });
+        }
     }
 });

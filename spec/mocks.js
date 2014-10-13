@@ -67,7 +67,8 @@ var mocks = {
             promise: Promise.resolve(rows),
             references: {
                 recruitmentTable: mocks.fusionTable(),
-                studyTable: mocks.trustTable()
+                studyTable: mocks.trustTable(),
+                currentDate: mocks.currentDate || new Date("2011-1-1")
             }
         });
     }

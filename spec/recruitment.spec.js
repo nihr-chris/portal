@@ -1,6 +1,7 @@
 var expect          = require('chai').expect;
 var describe        = global.describe, it = global.it, beforeEach = global.beforeEach;
 var expectOperation = require("./operation.helpers.js").expectOperation;
+var mock            = require("./mocks.js");
 
 var Fusion          = require("../src/modules/fusion.js");
 var Recruitment     = require("../src/modules/recruitment.js");
@@ -161,6 +162,138 @@ describe("recruitment", function() {
                             ]
                         }
                     ]
+                }
+            ]);
+        });
+    });
+    
+    describe("withTimeTargetInfo", function() {
+        it("should return time & target information for open studies", function() {
+            mock.currentDate = new Date("2011-1-6");
+            
+            expectOperation(Recruitment, function(parent) {
+                return parent.timeTargetInfo();
+            })
+            .withInput([
+                {
+                    ExpectedStartDate: new Date("2011-1-2"),
+                    ExpectedEndDate: new Date("2011-1-3"),
+                    ActualStartDate: new Date("2011-1-4"),
+                    ActualEndDate: '',
+                    ExpectedRecruitment: 102,
+                    ActualRecruitment: 104
+                }
+            ])
+            .toReturn([
+                {
+                    ExpectedStartDate: new Date("2011-1-2"),
+                    ExpectedEndDate: new Date("2011-1-3"),
+                    ActualStartDate: new Date("2011-1-4"),
+                    ActualEndDate: '',
+                    ExpectedRecruitment: 200,
+                    ActualRecruitment: 100,
+                    PercentTargetMet: 0.5,
+                    ExpectedDays: 1,
+                    ActualDays: 2,
+                    PercentProgress: 2,
+                    Open: true
+                }
+            ]);
+        });
+        
+        it("should return closed time/target information for studies with a closed date in the past", function() {
+            mock.currentDate = new Date("2011-1-10");
+            
+            return expectOperation(Recruitment, function(parent) {
+                return parent.timeTargetInfo();
+            })
+            .withInput([
+                {
+                    ExpectedStartDate: new Date("2011-1-2"),
+                    ExpectedEndDate: new Date("2011-1-4"),
+                    ActualStartDate: new Date("2011-1-4"),
+                    ActualEndDate: new Date("2011-1-8"),
+                    ExpectedRecruitment: 200,
+                    ActualRecruitment: 100,
+                }
+            ])
+            .toReturn([
+                {
+                    ExpectedStartDate: new Date("2011-1-2"),
+                    ExpectedEndDate: new Date("2011-1-4"),
+                    ActualStartDate: new Date("2011-1-4"),
+                    ActualEndDate: new Date("2011-1-8"),
+                    ExpectedRecruitment: 200,
+                    ActualRecruitment: 100,
+                    PercentTargetMet: 0.5,
+                    ExpectedDays: 2,
+                    ActualDays: 4,
+                    PercentProgress: 2,
+                    Open: false,
+                    IncompleteInformation: false
+                }
+            ]);
+        });
+        
+        it("should return open time & target information for studies without a closed date", function() {
+            mock.currentDate = new Date("2011-1-10");
+            
+            return expectOperation(Recruitment, function(parent) {
+                return parent.timeTargetInfo();
+            })
+            .withInput([
+                {
+                    ExpectedStartDate: new Date("2011-1-2"),
+                    ExpectedEndDate: new Date("2011-1-4"),
+                    ActualStartDate: new Date("2011-1-4"),
+                    ActualEndDate: "",
+                    ExpectedRecruitment: 200,
+                    ActualRecruitment: 100,
+                }
+            ])
+            .toReturn([
+                {
+                    ExpectedStartDate: new Date("2011-1-2"),
+                    ExpectedEndDate: new Date("2011-1-4"),
+                    ActualStartDate: new Date("2011-1-4"),
+                    ActualEndDate: "",
+                    ExpectedRecruitment: 200,
+                    ActualRecruitment: 100,
+                    PercentTargetMet: 0.5,
+                    ExpectedDays: 2,
+                    ActualDays: 6,
+                    PercentProgress: 3,
+                    Open: true,
+                    IncompleteInformation: false
+                }
+            ]);
+        });
+        
+        it("should return incomplete time & target information for studies missing targets", function() {
+            mock.currentDate = new Date("2011-1-10");
+            
+            return expectOperation(Recruitment, function(parent) {
+                return parent.timeTargetInfo();
+            })
+            .withInput([
+                {
+                    ExpectedStartDate: "",
+                    ExpectedEndDate: "",
+                    ActualStartDate: "",
+                    ActualEndDate: "",
+                    ExpectedRecruitment: "",
+                    ActualRecruitment: "",
+                }
+            ])
+            .toReturn([
+                {
+                    ExpectedStartDate: "",
+                    ExpectedEndDate: "",
+                    ActualStartDate: "",
+                    ActualEndDate: "",
+                    ExpectedRecruitment: "",
+                    ActualRecruitment: "",
+                    IncompleteInformation: true
                 }
             ]);
         });
