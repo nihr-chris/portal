@@ -9,6 +9,10 @@
     stroke-width: 1px;
 }
 
+.chart .x0.axis path {
+  stroke: none;
+}
+
 .chart text {
   font-size: 10px;
 }

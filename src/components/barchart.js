@@ -41,7 +41,7 @@ Ractive.components.barchart = Ractive.extend({
             .attr("transform", "translate(" + this.xPad + "," + this.yPad + ")");
             
         dataView.append("g")
-            .attr("class", "x axis");
+            .attr("class", "x0 axis");
 
         dataView.append("g")
             .attr("class", "y axis")
@@ -51,11 +51,11 @@ Ractive.components.barchart = Ractive.extend({
     
     updateGraph: function(data) {
         var allBarData = _.flatten(_.map(data, "values"), true);
-        var allXValues = _.uniq(_.map(allBarData, function(d){ return d.key }));
-        var allYValues = _.uniq(_.map(allBarData, function(d){ return _.reduce(d.values, function(memo, x){ return memo + x.value }, 0) }));
+        var allXValues = _.map(allBarData, function(d){ return d.key });
+        var allYValues = _.map(allBarData, function(d){ return _.reduce(d.values, function(memo, x){ return memo + x.value }, 0) });
         
         var maxY = _.max(allYValues);
-        var width = this.get("width");
+        var width = this.get("barWidth") * allXValues.length;
         var height = this.get("height");
         
         
@@ -68,7 +68,7 @@ Ractive.components.barchart = Ractive.extend({
             
         var x0 = d3.scale.ordinal()
             .domain(_.map(data, "key"))
-            .rangeRoundBands([0, width], 0.1)
+            .rangeRoundBands([0, width], 0.05)
             ;
         
         var x1 = d3.scale.ordinal()
@@ -88,14 +88,14 @@ Ractive.components.barchart = Ractive.extend({
             
         // Axes
             
-        var xAxis = d3.svg.axis()
+        var x0Axis = d3.svg.axis()
             .scale(x0)
             .orient("bottom")
             ;
             
-        dataView.select(".x.axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis)
+        dataView.select(".x0.axis")
+            .attr("transform", "translate(0," + (height + 15) + ")")
+            .call(x0Axis)
             ;
             
         var yAxis = d3.svg.axis()
@@ -120,11 +120,19 @@ Ractive.components.barchart = Ractive.extend({
         var groupRepresentation = dataView.selectAll("g.group")
             .data(data, function(d){ return d.key });
         
+        var x1Axis = d3.svg.axis()
+            .scale(x1)
+            .orient("bottom")
+            ;
+            
         groupRepresentation.enter()
             .append("g")
-            .attr("class", "group")
-            .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
-            ;
+                .attr("class", "group")
+                .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
+                .append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(x1Axis)
+                ;
             
         groupRepresentation.exit().remove();
         
@@ -178,35 +186,11 @@ Ractive.components.barchart = Ractive.extend({
             });
             
         stackedBitRepresentation.exit().remove();
-            
-            
-        // // Legend
-            
-        // var legend = chart.selectAll(".legend")
-        //     .data(legendData)
-        //     .enter().append("g")
-        //         .attr("class", "legend")
-        //         .attr("transform", function(d, i) {
-        //             return "translate(0," + i * 20 + ")";
-        //         });
-
-        // legend.append("rect")
-        //     .attr("x", width - 18)
-        //     .attr("width", 18)
-        //     .attr("height", 18)
-        //     .style("fill", function(d){ return d.color; });
-
-        // legend.append("text")
-        //     .attr("x", width - 24)
-        //     .attr("y", 9)
-        //     .attr("dy", ".35em")
-        //     .style("text-anchor", "end")
-        //     .text(function(d){ return d.key });
     },
     
     data: {
-        width: 600,
         height: 200,
+        barWidth: 75,
         'y-label': "",
         'x-format': _.identity,
         'y-format': _.identity,
