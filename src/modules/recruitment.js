@@ -143,6 +143,7 @@ module.exports = Operation.module({
                                 
                             output.IncompleteInformation = true;
                             return output;
+                            
                         } else {
                             output.IncompleteInformation = false;
                         }
@@ -162,13 +163,44 @@ module.exports = Operation.module({
                             }
                         }
                         
-                        output.PercentProgress = output.ActualDays / output.ExpectedDays;
+                        output.PercentProgress = output.Open ? (output.ActualDays / output.ExpectedDays) : 1.0;
                         output.PercentTargetMet = output.ActualRecruitment / output.ExpectedRecruitment;
                         
                         return output;
                     });
                 }
             });
+        },
+        
+        withTimeTargetRAG: function() {
+            return this.childOperation({
+                inputColumns: ["PercentTargetMet", "PercentProgress", "Open", "IncompleteInformation"],
+                outputColumns: this.outputColumns.concat(["TimeTargetScore", "RAG"]),
+                transform: function(rows) {
+                    return _.map(rows, function(input) {
+                        if (input.IncompleteInformation) return input;
+                        
+                        var output = _.clone(input);
+                        
+                        if (input.Open) {
+                            var score = input.PercentTargetMet / input.PercentProgress;
+                            output.TimeTargetScore = score;
+                            
+                            if (score < 0.7) output.RAG = "Red";
+                            else if (score < 1.0) output.RAG = "Amber";
+                            else output.RAG = "Green";
+                            
+                        } else {
+                            output.TimeTargetScore = input.PercentTargetMet;
+                            
+                            if (input.PercentTargetMet < 1.0) output.RAG = "Red";
+                            else output.RAG = "Green";
+                        }
+                        
+                        return output;
+                    });
+                }
+            })
         }
     }
 });

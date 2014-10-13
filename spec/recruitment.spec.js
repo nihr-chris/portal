@@ -228,7 +228,7 @@ describe("recruitment", function() {
                     PercentTargetMet: 0.5,
                     ExpectedDays: 2,
                     ActualDays: 4,
-                    PercentProgress: 2,
+                    PercentProgress: 1,
                     Open: false,
                     IncompleteInformation: false
                 }
@@ -294,6 +294,150 @@ describe("recruitment", function() {
                     ExpectedRecruitment: "",
                     ActualRecruitment: "",
                     IncompleteInformation: true
+                }
+            ]);
+        });
+    });
+    
+    describe("withTimeTargetRAG", function() {
+        it("should be red for open study < 0.7", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.withTimeTargetRAG();
+            })
+            .withInput([
+                {
+                    PercentTargetMet: 0.25,
+                    PercentProgress: 0.5,
+                    Open: true,
+                    IncompleteInformation: false,
+                }
+            ])
+            .toReturn([
+                {
+                    PercentTargetMet: 0.25,
+                    PercentProgress: 0.5,
+                    Open: true,
+                    IncompleteInformation: false,
+                    TimeTargetScore: 0.5,
+                    RAG: "Red"
+                }
+            ]);
+        });
+        
+        it("should be amber for open study >= 0.7 and < 1.0", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.withTimeTargetRAG();
+            })
+            .withInput([
+                {
+                    PercentTargetMet: 0.35,
+                    PercentProgress: 0.5,
+                    Open: true,
+                    IncompleteInformation: false,
+                }
+            ])
+            .toReturn([
+                {
+                    PercentTargetMet: 0.35,
+                    PercentProgress: 0.5,
+                    Open: true,
+                    IncompleteInformation: false,
+                    TimeTargetScore: 0.7,
+                    RAG: "Amber"
+                }
+            ]);
+        });
+        
+        it("should be green for open study >= 1.0", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.withTimeTargetRAG();
+            })
+            .withInput([
+                {
+                    PercentTargetMet: 0.5,
+                    PercentProgress: 0.5,
+                    Open: true,
+                    IncompleteInformation: false,
+                }
+            ])
+            .toReturn([
+                {
+                    PercentTargetMet: 0.5,
+                    PercentProgress: 0.5,
+                    Open: true,
+                    IncompleteInformation: false,
+                    TimeTargetScore: 1.0,
+                    RAG: "Green"
+                }
+            ]);
+        });
+        
+        it("should pass through incomplete info", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.withTimeTargetRAG();
+            })
+            .withInput([
+                {
+                    PercentTargetMet: 1.0,
+                    PercentProgress: 1,
+                    Open: false,
+                    IncompleteInformation: true,
+                }
+            ])
+            .toReturn([
+                {
+                    PercentTargetMet: 1.0,
+                    PercentProgress: 1,
+                    Open: false,
+                    IncompleteInformation: true,
+                }
+            ]);
+        });
+        
+        it("should be red for closed study < 1.0", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.withTimeTargetRAG();
+            })
+            .withInput([
+                {
+                    PercentTargetMet: 0.9,
+                    PercentProgress: 1,
+                    Open: false,
+                    IncompleteInformation: false
+                }
+            ])
+            .toReturn([
+                {
+                    PercentTargetMet: 0.9,
+                    PercentProgress: 1,
+                    Open: false,
+                    IncompleteInformation: false,
+                    TimeTargetScore: 0.9,
+                    RAG: "Red"
+                }
+            ]);
+        });
+        
+        it("should be green for closed study >= 1.0", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.withTimeTargetRAG();
+            })
+            .withInput([
+                {
+                    PercentTargetMet: 1.0,
+                    PercentProgress: 1,
+                    Open: false,
+                    IncompleteInformation: false
+                }
+            ])
+            .toReturn([
+                {
+                    PercentTargetMet: 1.0,
+                    PercentProgress: 1,
+                    Open: false,
+                    IncompleteInformation: false,
+                    TimeTargetScore: 1,
+                    RAG: "Green"
                 }
             ]);
         });
