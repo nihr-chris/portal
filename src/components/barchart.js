@@ -135,24 +135,49 @@ Ractive.components.barchart = Ractive.extend({
                 function(d){ return d.key; }
             );
         
-        barRepresentation.enter().append("rect")
+        barRepresentation.enter().append("g")
             .attr("class", "bar")
-            .attr("x", function(d) { 
-                return x1(d.key);
-            })
-            .attr("y", function(d){ 
-                return y(d.values[0].value);
-            })
+            .attr("transform", function(d) { return "translate(" + x1(d.key) + ",0)"; })
+            ;
+            
+        barRepresentation.exit().remove();
+            
+            
+        function stackedBitPresentationData(data) {
+            var result = [], start = 0;
+            
+            _.each(data, function(d, i){ 
+                result.push({
+                    startVal: start,
+                    color: d.color,
+                    value: d.value
+                });
+                start += d.value;
+            });
+            
+            return result;
+        }
+        
+        var stackedBitRepresentation = barRepresentation.selectAll("g.bar")
+            .data(
+                function(d){ return stackedBitPresentationData(d.values); },
+                undefined //todo: use color
+            );
+            
+        stackedBitRepresentation.enter().append("rect")
+            .style("fill", function(d){ return d.color; })
             .attr("width", function(){
                 return x1.rangeBand();
             })
             .attr("height", function(d){ 
-                return height - y(d.values[0].value);
+                return height - y(d.value);
             })
-            .style("fill", function(d){ return d.values[0].color; })
-            ;
+            .attr("x", 0)
+            .attr("y", function(d){ 
+                return y(d.value + d.startVal);
+            });
             
-        barRepresentation.exit().remove();
+        stackedBitRepresentation.exit().remove();
             
             
         // // Legend

@@ -15,6 +15,7 @@
     "bimap": "0.0.15",
     "browser-request": "^0.3.2",
     "chai": "^1.9.1",
+    "color": "^0.7.1",
     "d3": "^3.4.11",
     "js-schema": "^0.7.0",
     "loglevel": "^1.1.0",
