@@ -15,27 +15,16 @@ var baseColors = [
     "#F15854"
 ];
 
-palette.generate = function(count, keys) {
-    util.checkArgs(arguments, Number, Array.of(String));
+palette.generate = function(keys) {
+    util.checkArgs(arguments, Array.of(String));
     
-    var minSat = 0.5, maxSat = 0.9;
-    var range = maxSat - minSat;
-    
-    return _.map(baseColors, function(c) {
-        var colors = {};
-        
-        _.each(keys, function(key, i) {
-            var normalizedSaturation = (i + 1) / keys.length;
-            var sat = normalizedSaturation * range + minSat;
-            
-            colors[key] = Color(c)
-                .desaturate(sat)
-                .hexString()
-                ;
-        });
-        
+    var colors = {};
+    _.each(keys, function(key, i) {
+        colors[key] = baseColors[i];
         return colors;
     });
-}
+    
+    return colors;
+};
 
 module.exports = palette;

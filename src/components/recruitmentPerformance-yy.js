@@ -3,6 +3,7 @@ var template    = require("template");
 var _           = require("underscore");
 
 var Recruitment = require("../modules/recruitment.js");
+var palette     = require("../modules/palette.js");
 
 Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     template: template("recruitmentPerformance-yy.html"),
@@ -34,7 +35,7 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
                 commercialStudies: commercialMap[this.get("commercial")]
             })
             .performanceBarGraph({
-                colors: [],
+                colors: palette.generate(["Interventional/Both", "Observational", "Large", "Merged"]),
                 weighted: this.get("weighted")
             })
             .then(function(x) {

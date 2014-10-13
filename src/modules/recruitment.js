@@ -65,7 +65,7 @@ module.exports = Operation.module({
          */
         performanceBarGraph: function(params) {
             util.checkArgs(arguments, {
-                colors: Array.of({"Interventional/Both": String, Observational: String, Large: String, Merged: String}),
+                colors: {"Interventional/Both": String, Observational: String, Large: String, Merged: String},
                 weighted: Boolean
             });
             
@@ -82,31 +82,6 @@ module.exports = Operation.module({
                 // UNCLEAN!!! UNCLEAN!!!
                 // [todo] - tidy it up.
                 
-                var colorAllocations = {};
-                var unusedColors = _.clone(params.colors);
-                function getColor(horizontalGroup, verticalGroup) {
-                    var colors = colorAllocations[horizontalGroup];
-                    var defaultColor = {
-                        "Interventional/Both": "steelblue", 
-                        Observational: "steelblue", 
-                        Large: "steelblue", 
-                        Merged: "steelblue"
-                    };
-                    
-                    if (!colors) {
-                        colors = unusedColors.pop() || defaultColor;
-                        colorAllocations[horizontalGroup] = colors;
-                    }
-                    
-                    var color = colors[verticalGroup];
-                    if (!color) {
-                        throw new Error(
-                            "No color defined for banding " + verticalGroup + "\n"
-                            + "Defined bandings are: " + JSON.stringify(_.keys(colors))
-                        );
-                    }
-                    return color;
-                }
                 
                 return _.map(_.groupBy(rows, "Grouping"), function(rows, grouping) {
                     return {
@@ -122,7 +97,7 @@ module.exports = Operation.module({
                                         
                                         var row = rows[0];
                                         return {
-                                            color: getColor(fy, banding), 
+                                            color: params.colors[banding], 
                                             value: row.FYRecruitment
                                         };
                                     })
@@ -132,7 +107,7 @@ module.exports = Operation.module({
                                     key: fy, 
                                     values: [
                                         {
-                                            color: getColor(fy, "Merged"),
+                                            color: params.colors.Merged,
                                             value: _.reduce(rows, function(memo, row) {
                                                 return memo + row.FYRecruitment;
                                             }, 0)

@@ -167,7 +167,7 @@ Ractive.components.barchart = Ractive.extend({
         stackedBitRepresentation.enter().append("rect")
             .style("fill", function(d){ return d.color; })
             .attr("width", function(){
-                return x1.rangeBand();
+                return x1.rangeBand() - 1;
             })
             .attr("height", function(d){ 
                 return height - y(d.value);

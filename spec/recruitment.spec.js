@@ -71,10 +71,12 @@ describe("recruitment", function() {
     });
     
     describe("performanceBarGraph", function(){
-        var colors = [
-            {"Interventional/Both": "color2001-Int", Observational: "color2001-Obs", Large: "color2001-Large", Merged: "color2001-Merged"},
-            {"Interventional/Both": "color2000-Int", Observational: "color2000-Obs", Large: "color2000-Large", Merged: "color2000-Merged"}
-        ];
+        var colors = {
+            "Interventional/Both": "color-Int", 
+            Observational: "color-Obs", 
+            Large: "color-Large", 
+            Merged: "color-Merged"
+        };
         
         var sampleInput = [
             {MonthRecruitment: 1, Month: new Date("2001-1-1"), Banding: "Interventional/Both", Grouping: "Division 1"},
@@ -100,14 +102,14 @@ describe("recruitment", function() {
                         {
                             key: "2000",
                             values: [
-                                {color: "color2000-Int", value: 3},
-                                {color: "color2000-Obs", value: 3},
-                                {color: "color2000-Large", value: 4}
+                                {color: "color-Int", value: 3},
+                                {color: "color-Obs", value: 3},
+                                {color: "color-Large", value: 4}
                             ]
                         }, {
                             key: "2001",
                             values: [
-                                {color: "color2001-Obs", value: 5},
+                                {color: "color-Obs", value: 5},
                             ]
                         }
                     ]
@@ -117,7 +119,7 @@ describe("recruitment", function() {
                         {
                             key: "2001",
                             values: [
-                                {color: "color2001-Obs", value: 6},
+                                {color: "color-Obs", value: 6},
                             ]
                         }
                     ]
@@ -140,12 +142,12 @@ describe("recruitment", function() {
                         {
                             key: "2000",
                             values: [
-                                {color: "color2000-Merged", value: 10}
+                                {color: "color-Merged", value: 10}
                             ]
                         }, {
                             key: "2001",
                             values: [
-                                {color: "color2001-Merged", value: 5},
+                                {color: "color-Merged", value: 5},
                             ]
                         }
                     ]
@@ -155,7 +157,7 @@ describe("recruitment", function() {
                         {
                             key: "2001",
                             values: [
-                                {color: "color2001-Merged", value: 6},
+                                {color: "color-Merged", value: 6},
                             ]
                         }
                     ]
