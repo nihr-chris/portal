@@ -36,14 +36,14 @@ Ractive.components.barchart = Ractive.extend({
     setupGraph: function() {
         var chart = this.containerElement().append("svg");
         
-        chart.append("g")
+        var dataView = chart.append("g")
             .attr("class", "dataView")
             .attr("transform", "translate(" + this.xPad + "," + this.yPad + ")");
             
-        chart.append("g")
+        dataView.append("g")
             .attr("class", "x axis");
 
-        chart.append("g")
+        dataView.append("g")
             .attr("class", "y axis")
             .append("text")
             ;
@@ -80,7 +80,7 @@ Ractive.components.barchart = Ractive.extend({
         // Chart
         
         var chart = this.containerElement().select("svg");
-        var dataView = chart.select(".dataView").select("svg");
+        var dataView = chart.select(".dataView");
         
         chart.attr("width", width + (this.xPad * 2))
             .attr("height", height + (this.yPad * 2));
@@ -93,7 +93,7 @@ Ractive.components.barchart = Ractive.extend({
             .orient("bottom")
             ;
             
-        chart.select(".x.axis")
+        dataView.select(".x.axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis)
             ;
@@ -104,7 +104,7 @@ Ractive.components.barchart = Ractive.extend({
             .ticks(10)
             ;
             
-        chart.select(".y.axis")
+        dataView.select(".y.axis")
             .call(yAxis)
             .select("text")
                 .attr("transform", "rotate(-90)")
@@ -117,7 +117,7 @@ Ractive.components.barchart = Ractive.extend({
             
         // Data Representations
             
-        var groupRepresentation = chart.selectAll("g.group")
+        var groupRepresentation = dataView.selectAll("g.group")
             .data(data, function(d){ return d.key });
         
         groupRepresentation.enter()
