@@ -208,23 +208,27 @@ module.exports = Operation.module({
                                 
                             output.IncompleteInformation = true;
                             return output;
+                        }
+                        
+                        if (input.ActiveStatus === "Open") {
+                            output.ActualDays = currentDate.diff(start, "days");
+                            output.Open = true;
                             
                         } else {
-                            output.IncompleteInformation = false;
+                            if (actEnd.isValid()) {
+                                output.ActualDays = actEnd.diff(start, "days");
+                                output.Open = false;
+                                
+                            } else {
+                                output.IncompleteInformation = true;
+                                return output;
+                            }
                         }
                         
                         output.ExpectedDays = expEnd.diff(start, "days");
-                        
-                        if (actEnd.isValid()) {
-                            output.ActualDays = actEnd.diff(start, "days");
-                            output.Open = false;
-                        } else {
-                            output.ActualDays = currentDate.diff(start, "days");
-                            output.Open = true;
-                        }
-                        
                         output.PercentProgress = output.Open ? (output.ActualDays / output.ExpectedDays) : 1.0;
                         output.PercentTargetMet = output.ActualRecruitment / output.ExpectedRecruitment;
+                        output.IncompleteInformation = false;
                         
                         return output;
                     });

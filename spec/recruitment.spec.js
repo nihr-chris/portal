@@ -296,6 +296,7 @@ describe("recruitment", function() {
             })
             .withInput([
                 {
+                    ActiveStatus: "Open",
                     ExpectedEndDate: new Date("2011-1-3"),
                     StartDate: new Date("2011-1-4"),
                     ActualEndDate: '',
@@ -305,6 +306,7 @@ describe("recruitment", function() {
             ])
             .toReturn([
                 {
+                    ActiveStatus: "Open",
                     ExpectedEndDate: new Date("2011-1-3"),
                     StartDate: new Date("2011-1-4"),
                     ActualEndDate: '',
@@ -319,7 +321,7 @@ describe("recruitment", function() {
             ]);
         });
         
-        it("should return closed time/target information for studies with a closed date in the past", function() {
+        it("should return closed time/target information for studies with a closed activestatus", function() {
             mock.currentDate = new Date("2011-1-10");
             
             return expectOperation(Recruitment, function(parent) {
@@ -327,6 +329,7 @@ describe("recruitment", function() {
             })
             .withInput([
                 {
+                    ActiveStatus: "Closed - follow-up complete",
                     ExpectedEndDate: new Date("2011-1-6"),
                     StartDate: new Date("2011-1-4"),
                     ActualEndDate: new Date("2011-1-8"),
@@ -336,6 +339,7 @@ describe("recruitment", function() {
             ])
             .toReturn([
                 {
+                    ActiveStatus: "Closed - follow-up complete",
                     ExpectedEndDate: new Date("2011-1-6"),
                     StartDate: new Date("2011-1-4"),
                     ActualEndDate: new Date("2011-1-8"),
@@ -351,7 +355,7 @@ describe("recruitment", function() {
             ]);
         });
         
-        it("should return open time & target information for studies without a closed date", function() {
+        it("should return incomplete information for closed studies without a closed date", function() {
             mock.currentDate = new Date("2011-1-10");
             
             return expectOperation(Recruitment, function(parent) {
@@ -359,6 +363,7 @@ describe("recruitment", function() {
             })
             .withInput([
                 {
+                    ActiveStatus: "Closed - follow-up complete",
                     ExpectedEndDate: new Date("2011-1-6"),
                     StartDate: new Date("2011-1-4"),
                     ActualEndDate: "",
@@ -368,17 +373,13 @@ describe("recruitment", function() {
             ])
             .toReturn([
                 {
+                    ActiveStatus: "Closed - follow-up complete",
                     ExpectedEndDate: new Date("2011-1-6"),
                     StartDate: new Date("2011-1-4"),
                     ActualEndDate: "",
                     ExpectedRecruitment: 200,
                     ActualRecruitment: 100,
-                    PercentTargetMet: 0.5,
-                    ExpectedDays: 2,
-                    ActualDays: 6,
-                    PercentProgress: 3,
-                    Open: true,
-                    IncompleteInformation: false
+                    IncompleteInformation: true
                 }
             ]);
         });
@@ -391,6 +392,7 @@ describe("recruitment", function() {
             })
             .withInput([
                 {
+                    ActiveStatus: "Open",
                     ExpectedEndDate: "",
                     StartDate: "",
                     ActualEndDate: "",
@@ -400,6 +402,7 @@ describe("recruitment", function() {
             ])
             .toReturn([
                 {
+                    ActiveStatus: "Open",
                     ExpectedEndDate: "",
                     StartDate: "",
                     ActualEndDate: "",
