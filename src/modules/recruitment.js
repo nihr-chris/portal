@@ -122,7 +122,15 @@ module.exports = Operation.module({
             });
         },
         
-        timeTargetInfo: function() {
+        timeTargetStudyInfo: function(params) {
+            util.checkArgs(arguments, {
+                open: Boolean,
+                commercial: Boolean,
+                financialYear: Number,
+            });
+        },
+        
+        withTimeTargetInfo: function() {
             var currentDate = moment(this.currentDate);
             
             return this.childOperation({
@@ -200,7 +208,7 @@ module.exports = Operation.module({
                         return output;
                     });
                 }
-            })
+            });
         }
     }
 });

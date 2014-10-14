@@ -1,8 +1,9 @@
 {{# enabled }}
     {{# value }}
     <li class="active"><a href="#" on-click="toggle">{{label}}</a></li>
-    {{else}}
-    <li><a href="#" on-click="toggle">{{label}}</a></li>
+    {{/#}}
+    {{# !value }}
+    <li class="active"><a href="#" on-click="toggle">{{label}}!</a></li>
     {{/#}}
 {{else}}
 <li class="disabled"><a href="#">{{label}}</a></li>

@@ -167,12 +167,52 @@ describe("recruitment", function() {
         });
     });
     
+    describe("timeTargetStudyInfo", function() {
+        it("should fetch open commercial studies", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.timeTargetStudyInfo({
+                    open: true,
+                    commercial: true,
+                    financialYear: 2011
+                });
+            })
+            .toMakeQuery({
+                select: [
+                    "PortfolioStudyID",
+                    "MemberOrg",
+                    "ExpectedStartDate", 
+                    "ExpectedEndDate", 
+                    "ActualStartDate", 
+                    "ActualEndDate", 
+                    "ExpectedRecruitment", 
+                    "SUM(Recruitment) AS ActualRecruitment"
+                ],
+                where: [
+                    Fusion.eql("FY", 2011),
+                    Fusion.eql("CommercialStudy", "Commercial")
+                    // Inclusion criteria
+                ],
+                groupBy: [
+                    "PortfolioStudyID",
+                    "MemberOrg",
+                    "ExpectedStartDate", 
+                    "ExpectedEndDate", 
+                    "ActualStartDate", 
+                    "ActualEndDate", 
+                    "ExpectedRecruitment"
+                ]
+            });
+        });
+        it("should fetch closed studies");
+        it("should fetch noncommercial studies");
+    });
+    
     describe("withTimeTargetInfo", function() {
         it("should return time & target information for open studies", function() {
             mock.currentDate = new Date("2011-1-6");
             
             expectOperation(Recruitment, function(parent) {
-                return parent.timeTargetInfo();
+                return parent.withTimeTargetInfo();
             })
             .withInput([
                 {
@@ -205,7 +245,7 @@ describe("recruitment", function() {
             mock.currentDate = new Date("2011-1-10");
             
             return expectOperation(Recruitment, function(parent) {
-                return parent.timeTargetInfo();
+                return parent.withTimeTargetInfo();
             })
             .withInput([
                 {
@@ -239,7 +279,7 @@ describe("recruitment", function() {
             mock.currentDate = new Date("2011-1-10");
             
             return expectOperation(Recruitment, function(parent) {
-                return parent.timeTargetInfo();
+                return parent.withTimeTargetInfo();
             })
             .withInput([
                 {
@@ -273,7 +313,7 @@ describe("recruitment", function() {
             mock.currentDate = new Date("2011-1-10");
             
             return expectOperation(Recruitment, function(parent) {
-                return parent.timeTargetInfo();
+                return parent.withTimeTargetInfo();
             })
             .withInput([
                 {
