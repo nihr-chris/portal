@@ -146,7 +146,7 @@ module.exports = Operation.module({
                     var filters = [
                         Fusion.gte("PortfolioQualificationDate", new Date("2010-4-1")),
                         Fusion.eql("ProjectStatus", "Blue"),
-                        Fusion.notIn("ExpectedRecruitment", [0])
+                        Fusion.gt("ExpectedRecruitment", 0)
                     ];
                     
                     if (params.commercial) {
@@ -192,7 +192,7 @@ module.exports = Operation.module({
             var currentDate = moment(this.currentDate);
             
             return this.childOperation({
-                outputColumns: this.outputColumns.concat(["ExpectedDays", "ActualDays", "PercentProgress", "PercentTargetMet", "Open"]),
+                outputColumns: this.outputColumns.concat(["IncompleteInformation", "ExpectedDays", "ActualDays", "PercentProgress", "PercentTargetMet", "Open"]),
                 inputColumns: ["StartDate", "ExpectedEndDate", "ActualEndDate", "ExpectedRecruitment", "ActualRecruitment"],
                 transform: function(rows) {
                     return _.map(rows, function(input) {

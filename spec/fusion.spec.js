@@ -34,12 +34,16 @@ describe("Fusion", function() {
         expect(Fusion.in("f1", ["a", "b"])).to.eql("f1 IN ('a', 'b')");
     });
     
-    it("should encode not in condition", function() {
-        expect(Fusion.notIn("f1", ["a", "b"])).to.eql("NOT (f1 IN ('a', 'b'))");
+    it("should encode not equal condition", function() {
+        expect(Fusion.notEql("f1", "a")).to.eql("f1 NOT EQUAL TO 'a'");
+    });
+    
+    it("should encode greater than condition", function() {
+        expect(Fusion.gt("f1", 1)).to.eql("f1 > 1");
     });
     
     it("should encode equals date condition", function() {
-        expect(Fusion.eql("f1", new Date(2011, 0, 2))).to.eql('f1 = 2011.01.02');
+        expect(Fusion.eql("f1", new Date(2011, 0, 2))).to.eql("f1 = '2011.01.02'");
     });
     
     it("should encode equals null condition", function() {

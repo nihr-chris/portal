@@ -1,6 +1,9 @@
 var Promise     = require('promise');
 var moment      = require('moment');
 var _           = require('underscore');
+var log         = require('loglevel');
+
+var util        = require('./util.js');
 
 var encodeQueryParam = function(x) {
     if (_.isString(x)) {
@@ -10,7 +13,7 @@ var encodeQueryParam = function(x) {
         return x;
     }
     else if (_.isDate(x)) {
-        return moment(x).format("YYYY.MM.DD");
+        return moment(x).format("'YYYY.MM.DD'");
     }
     else if (_.isNull(x)) {
         return "''";
@@ -25,10 +28,12 @@ var encodeQueryURL = function(tableID, fields, filters, groupFields, key) {
     var where = (filters && filters.length > 0) ? " WHERE " + filters.join(' AND ') : "";
     var groupBy = (groupFields && groupFields.length > 0) ? " GROUP BY " + groupFields.join(', ') : "";
     
-    var query = encodeURIComponent(select + " FROM " + tableID + where + groupBy);
+    var query = select + " FROM " + tableID + where + groupBy;
+    log.debug("QUERY: " + query);
+    
     return (
         "https://www.googleapis.com/fusiontables/v1/query" 
-        + "?sql=" + query
+        + "?sql=" + encodeURIComponent(query)
         + "&key=" + key
     );
 };
@@ -108,16 +113,20 @@ Fusion.in = function(field, options) {
     );
 };
 
-Fusion.notIn = function(field, options) {
+Fusion.notEql = function(field, value) {
+    util.checkArgs(arguments, String, String);
+    
     return (
-        "NOT (" + field + " IN ("
-        + _.map(options.sort(), encodeQueryParam).join(", ")
-        + "))"
+        field + " NOT EQUAL TO " + encodeQueryParam(value)
     );
 };
 
 Fusion.gte = function(field, x) {
     return field + " >= " + encodeQueryParam(x);
+};
+
+Fusion.gt = function(field, x) {
+    return field + " > " + encodeQueryParam(x);
 };
 
 Fusion.lt = function(field, x) {

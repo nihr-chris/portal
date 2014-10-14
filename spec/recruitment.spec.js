@@ -193,7 +193,7 @@ describe("recruitment", function() {
                     Fusion.gte("PortfolioQualificationDate", new Date("2010-4-1")),
                     Fusion.gte("StartDate", new Date("2010-4-1")),
                     Fusion.eql("ProjectStatus", "Blue"),
-                    Fusion.notIn("ExpectedRecruitment", [0])
+                    Fusion.gt("ExpectedRecruitment", 0)
                 ],
                 groupBy: [
                     "PortfolioStudyID",
@@ -232,7 +232,7 @@ describe("recruitment", function() {
                     Fusion.gte("PortfolioQualificationDate", new Date("2010-4-1")),
                     Fusion.eql("ProjectStatus", "Blue"),
                     Fusion.between("ActualEndDate", new Date("2011-4-1"), new Date("2012-4-1")),
-                    Fusion.notIn("ExpectedRecruitment", [0])
+                    Fusion.gt("ExpectedRecruitment", 0)
                 ],
                 groupBy: [
                     "PortfolioStudyID",
@@ -271,7 +271,7 @@ describe("recruitment", function() {
                     Fusion.gte("PortfolioQualificationDate", new Date("2010-4-1")),
                     Fusion.eql("ProjectStatus", "Blue"),
                     Fusion.between("ActualEndDate", new Date("2011-4-1"), new Date("2012-4-1")),
-                    Fusion.notIn("ExpectedRecruitment", [0])
+                    Fusion.gt("ExpectedRecruitment", 0)
                 ],
                 groupBy: [
                     "PortfolioStudyID",

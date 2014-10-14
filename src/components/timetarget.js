@@ -26,7 +26,9 @@ Ractive.components.timetarget = Ractive.extend({
             })
             .withTimeTargetInfo()
             .withTimeTargetRAG()
-            .timeTargetGraph()
+            .timeTargetGraph({
+                colors: {Red: "darkred", Amber: "darkorange", Green: "green", IncompleteInformation: "lightstategray"}
+            })
         );
     },
     
