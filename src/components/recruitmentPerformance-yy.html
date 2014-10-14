@@ -5,6 +5,10 @@
         <toggle label="Weighted" value="{{weighted}}"></toggle>
     </controlbar>
     
+    <controlbar>
+        <multidropdown title={{filterMode.split(" ")[1] + "s"}} items="{{filterItems}}" selected="{{selectedFilterItems}}"></multidropdown>
+    </controlbar>
+    
     <barchart
         data='{{annualRecruitmentData}}'
         legend='{{examplelegend}}'

@@ -277,6 +277,24 @@ describe("any Operation", function(){
              });
          });
          
+         describe("filterValues", function() {
+             it("should filter", function() {
+                return expectOperation(function(parent){
+                    return parent.filterValues({
+                        column: "filterColumn",
+                        values: ["a", "b"]
+                    });
+                })
+                .withInput([
+                    {filterColumn: "a", otherColumn: 1}, 
+                    {filterColumn: "c", otherColumn: 2}
+                ])
+                .toReturn([
+                    {filterColumn: "a", otherColumn: 1}
+                ]);
+             });
+         });
+         
          describe("withFY", function() {
              it("should add financial year", function() {
                 return expectOperation(function(parent){

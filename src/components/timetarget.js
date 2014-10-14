@@ -10,9 +10,34 @@ Ractive.components.timetarget = Ractive.extend({
     
     init: function() {
         var component = this;
-        component.observe("commercial open", function(newval, oldval) {
+        component.observe("selectedOrgs", function(newval, oldval) {
             if (oldval) component.load();
         });
+        
+        this.set("memberOrgs", [
+            "Croydon Health Services NHS Trust",
+            "Epsom and St Helier University Hospitals NHS Trust",
+            "Guy's and St Thomas' NHS Foundation Trust",
+            "King's College Hospital NHS Foundation Trust",
+            "Kingston Hospital NHS Foundation Trust",
+            "Oxleas NHS Foundation Trust",
+            "South London and Maudsley NHS Foundation Trust",
+            "South London Healthcare NHS Trust",
+            "South London Primary Care",
+            "South West London and St George's Mental Health NHS Trust",
+            "St George's Healthcare NHS Trust",
+            "The Royal Hospital For Neuro-Disability",
+            "The Royal Marsden NHS Foundation Trust"
+        ]);
+        
+        this.set("selectedOrgs", [
+            "Croydon Health Services NHS Trust",
+            "Guy's and St Thomas' NHS Foundation Trust",
+            "King's College Hospital NHS Foundation Trust",
+            "South London and Maudsley NHS Foundation Trust",
+            "South London Primary Care",
+        ]);
+        
         component.load();
     },
     
@@ -23,6 +48,10 @@ Ractive.components.timetarget = Ractive.extend({
                 open: this.get("open"),
                 commercial: this.get("commercial"),
                 financialYear: 2014
+            })
+            .filterValues({
+                column: "MemberOrg",
+                values: this.get("selectedOrgs")
             })
             .withTimeTargetInfo()
             .withTimeTargetRAG()

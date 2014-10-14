@@ -1,13 +1,12 @@
 <li class="dropdown">
-    <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{ format(selected) }} <span class="caret"></span></a>
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{ title }} <span class="caret"></span></a>
     <ul class="dropdown-menu" role="menu">
         {{# items}}
-            {{# this === selected }}
+            {{# contains(selected, this) }}
             <li class="active">
-                <a href="#">{{ format(this) }}</a>
+                <a href="#" on-click="select">{{ format(this) }}</a>
             </li>
-            {{/#}}
-            {{# this !== selected}}
+            {{else}}
             <li>
                 <a href="#" on-click="select">{{ format(this) }}</a>
             </li>

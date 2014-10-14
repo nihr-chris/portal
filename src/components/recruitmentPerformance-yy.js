@@ -5,34 +5,66 @@ var _           = require("underscore");
 var Recruitment = require("../modules/recruitment.js");
 var palette     = require("../modules/palette.js");
 
+var modeMap = {
+    "By Trust":     "trust",
+    "By Division":  "division",
+    "By Specialty": "specialty"
+};
+
+var commercialMap = {
+    "Commercial Only": true,
+    "Noncommercial Only": false
+};
+
 Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     template: template("recruitmentPerformance-yy.html"),
     
     init: function() {
         var component = this;
-        component.observe("filterMode commercial weighted", function(newval, oldval) {
+        
+        component.observe("filterMode", function(newval, oldval) {
+            if (newval && oldval) component.loadAll();
+        });
+        
+        component.observe("commercial weighted selectedFilterItems", function(newval, oldval) {
             if (newval && oldval) component.load();
         });
-        component.load();
+        
+        component.loadAll();
+    },
+    
+    loadAll: function() {
+        var component = this;
+        
+        Recruitment.operation()
+        .fetchBandedRecruitment({
+            by: modeMap[this.get("filterMode")]
+        })
+        .justFields(["Grouping"])
+        .format(function(rows) {
+            return _.uniq(_.map(rows, "Grouping")).sort();
+        })
+        .then(function(value) {
+            value = _.without(value, 0);
+            
+            component.set("filterItems", value);
+            component.set("selectedFilterItems", []);
+        })
+        .then(function() {
+            component.load();
+        });
     },
     
     load: function() {
-        var modeMap = {
-            "By Trust":     "trust",
-            "By Division":  "division",
-            "By Specialty": "specialty"
-        };
-        
-        var commercialMap = {
-            "Commercial Only": true,
-            "Noncommercial Only": false
-        };
-        
         this.set("annualRecruitmentData", 
             Recruitment.operation()
             .fetchBandedRecruitment({
                 by: modeMap[this.get("filterMode")],
                 commercialStudies: commercialMap[this.get("commercial")]
+            })
+            .filterValues({
+                column: "Grouping",
+                values: this.get("selectedFilterItems")
             })
             .performanceBarGraph({
                 colors: palette.generate(["Interventional/Both", "Observational", "Large", "Merged"]),

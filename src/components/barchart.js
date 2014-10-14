@@ -98,7 +98,7 @@ Ractive.components.barchart = Ractive.extend({
             ;
             
         var x0 = d3.scale.ordinal()
-            .domain(_.map(data, "key"))
+            .domain(_.map(data, "key").sort())
             .rangeRoundBands([0, width], 0.05)
             ;
         

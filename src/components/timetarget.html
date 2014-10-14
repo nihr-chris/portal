@@ -1,4 +1,8 @@
 <panel title="Time & Target">
+    <controlbar>
+        <multidropdown title='Trusts' items="{{memberOrgs}}" selected="{{selectedOrgs}}"></multidropdown>
+    </controlbar>
+    
     <barchart
         data='{{timeTargetGraphData}}'
         group-spacing='10'>

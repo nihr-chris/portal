@@ -516,6 +516,17 @@ module.exports = operationModule({
             });
         },
         
+        filterValues: function(params) {
+            return this.childOperation({
+                inputColumns: [params.column],
+                outputColumns: this.outputColumns,
+                transform: function(rows) {
+                    return _.filter(rows, function(r) {
+                        return _.contains(params.values, r[params.column])
+                    });
+                }
+            });
+        },
         
         /** Summarizing Operations **/
     

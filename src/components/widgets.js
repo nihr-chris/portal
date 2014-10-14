@@ -32,6 +32,34 @@ Ractive.components.dropdown = Ractive.extend({
     }
 });
 
+Ractive.components.multidropdown = Ractive.extend({
+    isolated: true,
+    template: template('widgets.multidropdown.html'),
+    
+    init: function() {
+        var component = this;
+        
+        if (!component.get("items")) component.set("items", []);
+        if (!component.get("items")) component.set("selected", []);
+        
+        component.on('select', function(event) {
+            var oldSelection = component.get("selected");
+            var item = event.context;
+            
+            if (_.contains(oldSelection, item)) {
+                component.set("selected", _.without(oldSelection, item));
+            } else {
+                component.push("selected", item);
+            }
+        });
+    },
+    
+    data: {
+        format: _.identity,
+        contains: _.contains
+    }
+});
+
 Ractive.components.toggle = Ractive.extend({
     isolated: true,
     template: template('widgets.toggle.html'),
