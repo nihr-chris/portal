@@ -128,6 +128,67 @@ module.exports = Operation.module({
                 commercial: Boolean,
                 financialYear: Number,
             });
+            
+            var table = this.recruitmentTable;
+            
+            return this.childOperation({
+                inputColumns: [],
+                outputColumns: [
+                    "PortfolioStudyID",
+                    "MemberOrg",
+                    "ExpectedStartDate",
+                    "ExpectedEndDate",
+                    "ActualStartDate",
+                    "ActualEndDate",
+                    "ExpectedRecruitment",
+                    "ActualRecruitment"
+                ],
+                transform: function(rows) {
+                    var filters = [
+                        Fusion.gte("PortfolioQualificationDate", new Date("2010-4-1")),
+                        Fusion.eql("ProjectStatus", "Blue"),
+                        Fusion.notIn("ExpectedRecruitment", [0])
+                    ];
+                    
+                    if (params.commercial) {
+                        filters.push(Fusion.eql("CommercialStudy", "Commercial"));
+                    } else {
+                        filters.push(Fusion.eql("CommercialStudy", "Non-Commercial"));
+                    }
+                    
+                    if (params.open) {
+                        filters.push(Fusion.eql("ActiveStatus", "Open"));
+                        filters.push(Fusion.gte("ActualStartDate", new Date("2010-4-1")));
+                        filters.push(Fusion.gte("Month", new Date(params.financialYear - 1, 3, 1)));
+                    } else {
+                        filters.push(Fusion.in("ActiveStatus", ["Closed - in follow-up", "Closed - follow-up complete"]));
+                        filters.push(Fusion.between("ActualEndDate", new Date(params.financialYear - 1, 3, 1), new Date(params.financialYear, 3, 1)));
+                    }
+                    
+                    return table.fetch({
+                        select: [
+                            "PortfolioStudyID",
+                            "MemberOrg",
+                            "ExpectedStartDate",
+                            "ExpectedEndDate",
+                            "ActualStartDate",
+                            "ActualEndDate",
+                            "ExpectedRecruitment",
+                            "SUM(Recruitment) AS ActualRecruitment"
+                        ],
+                        where: filters,
+                        groupBy: [
+                            "PortfolioStudyID",
+                            "MemberOrg",
+                            "ExpectedStartDate",
+                            "ExpectedEndDate",
+                            "ActualStartDate",
+                            "ActualEndDate",
+                            "ExpectedRecruitment"
+                        ]
+                    });
+                }
+            });
         },
         
         withTimeTargetInfo: function() {

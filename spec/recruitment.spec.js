@@ -173,7 +173,7 @@ describe("recruitment", function() {
                 return parent.timeTargetStudyInfo({
                     open: true,
                     commercial: true,
-                    financialYear: 2011
+                    financialYear: 2012
                 });
             })
             .toMakeQuery({
@@ -188,9 +188,13 @@ describe("recruitment", function() {
                     "SUM(Recruitment) AS ActualRecruitment"
                 ],
                 where: [
-                    Fusion.eql("FY", 2011),
-                    Fusion.eql("CommercialStudy", "Commercial")
-                    // Inclusion criteria
+                    Fusion.gte("Month", new Date("2011-4-1")),
+                    Fusion.eql("CommercialStudy", "Commercial"),
+                    Fusion.eql("ActiveStatus", "Open"),
+                    Fusion.gte("PortfolioQualificationDate", new Date("2010-4-1")),
+                    Fusion.gte("ActualStartDate", new Date("2010-4-1")),
+                    Fusion.eql("ProjectStatus", "Blue"),
+                    Fusion.notIn("ExpectedRecruitment", [0])
                 ],
                 groupBy: [
                     "PortfolioStudyID",
@@ -201,10 +205,92 @@ describe("recruitment", function() {
                     "ActualEndDate", 
                     "ExpectedRecruitment"
                 ]
-            });
+            })
+            .onTable("recruitmentTable")
+            .andReturnQueryResults();
         });
-        it("should fetch closed studies");
-        it("should fetch noncommercial studies");
+        
+        it("should fetch closed commercial studies", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.timeTargetStudyInfo({
+                    open: false,
+                    commercial: true,
+                    financialYear: 2012
+                });
+            })
+            .toMakeQuery({
+                select: [
+                    "PortfolioStudyID",
+                    "MemberOrg",
+                    "ExpectedStartDate", 
+                    "ExpectedEndDate", 
+                    "ActualStartDate", 
+                    "ActualEndDate", 
+                    "ExpectedRecruitment", 
+                    "SUM(Recruitment) AS ActualRecruitment"
+                ],
+                where: [
+                    Fusion.eql("CommercialStudy", "Commercial"),
+                    Fusion.in("ActiveStatus", ["Closed - follow-up complete", "Closed - in follow-up"]),
+                    Fusion.gte("PortfolioQualificationDate", new Date("2010-4-1")),
+                    Fusion.eql("ProjectStatus", "Blue"),
+                    Fusion.between("ActualEndDate", new Date("2011-4-1"), new Date("2012-4-1")),
+                    Fusion.notIn("ExpectedRecruitment", [0])
+                ],
+                groupBy: [
+                    "PortfolioStudyID",
+                    "MemberOrg",
+                    "ExpectedStartDate", 
+                    "ExpectedEndDate", 
+                    "ActualStartDate", 
+                    "ActualEndDate", 
+                    "ExpectedRecruitment"
+                ]
+            })
+            .onTable("recruitmentTable")
+            .andReturnQueryResults();
+        });
+        
+        it("should fetch closed noncommercial studies", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.timeTargetStudyInfo({
+                    open: false,
+                    commercial: false,
+                    financialYear: 2012
+                });
+            })
+            .toMakeQuery({
+                select: [
+                    "PortfolioStudyID",
+                    "MemberOrg",
+                    "ExpectedStartDate", 
+                    "ExpectedEndDate", 
+                    "ActualStartDate", 
+                    "ActualEndDate", 
+                    "ExpectedRecruitment", 
+                    "SUM(Recruitment) AS ActualRecruitment"
+                ],
+                where: [
+                    Fusion.eql("CommercialStudy", "Non-Commercial"),
+                    Fusion.in("ActiveStatus", ["Closed - follow-up complete", "Closed - in follow-up"]),
+                    Fusion.gte("PortfolioQualificationDate", new Date("2010-4-1")),
+                    Fusion.eql("ProjectStatus", "Blue"),
+                    Fusion.between("ActualEndDate", new Date("2011-4-1"), new Date("2012-4-1")),
+                    Fusion.notIn("ExpectedRecruitment", [0])
+                ],
+                groupBy: [
+                    "PortfolioStudyID",
+                    "MemberOrg",
+                    "ExpectedStartDate", 
+                    "ExpectedEndDate", 
+                    "ActualStartDate", 
+                    "ActualEndDate", 
+                    "ExpectedRecruitment"
+                ]
+            })
+            .onTable("recruitmentTable")
+            .andReturnQueryResults();
+        });
     });
     
     describe("withTimeTargetInfo", function() {
