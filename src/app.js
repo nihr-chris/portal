@@ -1,4 +1,5 @@
 var Ractive = require("ractive");
+var template = require("template");
 
 var log = require('loglevel');
 log.setLevel("trace");
@@ -12,7 +13,11 @@ require('./components/filter.js');
 require('./components/master-detail.js');
 require('./components/barchart.js');
 require('./components/recruitmentPerformance-yy.js');
+require('./components/timetarget.js');
 
-new Ractive.components.recruitmentPerformanceYY({
-    el: "#main"
-});
+window.runApp = function(mainComponent) {
+    new Ractive({
+        el: "#main",
+        template: "<" + mainComponent + "></" + mainComponent + ">"
+    });
+};
