@@ -3,6 +3,31 @@ var d3 = require('d3');
 var _ = require('underscore');
 var util = require ('../modules/util.js');
 
+// copypasta: http://bl.ocks.org/mbostock/7555321
+function wrap(text, width) {
+  text.each(function() {
+    var text = d3.select(this),
+        words = text.text().split(/\s+/).reverse(),
+        word,
+        line = [],
+        lineNumber = 0,
+        lineHeight = 1.1, // ems
+        y = text.attr("y"),
+        dy = parseFloat(text.attr("dy")),
+        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+    while (word = words.pop()) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+      }
+    }
+  });
+}
+
 Ractive.components.barchart = Ractive.extend({
     template: "<div class='chart barchart' id='multibar{{ makeID() }}'></div>",
     
@@ -102,6 +127,8 @@ Ractive.components.barchart = Ractive.extend({
         dataView.select(".x0.axis")
             .attr("transform", "translate(0," + (height + 15) + ")")
             .call(x0Axis)
+            .selectAll(".tick text")
+                .call(wrap, x0.rangeBand())
             ;
             
         var yAxis = d3.svg.axis()
@@ -141,7 +168,9 @@ Ractive.components.barchart = Ractive.extend({
             .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
             .select("g.x1")
                 .attr("transform", "translate(0," + height + ")")
-                .call(x1Axis);
+                .call(x1Axis)
+                .selectAll(".tick text")
+                    .call(wrap, x1.rangeBand());
             
         groupRepresentation.exit().remove();
         
