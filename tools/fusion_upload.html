@@ -11,7 +11,7 @@
             window.clientID = "456108084199-keqche7lea1kb1f9m8tmfg17pojul8mc.apps.googleusercontent.com";
             
             // Replace with fusion table IDs
-            window.recruitmentTableID = "1d2jWepLCN4cgsrL1KpMVdqSwQBWbsQdej84ei8Pr";
+            window.recruitmentTableID = "1S5VGpvqa3s5EknoDXTUYt-k2SkuhT7n3BhKJIrKM";
             window.studyInfoTableID = "15Hjojdr2KMMR9P50TABJpU-h-4RwniraR-pOINU9";
         </script>
         
@@ -61,17 +61,12 @@
                         </h6>
                         <div class="row well-offset"></div>
                         <div class="row">
-                            <div class="col-xs-1"></div>
+                            <div class="col-xs-3"></div>
                             <div class="col-xs-4 dropzone well" id="dropRecruitment">
                                 <span class="glyphicon glyphicon-file"></span>
-                                Recruitment
+                                Q_ActivityMonthly
                             </div>
-                            <div class="col-xs-2"></div>
-                            <div class="col-xs-4 dropzone well" id="dropStudyInfo">
-                                <span class="glyphicon glyphicon-file"></span>
-                                Study Info
-                            </div>
-                            <div class="col-xs-1" id="dropRecruitment"></div>
+                            <div class="col-xs-3"></div>
                         </div>
                         
                         <div class="row">
@@ -168,7 +163,7 @@
             }
             
             function updateUploadButton() {
-                if (pickedFiles[window.recruitmentTableID] && pickedFiles[window.studyInfoTableID]) {
+                if (pickedFiles[window.recruitmentTableID]) {
                     setPrompt("Ready to upload");
             
                     var uploadButton = document.getElementById("uploadButton");
@@ -217,8 +212,7 @@
                 
                 authorizeAPICall(function(auth) {
                     Promise.all([
-                        replaceTableContent(auth, window.recruitmentTableID),
-                        replaceTableContent(auth, window.studyInfoTableID)
+                        replaceTableContent(auth, window.recruitmentTableID)
                     ]).then(
                         function() {
                             setPrompt("Done!");
@@ -265,10 +259,9 @@
                 window.setTimeout(checkAuth,1);
             }
 
-            bindFilePicker("dropRecruitment", filePickedHandler(window.recruitmentTableID));
-            bindFilePicker("dropStudyInfo", filePickedHandler(window.studyInfoTableID));
+            bindFilePicker("dropRecruitment", filePickedHandler(window.studyInfoTableID));
             
-            setPrompt("Drop .csv files for each report onto the wells.");
+            setPrompt("Drop .csv files for report onto the wells.");
         </script>
     </body>
 </html>

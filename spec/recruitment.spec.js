@@ -569,14 +569,14 @@ describe("recruitment", function() {
                 });
             })
             .withInput([
-                {RAG: "Red", MemberOrg: "1"},
-                {RAG: "Red", MemberOrg: "2"},
-                {RAG: "Green", MemberOrg: "1"},
-                {RAG: "Green", MemberOrg: "1"},
-                {RAG: "Green", MemberOrg: "2"},
-                {RAG: "Amber", MemberOrg: "1"},
-                {RAG: "Amber", MemberOrg: "2"},
-                {RAG: "Amber", MemberOrg: "2"},
+                {RAG: "Red", MemberOrg: "1", PortfolioStudyID: 1},
+                {RAG: "Red", MemberOrg: "2", PortfolioStudyID: 1},
+                {RAG: "Green", MemberOrg: "1", PortfolioStudyID: 1},
+                {RAG: "Green", MemberOrg: "1", PortfolioStudyID: 2},
+                {RAG: "Green", MemberOrg: "2", PortfolioStudyID: 1},
+                {RAG: "Amber", MemberOrg: "1", PortfolioStudyID: 1},
+                {RAG: "Amber", MemberOrg: "2", PortfolioStudyID: 1},
+                {RAG: "Amber", MemberOrg: "2", PortfolioStudyID: 2},
                 {RAG: "IncompleteInformation", MemberOrg: "2"}
             ])
             .toReturn([

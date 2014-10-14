@@ -273,7 +273,7 @@ module.exports = Operation.module({
                 colors: {Red: String, Amber: String, Green: String, IncompleteInformation: String}
             });
             
-            return this.count({
+            return this.justFields(["RAG", "MemberOrg"]).count({
                 valuesFromField: "RAG",
                 inFields: {
                     Red: "RedStudies",
