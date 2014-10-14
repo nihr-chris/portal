@@ -242,11 +242,12 @@ module.exports = Operation.module({
                 outputColumns: this.outputColumns.concat(["TimeTargetScore", "RAG"]),
                 transform: function(rows) {
                     return _.map(rows, function(input) {
-                        if (input.IncompleteInformation) return input;
-                        
                         var output = _.clone(input);
                         
-                        if (input.Open) {
+                        if (input.IncompleteInformation) {
+                            output.RAG = "IncompleteInformation";
+                            
+                        } else if (input.Open) {
                             var score = input.PercentTargetMet / input.PercentProgress;
                             output.TimeTargetScore = score;
                             
@@ -264,6 +265,47 @@ module.exports = Operation.module({
                         return output;
                     });
                 }
+            });
+        },
+        
+        timeTargetGraph: function(params) {
+            util.checkArgs(arguments, {
+                colors: {Red: String, Amber: String, Green: String, IncompleteInformation: String}
+            });
+            
+            return this.count({
+                valuesFromField: "RAG",
+                inFields: {
+                    Red: "RedStudies",
+                    Amber: "AmberStudies",
+                    Green: "GreenStudies",
+                    IncompleteInformation: "IncompleteStudies"
+                },
+                groupBy: ["MemberOrg"]
+            })
+            .format(function(rows) {
+                return _.map(rows, function(r) {
+                    var ragBars = [];
+                    
+                    function addBar(label, color, value) {
+                        ragBars.push({
+                            key: label,
+                            values: [
+                                {color: color, value: value}
+                            ]
+                        });
+                    }
+                    
+                    if (r.RedStudies > 0) addBar("Red", params.colors.Red, r.RedStudies);
+                    if (r.AmberStudies > 0) addBar("Amber", params.colors.Amber, r.AmberStudies);
+                    if (r.GreenStudies > 0) addBar("Green", params.colors.Green, r.GreenStudies);
+                    if (r.IncompleteStudies > 0) addBar("Incomplete Information", params.colors.IncompleteInformation, r.IncompleteStudies);
+                
+                    return {
+                        "key": r.MemberOrg,
+                        values: ragBars
+                    };
+                });
             });
         }
     }

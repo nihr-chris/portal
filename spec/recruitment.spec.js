@@ -487,7 +487,7 @@ describe("recruitment", function() {
             ]);
         });
         
-        it("should pass through incomplete info", function() {
+        it("should record incomplete info", function() {
             return expectOperation(Recruitment, function(parent) {
                 return parent.withTimeTargetRAG();
             })
@@ -505,6 +505,7 @@ describe("recruitment", function() {
                     PercentProgress: 1,
                     Open: false,
                     IncompleteInformation: true,
+                    RAG: "IncompleteInformation"
                 }
             ]);
         });
@@ -554,6 +555,47 @@ describe("recruitment", function() {
                     TimeTargetScore: 1,
                     RAG: "Green"
                 }
+            ]);
+        });
+    });
+    
+    describe("timeTargetGraph", function() {
+        it("should produce graph data", function() {
+            return expectOperation(Recruitment, function(parent) {
+                return parent.timeTargetGraph({
+                    colors: {
+                        Red: "r", Amber: "a", Green: "g", IncompleteInformation: "i"
+                    }
+                });
+            })
+            .withInput([
+                {RAG: "Red", MemberOrg: "1"},
+                {RAG: "Red", MemberOrg: "2"},
+                {RAG: "Green", MemberOrg: "1"},
+                {RAG: "Green", MemberOrg: "1"},
+                {RAG: "Green", MemberOrg: "2"},
+                {RAG: "Amber", MemberOrg: "1"},
+                {RAG: "Amber", MemberOrg: "2"},
+                {RAG: "Amber", MemberOrg: "2"},
+                {RAG: "IncompleteInformation", MemberOrg: "2"}
+            ])
+            .toReturn([
+                {
+                    key: "1",
+                    values: [
+                        {key: "Red", values: [{color: "r", value: 1}]},
+                        {key: "Amber", values: [{color: "a", value: 1}]},
+                        {key: "Green", values: [{color: "g", value: 2}]},
+                    ]
+                },{
+                    key: "2",
+                    values: [
+                        {key: "Red", values: [{color: "r", value: 1}]},
+                        {key: "Amber", values: [{color: "a", value: 2}]},
+                        {key: "Green", values: [{color: "g", value: 1}]},
+                        {key: "Incomplete Information", values: [{color: "i", value: 1}]},
+                    ]
+                },
             ]);
         });
     });
