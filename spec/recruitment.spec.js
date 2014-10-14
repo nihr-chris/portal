@@ -180,9 +180,8 @@ describe("recruitment", function() {
                 select: [
                     "PortfolioStudyID",
                     "MemberOrg",
-                    "ExpectedStartDate", 
                     "ExpectedEndDate", 
-                    "ActualStartDate", 
+                    "StartDate", 
                     "ActualEndDate", 
                     "ExpectedRecruitment", 
                     "SUM(Recruitment) AS ActualRecruitment"
@@ -192,16 +191,15 @@ describe("recruitment", function() {
                     Fusion.eql("CommercialStudy", "Commercial"),
                     Fusion.eql("ActiveStatus", "Open"),
                     Fusion.gte("PortfolioQualificationDate", new Date("2010-4-1")),
-                    Fusion.gte("ActualStartDate", new Date("2010-4-1")),
+                    Fusion.gte("StartDate", new Date("2010-4-1")),
                     Fusion.eql("ProjectStatus", "Blue"),
                     Fusion.notIn("ExpectedRecruitment", [0])
                 ],
                 groupBy: [
                     "PortfolioStudyID",
                     "MemberOrg",
-                    "ExpectedStartDate", 
                     "ExpectedEndDate", 
-                    "ActualStartDate", 
+                    "StartDate", 
                     "ActualEndDate", 
                     "ExpectedRecruitment"
                 ]
@@ -222,9 +220,8 @@ describe("recruitment", function() {
                 select: [
                     "PortfolioStudyID",
                     "MemberOrg",
-                    "ExpectedStartDate", 
                     "ExpectedEndDate", 
-                    "ActualStartDate", 
+                    "StartDate", 
                     "ActualEndDate", 
                     "ExpectedRecruitment", 
                     "SUM(Recruitment) AS ActualRecruitment"
@@ -240,9 +237,8 @@ describe("recruitment", function() {
                 groupBy: [
                     "PortfolioStudyID",
                     "MemberOrg",
-                    "ExpectedStartDate", 
                     "ExpectedEndDate", 
-                    "ActualStartDate", 
+                    "StartDate", 
                     "ActualEndDate", 
                     "ExpectedRecruitment"
                 ]
@@ -263,9 +259,8 @@ describe("recruitment", function() {
                 select: [
                     "PortfolioStudyID",
                     "MemberOrg",
-                    "ExpectedStartDate", 
                     "ExpectedEndDate", 
-                    "ActualStartDate", 
+                    "StartDate", 
                     "ActualEndDate", 
                     "ExpectedRecruitment", 
                     "SUM(Recruitment) AS ActualRecruitment"
@@ -281,9 +276,8 @@ describe("recruitment", function() {
                 groupBy: [
                     "PortfolioStudyID",
                     "MemberOrg",
-                    "ExpectedStartDate", 
                     "ExpectedEndDate", 
-                    "ActualStartDate", 
+                    "StartDate", 
                     "ActualEndDate", 
                     "ExpectedRecruitment"
                 ]
@@ -302,9 +296,8 @@ describe("recruitment", function() {
             })
             .withInput([
                 {
-                    ExpectedStartDate: new Date("2011-1-2"),
                     ExpectedEndDate: new Date("2011-1-3"),
-                    ActualStartDate: new Date("2011-1-4"),
+                    StartDate: new Date("2011-1-4"),
                     ActualEndDate: '',
                     ExpectedRecruitment: 102,
                     ActualRecruitment: 104
@@ -312,9 +305,8 @@ describe("recruitment", function() {
             ])
             .toReturn([
                 {
-                    ExpectedStartDate: new Date("2011-1-2"),
                     ExpectedEndDate: new Date("2011-1-3"),
-                    ActualStartDate: new Date("2011-1-4"),
+                    StartDate: new Date("2011-1-4"),
                     ActualEndDate: '',
                     ExpectedRecruitment: 200,
                     ActualRecruitment: 100,
@@ -335,9 +327,8 @@ describe("recruitment", function() {
             })
             .withInput([
                 {
-                    ExpectedStartDate: new Date("2011-1-2"),
-                    ExpectedEndDate: new Date("2011-1-4"),
-                    ActualStartDate: new Date("2011-1-4"),
+                    ExpectedEndDate: new Date("2011-1-6"),
+                    StartDate: new Date("2011-1-4"),
                     ActualEndDate: new Date("2011-1-8"),
                     ExpectedRecruitment: 200,
                     ActualRecruitment: 100,
@@ -345,9 +336,8 @@ describe("recruitment", function() {
             ])
             .toReturn([
                 {
-                    ExpectedStartDate: new Date("2011-1-2"),
-                    ExpectedEndDate: new Date("2011-1-4"),
-                    ActualStartDate: new Date("2011-1-4"),
+                    ExpectedEndDate: new Date("2011-1-6"),
+                    StartDate: new Date("2011-1-4"),
                     ActualEndDate: new Date("2011-1-8"),
                     ExpectedRecruitment: 200,
                     ActualRecruitment: 100,
@@ -369,9 +359,8 @@ describe("recruitment", function() {
             })
             .withInput([
                 {
-                    ExpectedStartDate: new Date("2011-1-2"),
-                    ExpectedEndDate: new Date("2011-1-4"),
-                    ActualStartDate: new Date("2011-1-4"),
+                    ExpectedEndDate: new Date("2011-1-6"),
+                    StartDate: new Date("2011-1-4"),
                     ActualEndDate: "",
                     ExpectedRecruitment: 200,
                     ActualRecruitment: 100,
@@ -379,9 +368,8 @@ describe("recruitment", function() {
             ])
             .toReturn([
                 {
-                    ExpectedStartDate: new Date("2011-1-2"),
-                    ExpectedEndDate: new Date("2011-1-4"),
-                    ActualStartDate: new Date("2011-1-4"),
+                    ExpectedEndDate: new Date("2011-1-6"),
+                    StartDate: new Date("2011-1-4"),
                     ActualEndDate: "",
                     ExpectedRecruitment: 200,
                     ActualRecruitment: 100,
@@ -403,9 +391,8 @@ describe("recruitment", function() {
             })
             .withInput([
                 {
-                    ExpectedStartDate: "",
                     ExpectedEndDate: "",
-                    ActualStartDate: "",
+                    StartDate: "",
                     ActualEndDate: "",
                     ExpectedRecruitment: "",
                     ActualRecruitment: "",
@@ -413,9 +400,8 @@ describe("recruitment", function() {
             ])
             .toReturn([
                 {
-                    ExpectedStartDate: "",
                     ExpectedEndDate: "",
-                    ActualStartDate: "",
+                    StartDate: "",
                     ActualEndDate: "",
                     ExpectedRecruitment: "",
                     ActualRecruitment: "",

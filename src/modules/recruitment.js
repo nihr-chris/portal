@@ -136,9 +136,8 @@ module.exports = Operation.module({
                 outputColumns: [
                     "PortfolioStudyID",
                     "MemberOrg",
-                    "ExpectedStartDate",
+                    "StartDate",
                     "ExpectedEndDate",
-                    "ActualStartDate",
                     "ActualEndDate",
                     "ExpectedRecruitment",
                     "ActualRecruitment"
@@ -158,7 +157,7 @@ module.exports = Operation.module({
                     
                     if (params.open) {
                         filters.push(Fusion.eql("ActiveStatus", "Open"));
-                        filters.push(Fusion.gte("ActualStartDate", new Date("2010-4-1")));
+                        filters.push(Fusion.gte("StartDate", new Date("2010-4-1")));
                         filters.push(Fusion.gte("Month", new Date(params.financialYear - 1, 3, 1)));
                     } else {
                         filters.push(Fusion.in("ActiveStatus", ["Closed - in follow-up", "Closed - follow-up complete"]));
@@ -169,9 +168,8 @@ module.exports = Operation.module({
                         select: [
                             "PortfolioStudyID",
                             "MemberOrg",
-                            "ExpectedStartDate",
+                            "StartDate",
                             "ExpectedEndDate",
-                            "ActualStartDate",
                             "ActualEndDate",
                             "ExpectedRecruitment",
                             "SUM(Recruitment) AS ActualRecruitment"
@@ -180,9 +178,8 @@ module.exports = Operation.module({
                         groupBy: [
                             "PortfolioStudyID",
                             "MemberOrg",
-                            "ExpectedStartDate",
+                            "StartDate",
                             "ExpectedEndDate",
-                            "ActualStartDate",
                             "ActualEndDate",
                             "ExpectedRecruitment"
                         ]
@@ -196,17 +193,16 @@ module.exports = Operation.module({
             
             return this.childOperation({
                 outputColumns: this.outputColumns.concat(["ExpectedDays", "ActualDays", "PercentProgress", "PercentTargetMet", "Open"]),
-                inputColumns: ["ExpectedStartDate", "ExpectedEndDate", "ActualStartDate", "ActualEndDate", "ExpectedRecruitment", "ActualRecruitment"],
+                inputColumns: ["StartDate", "ExpectedEndDate", "ActualEndDate", "ExpectedRecruitment", "ActualRecruitment"],
                 transform: function(rows) {
                     return _.map(rows, function(input) {
                         var output = _.clone(input);
                         
-                        var expStart = moment(input.ExpectedStartDate);
+                        var start = moment(input.StartDate);
                         var expEnd = moment(input.ExpectedEndDate);
-                        var actStart = moment(input.ActualStartDate);
                         var actEnd = moment(input.ActualEndDate);
                         
-                        if (!expStart.isValid()
+                        if (!start.isValid()
                             || !expEnd.isValid()
                             || !_.isNumber(input.ExpectedRecruitment)) {
                                 
@@ -217,19 +213,14 @@ module.exports = Operation.module({
                             output.IncompleteInformation = false;
                         }
                         
-                        output.ExpectedDays = expEnd.diff(expStart, "days");
+                        output.ExpectedDays = expEnd.diff(start, "days");
                         
-                        if (!actStart.isValid()) {
-                            output.ActualDays = 0;
-                            
+                        if (actEnd.isValid()) {
+                            output.ActualDays = actEnd.diff(start, "days");
+                            output.Open = false;
                         } else {
-                            if (actEnd.isValid()) {
-                                output.ActualDays = actEnd.diff(actStart, "days");
-                                output.Open = false;
-                            } else {
-                                output.ActualDays = currentDate.diff(actStart, "days");
-                                output.Open = true;
-                            }
+                            output.ActualDays = currentDate.diff(start, "days");
+                            output.Open = true;
                         }
                         
                         output.PercentProgress = output.Open ? (output.ActualDays / output.ExpectedDays) : 1.0;
