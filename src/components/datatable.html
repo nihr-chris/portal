@@ -1,0 +1,16 @@
+<table class="table">
+    <thead>
+        {{# headers ? headers : keys }}
+        <th>{{.}}</th>
+        {{/}}
+    </thead>
+    <tbody>
+        {{# rows }}
+        <tr>
+            {{# this }}
+            <td>{{.}}</td>
+            {{/}}
+        </tr>
+        {{/}}
+    </tbody>
+</table>

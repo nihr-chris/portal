@@ -4,6 +4,7 @@ var _           = require("underscore");
 
 var Recruitment = require("../modules/recruitment.js");
 var palette     = require("../modules/palette.js");
+var util        = require("../modules/util.js");
 
 var modeMap = {
     "By Trust":     "trust",
@@ -56,25 +57,51 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     },
     
     load: function() {
-        this.set("annualRecruitmentData", 
-            Recruitment.operation()
-            .fetchBandedRecruitment({
-                by: modeMap[this.get("filterMode")],
-                commercialStudies: commercialMap[this.get("commercial")]
-            })
-            .filterValues({
-                column: "Grouping",
-                values: this.get("selectedFilterItems")
-            })
-            .performanceBarGraph({
-                colors: palette.generate(["Interventional/Both", "Observational", "Large", "Merged"]),
-                weighted: this.get("weighted")
-            })
-            .then(function(x) {
-                // Break here to catch chart data
-                return x;
-            })
-        );
+        var component = this;
+        
+        var graph = Recruitment.operation()
+        .fetchBandedRecruitment({
+            by: modeMap[this.get("filterMode")],
+            commercialStudies: commercialMap[this.get("commercial")]
+        })
+        .filterValues({
+            column: "Grouping",
+            values: this.get("selectedFilterItems")
+        })
+        .performanceBarGraph({
+            colors: palette.generate(["Interventional/Both", "Observational", "Large", "Merged"]),
+            weighted: this.get("weighted")
+        })
+        ;
+        
+        this.set("annualRecruitmentData", graph);
+        
+        graph.format(function(graphData) {
+            return _.map(graphData, function(group) {
+                var mapped = util.hashArray("key", group.values);
+                
+                function total(what) {
+                    var data = mapped[what];
+                    if (!data) return "-";
+                    
+                    var total = 0;
+                    _.each(data.values, function(x) {
+                        total += x.value;
+                    });
+                    return total;
+                }
+                
+                return {
+                    grouping: group.key,
+                    2012: total("2012-13"),
+                    2013: total("2013-14"),
+                    2014: total("2014-15"),
+                };
+            });
+        })
+        .then(function(x) {
+            component.set("tabledata", x);
+        });
     },
     
     data: {

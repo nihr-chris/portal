@@ -522,7 +522,7 @@ module.exports = operationModule({
                 outputColumns: this.outputColumns,
                 transform: function(rows) {
                     return _.filter(rows, function(r) {
-                        return _.contains(params.values, r[params.column])
+                        return _.contains(params.values, r[params.column]);
                     });
                 }
             });

@@ -6,7 +6,10 @@
     </controlbar>
     
     <controlbar>
-        <multidropdown title={{filterMode.split(" ")[1] + "s"}} items="{{filterItems}}" selected="{{selectedFilterItems}}"></multidropdown>
+        <multidropdown 
+            title={{filterMode.split(" ")[1] + "s"}} 
+            items="{{filterItems}}" 
+            selected="{{selectedFilterItems}}"></multidropdown>
     </controlbar>
     
     <barchart
@@ -16,4 +19,10 @@
         y-label=''
         group-spacing='10'>
     </barchart>
+    
+    <datatable 
+        headers='{{ ["", "2012-13", "2013-14", "2014-15"] }}'
+        keys='{{ ["grouping", "2012", "2013", "2014"] }}' 
+        data='{{tabledata}}'>
+    </datatable>
 </panel>
