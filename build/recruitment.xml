@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <Module>
-  <ModulePrefs title="Proxied Content Example">
-</ModulePrefs>
-  <Content view="canvas" 
-    href="http://gadget-doc-examples.googlecode.com/svn/trunk/opensocial-09/mycontent.html">
-  </Content>
-  <Content view="home">
-    <![CDATA[
-      Hello, home view!
-    ]]>
-  </Content>
+  <ModulePrefs 
+      title="CRN Recruitmet" 
+      height="200" 
+      author="Chris Devereux" 
+      author_email="chris.devereux@nihr.ac.uk">
+        <Locale lang="en" country="uk" />
+  </ModulePrefs>
+  
+  <Content type="url" href="https://crn-c9-chrisdevereux.c9.io/reporting/build/recruitment.html"/>
 </Module>
+
