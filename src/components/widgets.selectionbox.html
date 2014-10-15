@@ -1,0 +1,25 @@
+<div class='selectionbox'>
+    <div class="add btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            {{# items }}
+                {{# !contains(selected, this) }}
+                <li><a href="#" on-click="select">{{.}}</a></li>
+                {{/}}
+            {{/}}
+        </ul>
+    </div>
+
+    <div class="item-flow">
+        {{# items }}
+            {{# contains(selected, this) }}
+            <span class='item'>
+                
+            </span>
+            <li><a on-click="select" href="#">{{ format(.) }}</a></li>
+            {{/}}
+        {{/}}
+    </div>
+</div>

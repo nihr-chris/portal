@@ -1,4 +1,8 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"Y6dZXr":[function(require,module,exports){
+var templates = {"widgets.toggle.html":"{{# enabled }}\n    {{# value }}\n    <li class=\"active\"><a href=\"#\" on-click=\"toggle\">{{label}}</a></li>\n    {{/#}}\n    {{# !value }}\n    <li class=\"active\"><a href=\"#\" on-click=\"toggle\">{{label}}!</a></li>\n    {{/#}}\n{{else}}\n<li class=\"disabled\"><a href=\"#\">{{label}}</a></li>\n{{/#}}\n","widgets.selectionbox.html":"<div class='selectionbox'>\n    <div class=\"add btn-group\">\n        <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n            <span class=\"glyphicon glyphicon-plus\"></span>\n        </button>\n        <ul class=\"dropdown-menu\" role=\"menu\">\n            {{# items }}\n                {{# !contains(selected, this) }}\n                <li><a href=\"#\" on-click=\"select\">{{.}}</a></li>\n                {{/}}\n            {{/}}\n        </ul>\n    </div>\n\n    <div class=\"item-flow\">\n        {{# items }}\n            {{# contains(selected, this) }}\n            <span class='item'>\n                \n            </span>\n            <li><a on-click=\"select\" href=\"#\">{{ format(.) }}</a></li>\n            {{/}}\n        {{/}}\n    </div>\n</div>\n","widgets.panel.html":"<div class=\"panel panel-{{ type ? type : 'default'}}\">\n    <div class=\"panel-heading\">\n        {{ title }}\n    </div>\n    <div class=\"panel-body\">\n        {{ yield }}\n    </div>\n</div>\nblubblub","widgets.multidropdown.html":"<li class=\"dropdown\">\n    <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">{{ title }} <span class=\"caret\"></span></a>\n    <ul class=\"dropdown-menu\" role=\"menu\">\n        {{# items}}\n            {{# contains(selected, this) }}\n            <li class=\"active\">\n                <a href=\"#\" on-click=\"select\">{{ format(this) }}</a>\n            </li>\n            {{else}}\n            <li>\n                <a href=\"#\" on-click=\"select\">{{ format(this) }}</a>\n            </li>\n            {{/#}}\n        {{/#}}\n    </ul>\n</li>","widgets.dropdown.html":"<li class=\"dropdown\">\n    <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">{{ format(selected) }} <span class=\"caret\"></span></a>\n    <ul class=\"dropdown-menu\" role=\"menu\">\n        {{# items}}\n            {{# this === selected }}\n            <li class=\"active\">\n                <a href=\"#\">{{ format(this) }}</a>\n            </li>\n            {{/#}}\n            {{# this !== selected}}\n            <li>\n                <a href=\"#\" on-click=\"select\">{{ format(this) }}</a>\n            </li>\n            {{/#}}\n        {{/#}}\n    </ul>\n</li>","timetarget.html":"<panel title=\"Time & Target\">\n    <controlbar>\n        <multidropdown title='Trusts' items=\"{{memberOrgs}}\" selected=\"{{selectedOrgs}}\"></multidropdown>\n    </controlbar>\n    \n    <barchart\n        data='{{timeTargetGraphData}}'\n        group-spacing='10'>\n    </barchart>\n</panel>\n","recruitmentPerformance-yy.html":"<panel title=\"Annual recruitment performance\">\n    <controlbar>\n        <dropdown items=\"{{filterModeOptions}}\" selected=\"{{filterMode}}\"></dropdown>\n        <dropdown items=\"{{commercialOptions}}\" selected=\"{{commercial}}\"></dropdown>\n        <toggle label=\"Weighted\" value=\"{{weighted}}\"></toggle>\n    </controlbar>\n    \n    <controlbar>\n        <multidropdown \n            title={{filterMode.split(\" \")[1] + \"s\"}} \n            items=\"{{filterItems}}\" \n            selected=\"{{selectedFilterItems}}\"></multidropdown>\n    </controlbar>\n    \n    <barchart\n        data='{{annualRecruitmentData}}'\n        legend='{{examplelegend}}'\n        width='2000'\n        y-label=''\n        group-spacing='10'>\n    </barchart>\n    \n    <datatable \n        headers='{{ [\"\", \"2012-13\", \"2013-14\", \"2014-15\"] }}'\n        keys='{{ [\"grouping\", \"2012\", \"2013\", \"2014\"] }}' \n        data='{{tabledata}}'>\n    </datatable>\n</panel>\n","overview.html":"<div class='row'>\n    <div class='col-xs-12'>\n        <h1>Percentage of recruitment target met</h1>\n    </div>\n</div>\n\n<div class='row'>\n    <div class='col-xs-12'>\n        <h1>Proportion of studies recruiting to time & target</h1>\n    </div>\n</div>\n","master-detail.html":"<div class='row'>\n    <div class='col-xs-4 sidebar'>\n        {{#options}}\n        <div class='row'>\n            <div class='col-xs-12'>\n                <a href='#' class='{{id === current ? \"active\" : \"inactive\"}}' on-click='optionSelected'>\n                    {{title}}\n                </a>\n            </div>\n        </div>\n        {{/#}}\n    </div>\n    <div class='col-xs-6' id='detail'>\n    </div>\n</div>\n","filter.html":"<div class='filter'>\n    {{# items }}\n    <div class='row'>\n        \n    </div>\n    {{/}}\n</div>\n","datatable.html":"<table class=\"table\">\n    <thead>\n        {{# headers ? headers : keys }}\n        <th>{{.}}</th>\n        {{/}}\n    </thead>\n    <tbody>\n        {{# rows }}\n        <tr>\n            {{# this }}\n            <td>{{.}}</td>\n            {{/}}\n        </tr>\n        {{/}}\n    </tbody>\n</table>\n"}; module.exports = function(name) { return templates[name] };
+},{}],"template":[function(require,module,exports){
+module.exports=require('Y6dZXr');
+},{}],3:[function(require,module,exports){
 // Browser Request
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -474,7 +478,7 @@ function b64_enc (data) {
 }
 module.exports = request;
 
-},{}],2:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /* MIT license */
 var convert = require("color-convert"),
     string = require("color-string");
@@ -904,7 +908,7 @@ Color.prototype.setChannel = function(space, index, val) {
    return this;
 }
 
-},{"color-convert":4,"color-string":5}],3:[function(require,module,exports){
+},{"color-convert":6,"color-string":7}],5:[function(require,module,exports){
 /* MIT license */
 
 module.exports = {
@@ -1596,7 +1600,7 @@ for (var key in cssKeywords) {
   reverseKeywords[JSON.stringify(cssKeywords[key])] = key;
 }
 
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var conversions = require("./conversions");
 
 var convert = function() {
@@ -1689,7 +1693,7 @@ Converter.prototype.getValues = function(space) {
 });
 
 module.exports = convert;
-},{"./conversions":3}],5:[function(require,module,exports){
+},{"./conversions":5}],7:[function(require,module,exports){
 /* MIT license */
 var convert = require("color-convert");
 
@@ -1903,7 +1907,7 @@ function hexDouble(num) {
   return (str.length < 2) ? "0" + str : str;
 }
 
-},{"color-convert":4}],6:[function(require,module,exports){
+},{"color-convert":6}],8:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.4.11"
@@ -11137,7 +11141,7 @@ function hexDouble(num) {
   if (typeof define === "function" && define.amd) define(d3); else if (typeof module === "object" && module.exports) module.exports = d3;
   this.d3 = d3;
 }();
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -11182,16 +11186,6 @@ process.browser = true;
 process.env = {};
 process.argv = [];
 
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
 }
@@ -11202,7 +11196,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = require('./lib/schema')
 
 // Patterns
@@ -11225,7 +11219,7 @@ require('./lib/extensions/Array')
 require('./lib/extensions/Function')
 require('./lib/extensions/Schema')
 
-},{"./lib/extensions/Array":10,"./lib/extensions/Boolean":11,"./lib/extensions/Function":12,"./lib/extensions/Number":13,"./lib/extensions/Object":14,"./lib/extensions/Schema":15,"./lib/extensions/String":16,"./lib/patterns/anything":17,"./lib/patterns/class":18,"./lib/patterns/equality":19,"./lib/patterns/nothing":20,"./lib/patterns/object":21,"./lib/patterns/or":22,"./lib/patterns/reference":23,"./lib/patterns/regexp":24,"./lib/patterns/schema":25,"./lib/schema":26}],9:[function(require,module,exports){
+},{"./lib/extensions/Array":12,"./lib/extensions/Boolean":13,"./lib/extensions/Function":14,"./lib/extensions/Number":15,"./lib/extensions/Object":16,"./lib/extensions/Schema":17,"./lib/extensions/String":18,"./lib/patterns/anything":19,"./lib/patterns/class":20,"./lib/patterns/equality":21,"./lib/patterns/nothing":22,"./lib/patterns/object":23,"./lib/patterns/or":24,"./lib/patterns/reference":25,"./lib/patterns/regexp":26,"./lib/patterns/schema":27,"./lib/schema":28}],11:[function(require,module,exports){
 var Schema = module.exports = function() {}
 
 Schema.prototype = {
@@ -11348,7 +11342,7 @@ Schema.fromJSON.def = Array.prototype.push.bind(fromJSONdefs)
 Schema.patterns = {}
 Schema.extensions = {}
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var Schema          = require('../BaseSchema')
   , EqualitySchema  = require('../patterns/equality')
   , anything        = require('../patterns/anything').instance
@@ -11453,7 +11447,7 @@ Array.like = function(other) {
 
 Array.schema = new ArraySchema().wrap()
 
-},{"../BaseSchema":9,"../patterns/anything":17,"../patterns/equality":19}],11:[function(require,module,exports){
+},{"../BaseSchema":11,"../patterns/anything":19,"../patterns/equality":21}],13:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var BooleanSchema = module.exports = Schema.extensions.BooleanSchema = new Schema.extend({
@@ -11485,14 +11479,14 @@ Schema.fromJSON.def(function(sch) {
 
 Boolean.schema = booleanSchema
 
-},{"../BaseSchema":9}],12:[function(require,module,exports){
+},{"../BaseSchema":11}],14:[function(require,module,exports){
 var ReferenceSchema = require('../patterns/reference')
 
 Function.reference = function(f) {
   return new ReferenceSchema(f).wrap()
 }
 
-},{"../patterns/reference":23}],13:[function(require,module,exports){
+},{"../patterns/reference":25}],15:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var NumberSchema = module.exports = Schema.extensions.NumberSchema = Schema.extend({
@@ -11612,7 +11606,7 @@ Number.step       = Number.schema.step
 
 Number.Integer    = Number.step(1)
 
-},{"../BaseSchema":9}],14:[function(require,module,exports){
+},{"../BaseSchema":11}],16:[function(require,module,exports){
 var ReferenceSchema = require('../patterns/reference')
   , EqualitySchema = require('../patterns/equality')
   , ObjectSchema = require('../patterns/object')
@@ -11627,7 +11621,7 @@ Object.reference = function(o) {
 
 Object.schema = new ObjectSchema().wrap()
 
-},{"../patterns/equality":19,"../patterns/object":21,"../patterns/reference":23}],15:[function(require,module,exports){
+},{"../patterns/equality":21,"../patterns/object":23,"../patterns/reference":25}],17:[function(require,module,exports){
 var Schema = require('../BaseSchema')
   , schema = require('../schema')
 
@@ -11707,7 +11701,7 @@ Schema.fromJSON.def(function(sch) {
   }
 })
 
-},{"../BaseSchema":9,"../schema":26}],16:[function(require,module,exports){
+},{"../BaseSchema":11,"../schema":28}],18:[function(require,module,exports){
 var RegexpSchema = require('../patterns/regexp')
 
 String.of = function() {
@@ -11725,7 +11719,7 @@ String.of = function() {
 
 String.schema = new RegexpSchema().wrap()
 
-},{"../patterns/regexp":24}],17:[function(require,module,exports){
+},{"../patterns/regexp":26}],19:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var AnythingSchema = module.exports = Schema.patterns.AnythingSchema = Schema.extend({
@@ -11754,7 +11748,7 @@ Schema.fromJSON.def(function(sch) {
   if (sch.type === 'any') return anything
 })
 
-},{"../BaseSchema":9}],18:[function(require,module,exports){
+},{"../BaseSchema":11}],20:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var ClassSchema = module.exports = Schema.patterns.ClassSchema = Schema.extend({
@@ -11796,7 +11790,7 @@ Schema.fromJS.def(function(constructor) {
   }
 })
 
-},{"../BaseSchema":9}],19:[function(require,module,exports){
+},{"../BaseSchema":11}],21:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 // Object deep equality
@@ -11847,7 +11841,7 @@ Schema.fromJS.def(function(sch) {
   if (sch instanceof Array && sch.length === 1) return new EqualitySchema(sch[0])
 })
 
-},{"../BaseSchema":9}],20:[function(require,module,exports){
+},{"../BaseSchema":11}],22:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var NothingSchema = module.exports = Schema.patterns.NothingSchema = Schema.extend({
@@ -11873,7 +11867,7 @@ Schema.fromJSON.def(function(sch) {
   if (sch.type === 'null') return nothing
 })
 
-},{"../BaseSchema":9}],21:[function(require,module,exports){
+},{"../BaseSchema":11}],23:[function(require,module,exports){
 var Schema    = require('../BaseSchema')
   , anything  = require('./anything').instance
   , nothing   = require('./nothing').instance
@@ -12094,7 +12088,7 @@ Schema.fromJSON.def(function(json) {
   return new ObjectSchema(properties, other)
 })
 
-},{"../BaseSchema":9,"./anything":17,"./nothing":20}],22:[function(require,module,exports){
+},{"../BaseSchema":11,"./anything":19,"./nothing":22}],24:[function(require,module,exports){
 var Schema = require('../BaseSchema')
   , EqualitySchema = require('../patterns/equality')
 
@@ -12177,7 +12171,7 @@ Schema.fromJSON.def(function(sch) {
   }
 })
 
-},{"../BaseSchema":9,"../patterns/equality":19}],23:[function(require,module,exports){
+},{"../BaseSchema":11,"../patterns/equality":21}],25:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var ReferenceSchema = module.exports = Schema.patterns.ReferenceSchema = Schema.extend({
@@ -12219,7 +12213,7 @@ Schema.fromJS.def(function(value) {
   return new ReferenceSchema(value)
 })
 
-},{"../BaseSchema":9}],24:[function(require,module,exports){
+},{"../BaseSchema":11}],26:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var RegexpSchema = module.exports = Schema.patterns.RegexpSchema = Schema.extend({
@@ -12272,14 +12266,14 @@ Schema.fromJS.def(function(regexp) {
   if (regexp instanceof RegExp) return new RegexpSchema(regexp)
 })
 
-},{"../BaseSchema":9}],25:[function(require,module,exports){
+},{"../BaseSchema":11}],27:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 Schema.fromJS.def(function(sch) {
   if (sch instanceof Schema) return sch
 })
 
-},{"../BaseSchema":9}],26:[function(require,module,exports){
+},{"../BaseSchema":11}],28:[function(require,module,exports){
 var Schema = require('./BaseSchema')
 
 schema = module.exports = function(schemaDescription) {
@@ -12321,7 +12315,7 @@ schema.fromJSON = function(sch) {
   return Schema.fromJSON(sch).wrap()
 }
 
-},{"./BaseSchema":9}],27:[function(require,module,exports){
+},{"./BaseSchema":11}],29:[function(require,module,exports){
 /*
 * loglevel - https://github.com/pimterry/loglevel
 *
@@ -12528,9 +12522,8 @@ schema.fromJSON = function(sch) {
     return self;
 }));
 
-},{}],28:[function(require,module,exports){
-(function (global){
-//! moment.js
+},{}],30:[function(require,module,exports){
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};//! moment.js
 //! version : 2.8.3
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
@@ -15387,15 +15380,695 @@ schema.fromJSON = function(sch) {
     }
 }).call(this);
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
+/*!
+ * numeral.js
+ * version : 1.5.3
+ * author : Adam Draper
+ * license : MIT
+ * http://adamwdraper.github.com/Numeral-js/
+ */
+
+(function () {
+
+    /************************************
+        Constants
+    ************************************/
+
+    var numeral,
+        VERSION = '1.5.3',
+        // internal storage for language config files
+        languages = {},
+        currentLanguage = 'en',
+        zeroFormat = null,
+        defaultFormat = '0,0',
+        // check for nodeJS
+        hasModule = (typeof module !== 'undefined' && module.exports);
+
+
+    /************************************
+        Constructors
+    ************************************/
+
+
+    // Numeral prototype object
+    function Numeral (number) {
+        this._value = number;
+    }
+
+    /**
+     * Implementation of toFixed() that treats floats more like decimals
+     *
+     * Fixes binary rounding issues (eg. (0.615).toFixed(2) === '0.61') that present
+     * problems for accounting- and finance-related software.
+     */
+    function toFixed (value, precision, roundingFunction, optionals) {
+        var power = Math.pow(10, precision),
+            optionalsRegExp,
+            output;
+            
+        //roundingFunction = (roundingFunction !== undefined ? roundingFunction : Math.round);
+        // Multiply up by precision, round accurately, then divide and use native toFixed():
+        output = (roundingFunction(value * power) / power).toFixed(precision);
+
+        if (optionals) {
+            optionalsRegExp = new RegExp('0{1,' + optionals + '}$');
+            output = output.replace(optionalsRegExp, '');
+        }
+
+        return output;
+    }
+
+    /************************************
+        Formatting
+    ************************************/
+
+    // determine what type of formatting we need to do
+    function formatNumeral (n, format, roundingFunction) {
+        var output;
+
+        // figure out what kind of format we are dealing with
+        if (format.indexOf('$') > -1) { // currency!!!!!
+            output = formatCurrency(n, format, roundingFunction);
+        } else if (format.indexOf('%') > -1) { // percentage
+            output = formatPercentage(n, format, roundingFunction);
+        } else if (format.indexOf(':') > -1) { // time
+            output = formatTime(n, format);
+        } else { // plain ol' numbers or bytes
+            output = formatNumber(n._value, format, roundingFunction);
+        }
+
+        // return string
+        return output;
+    }
+
+    // revert to number
+    function unformatNumeral (n, string) {
+        var stringOriginal = string,
+            thousandRegExp,
+            millionRegExp,
+            billionRegExp,
+            trillionRegExp,
+            suffixes = ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+            bytesMultiplier = false,
+            power;
+
+        if (string.indexOf(':') > -1) {
+            n._value = unformatTime(string);
+        } else {
+            if (string === zeroFormat) {
+                n._value = 0;
+            } else {
+                if (languages[currentLanguage].delimiters.decimal !== '.') {
+                    string = string.replace(/\./g,'').replace(languages[currentLanguage].delimiters.decimal, '.');
+                }
+
+                // see if abbreviations are there so that we can multiply to the correct number
+                thousandRegExp = new RegExp('[^a-zA-Z]' + languages[currentLanguage].abbreviations.thousand + '(?:\\)|(\\' + languages[currentLanguage].currency.symbol + ')?(?:\\))?)?$');
+                millionRegExp = new RegExp('[^a-zA-Z]' + languages[currentLanguage].abbreviations.million + '(?:\\)|(\\' + languages[currentLanguage].currency.symbol + ')?(?:\\))?)?$');
+                billionRegExp = new RegExp('[^a-zA-Z]' + languages[currentLanguage].abbreviations.billion + '(?:\\)|(\\' + languages[currentLanguage].currency.symbol + ')?(?:\\))?)?$');
+                trillionRegExp = new RegExp('[^a-zA-Z]' + languages[currentLanguage].abbreviations.trillion + '(?:\\)|(\\' + languages[currentLanguage].currency.symbol + ')?(?:\\))?)?$');
+
+                // see if bytes are there so that we can multiply to the correct number
+                for (power = 0; power <= suffixes.length; power++) {
+                    bytesMultiplier = (string.indexOf(suffixes[power]) > -1) ? Math.pow(1024, power + 1) : false;
+
+                    if (bytesMultiplier) {
+                        break;
+                    }
+                }
+
+                // do some math to create our number
+                n._value = ((bytesMultiplier) ? bytesMultiplier : 1) * ((stringOriginal.match(thousandRegExp)) ? Math.pow(10, 3) : 1) * ((stringOriginal.match(millionRegExp)) ? Math.pow(10, 6) : 1) * ((stringOriginal.match(billionRegExp)) ? Math.pow(10, 9) : 1) * ((stringOriginal.match(trillionRegExp)) ? Math.pow(10, 12) : 1) * ((string.indexOf('%') > -1) ? 0.01 : 1) * (((string.split('-').length + Math.min(string.split('(').length-1, string.split(')').length-1)) % 2)? 1: -1) * Number(string.replace(/[^0-9\.]+/g, ''));
+
+                // round if we are talking about bytes
+                n._value = (bytesMultiplier) ? Math.ceil(n._value) : n._value;
+            }
+        }
+        return n._value;
+    }
+
+    function formatCurrency (n, format, roundingFunction) {
+        var symbolIndex = format.indexOf('$'),
+            openParenIndex = format.indexOf('('),
+            minusSignIndex = format.indexOf('-'),
+            space = '',
+            spliceIndex,
+            output;
+
+        // check for space before or after currency
+        if (format.indexOf(' $') > -1) {
+            space = ' ';
+            format = format.replace(' $', '');
+        } else if (format.indexOf('$ ') > -1) {
+            space = ' ';
+            format = format.replace('$ ', '');
+        } else {
+            format = format.replace('$', '');
+        }
+
+        // format the number
+        output = formatNumber(n._value, format, roundingFunction);
+
+        // position the symbol
+        if (symbolIndex <= 1) {
+            if (output.indexOf('(') > -1 || output.indexOf('-') > -1) {
+                output = output.split('');
+                spliceIndex = 1;
+                if (symbolIndex < openParenIndex || symbolIndex < minusSignIndex){
+                    // the symbol appears before the "(" or "-"
+                    spliceIndex = 0;
+                }
+                output.splice(spliceIndex, 0, languages[currentLanguage].currency.symbol + space);
+                output = output.join('');
+            } else {
+                output = languages[currentLanguage].currency.symbol + space + output;
+            }
+        } else {
+            if (output.indexOf(')') > -1) {
+                output = output.split('');
+                output.splice(-1, 0, space + languages[currentLanguage].currency.symbol);
+                output = output.join('');
+            } else {
+                output = output + space + languages[currentLanguage].currency.symbol;
+            }
+        }
+
+        return output;
+    }
+
+    function formatPercentage (n, format, roundingFunction) {
+        var space = '',
+            output,
+            value = n._value * 100;
+
+        // check for space before %
+        if (format.indexOf(' %') > -1) {
+            space = ' ';
+            format = format.replace(' %', '');
+        } else {
+            format = format.replace('%', '');
+        }
+
+        output = formatNumber(value, format, roundingFunction);
+        
+        if (output.indexOf(')') > -1 ) {
+            output = output.split('');
+            output.splice(-1, 0, space + '%');
+            output = output.join('');
+        } else {
+            output = output + space + '%';
+        }
+
+        return output;
+    }
+
+    function formatTime (n) {
+        var hours = Math.floor(n._value/60/60),
+            minutes = Math.floor((n._value - (hours * 60 * 60))/60),
+            seconds = Math.round(n._value - (hours * 60 * 60) - (minutes * 60));
+        return hours + ':' + ((minutes < 10) ? '0' + minutes : minutes) + ':' + ((seconds < 10) ? '0' + seconds : seconds);
+    }
+
+    function unformatTime (string) {
+        var timeArray = string.split(':'),
+            seconds = 0;
+        // turn hours and minutes into seconds and add them all up
+        if (timeArray.length === 3) {
+            // hours
+            seconds = seconds + (Number(timeArray[0]) * 60 * 60);
+            // minutes
+            seconds = seconds + (Number(timeArray[1]) * 60);
+            // seconds
+            seconds = seconds + Number(timeArray[2]);
+        } else if (timeArray.length === 2) {
+            // minutes
+            seconds = seconds + (Number(timeArray[0]) * 60);
+            // seconds
+            seconds = seconds + Number(timeArray[1]);
+        }
+        return Number(seconds);
+    }
+
+    function formatNumber (value, format, roundingFunction) {
+        var negP = false,
+            signed = false,
+            optDec = false,
+            abbr = '',
+            abbrK = false, // force abbreviation to thousands
+            abbrM = false, // force abbreviation to millions
+            abbrB = false, // force abbreviation to billions
+            abbrT = false, // force abbreviation to trillions
+            abbrForce = false, // force abbreviation
+            bytes = '',
+            ord = '',
+            abs = Math.abs(value),
+            suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+            min,
+            max,
+            power,
+            w,
+            precision,
+            thousands,
+            d = '',
+            neg = false;
+
+        // check if number is zero and a custom zero format has been set
+        if (value === 0 && zeroFormat !== null) {
+            return zeroFormat;
+        } else {
+            // see if we should use parentheses for negative number or if we should prefix with a sign
+            // if both are present we default to parentheses
+            if (format.indexOf('(') > -1) {
+                negP = true;
+                format = format.slice(1, -1);
+            } else if (format.indexOf('+') > -1) {
+                signed = true;
+                format = format.replace(/\+/g, '');
+            }
+
+            // see if abbreviation is wanted
+            if (format.indexOf('a') > -1) {
+                // check if abbreviation is specified
+                abbrK = format.indexOf('aK') >= 0;
+                abbrM = format.indexOf('aM') >= 0;
+                abbrB = format.indexOf('aB') >= 0;
+                abbrT = format.indexOf('aT') >= 0;
+                abbrForce = abbrK || abbrM || abbrB || abbrT;
+
+                // check for space before abbreviation
+                if (format.indexOf(' a') > -1) {
+                    abbr = ' ';
+                    format = format.replace(' a', '');
+                } else {
+                    format = format.replace('a', '');
+                }
+
+                if (abs >= Math.pow(10, 12) && !abbrForce || abbrT) {
+                    // trillion
+                    abbr = abbr + languages[currentLanguage].abbreviations.trillion;
+                    value = value / Math.pow(10, 12);
+                } else if (abs < Math.pow(10, 12) && abs >= Math.pow(10, 9) && !abbrForce || abbrB) {
+                    // billion
+                    abbr = abbr + languages[currentLanguage].abbreviations.billion;
+                    value = value / Math.pow(10, 9);
+                } else if (abs < Math.pow(10, 9) && abs >= Math.pow(10, 6) && !abbrForce || abbrM) {
+                    // million
+                    abbr = abbr + languages[currentLanguage].abbreviations.million;
+                    value = value / Math.pow(10, 6);
+                } else if (abs < Math.pow(10, 6) && abs >= Math.pow(10, 3) && !abbrForce || abbrK) {
+                    // thousand
+                    abbr = abbr + languages[currentLanguage].abbreviations.thousand;
+                    value = value / Math.pow(10, 3);
+                }
+            }
+
+            // see if we are formatting bytes
+            if (format.indexOf('b') > -1) {
+                // check for space before
+                if (format.indexOf(' b') > -1) {
+                    bytes = ' ';
+                    format = format.replace(' b', '');
+                } else {
+                    format = format.replace('b', '');
+                }
+
+                for (power = 0; power <= suffixes.length; power++) {
+                    min = Math.pow(1024, power);
+                    max = Math.pow(1024, power+1);
+
+                    if (value >= min && value < max) {
+                        bytes = bytes + suffixes[power];
+                        if (min > 0) {
+                            value = value / min;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // see if ordinal is wanted
+            if (format.indexOf('o') > -1) {
+                // check for space before
+                if (format.indexOf(' o') > -1) {
+                    ord = ' ';
+                    format = format.replace(' o', '');
+                } else {
+                    format = format.replace('o', '');
+                }
+
+                ord = ord + languages[currentLanguage].ordinal(value);
+            }
+
+            if (format.indexOf('[.]') > -1) {
+                optDec = true;
+                format = format.replace('[.]', '.');
+            }
+
+            w = value.toString().split('.')[0];
+            precision = format.split('.')[1];
+            thousands = format.indexOf(',');
+
+            if (precision) {
+                if (precision.indexOf('[') > -1) {
+                    precision = precision.replace(']', '');
+                    precision = precision.split('[');
+                    d = toFixed(value, (precision[0].length + precision[1].length), roundingFunction, precision[1].length);
+                } else {
+                    d = toFixed(value, precision.length, roundingFunction);
+                }
+
+                w = d.split('.')[0];
+
+                if (d.split('.')[1].length) {
+                    d = languages[currentLanguage].delimiters.decimal + d.split('.')[1];
+                } else {
+                    d = '';
+                }
+
+                if (optDec && Number(d.slice(1)) === 0) {
+                    d = '';
+                }
+            } else {
+                w = toFixed(value, null, roundingFunction);
+            }
+
+            // format number
+            if (w.indexOf('-') > -1) {
+                w = w.slice(1);
+                neg = true;
+            }
+
+            if (thousands > -1) {
+                w = w.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + languages[currentLanguage].delimiters.thousands);
+            }
+
+            if (format.indexOf('.') === 0) {
+                w = '';
+            }
+
+            return ((negP && neg) ? '(' : '') + ((!negP && neg) ? '-' : '') + ((!neg && signed) ? '+' : '') + w + d + ((ord) ? ord : '') + ((abbr) ? abbr : '') + ((bytes) ? bytes : '') + ((negP && neg) ? ')' : '');
+        }
+    }
+
+    /************************************
+        Top Level Functions
+    ************************************/
+
+    numeral = function (input) {
+        if (numeral.isNumeral(input)) {
+            input = input.value();
+        } else if (input === 0 || typeof input === 'undefined') {
+            input = 0;
+        } else if (!Number(input)) {
+            input = numeral.fn.unformat(input);
+        }
+
+        return new Numeral(Number(input));
+    };
+
+    // version number
+    numeral.version = VERSION;
+
+    // compare numeral object
+    numeral.isNumeral = function (obj) {
+        return obj instanceof Numeral;
+    };
+
+    // This function will load languages and then set the global language.  If
+    // no arguments are passed in, it will simply return the current global
+    // language key.
+    numeral.language = function (key, values) {
+        if (!key) {
+            return currentLanguage;
+        }
+
+        if (key && !values) {
+            if(!languages[key]) {
+                throw new Error('Unknown language : ' + key);
+            }
+            currentLanguage = key;
+        }
+
+        if (values || !languages[key]) {
+            loadLanguage(key, values);
+        }
+
+        return numeral;
+    };
+    
+    // This function provides access to the loaded language data.  If
+    // no arguments are passed in, it will simply return the current
+    // global language object.
+    numeral.languageData = function (key) {
+        if (!key) {
+            return languages[currentLanguage];
+        }
+        
+        if (!languages[key]) {
+            throw new Error('Unknown language : ' + key);
+        }
+        
+        return languages[key];
+    };
+
+    numeral.language('en', {
+        delimiters: {
+            thousands: ',',
+            decimal: '.'
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            var b = number % 10;
+            return (~~ (number % 100 / 10) === 1) ? 'th' :
+                (b === 1) ? 'st' :
+                (b === 2) ? 'nd' :
+                (b === 3) ? 'rd' : 'th';
+        },
+        currency: {
+            symbol: '$'
+        }
+    });
+
+    numeral.zeroFormat = function (format) {
+        zeroFormat = typeof(format) === 'string' ? format : null;
+    };
+
+    numeral.defaultFormat = function (format) {
+        defaultFormat = typeof(format) === 'string' ? format : '0.0';
+    };
+
+    /************************************
+        Helpers
+    ************************************/
+
+    function loadLanguage(key, values) {
+        languages[key] = values;
+    }
+
+    /************************************
+        Floating-point helpers
+    ************************************/
+
+    // The floating-point helper functions and implementation
+    // borrows heavily from sinful.js: http://guipn.github.io/sinful.js/
+
+    /**
+     * Array.prototype.reduce for browsers that don't support it
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce#Compatibility
+     */
+    if ('function' !== typeof Array.prototype.reduce) {
+        Array.prototype.reduce = function (callback, opt_initialValue) {
+            'use strict';
+            
+            if (null === this || 'undefined' === typeof this) {
+                // At the moment all modern browsers, that support strict mode, have
+                // native implementation of Array.prototype.reduce. For instance, IE8
+                // does not support strict mode, so this check is actually useless.
+                throw new TypeError('Array.prototype.reduce called on null or undefined');
+            }
+            
+            if ('function' !== typeof callback) {
+                throw new TypeError(callback + ' is not a function');
+            }
+
+            var index,
+                value,
+                length = this.length >>> 0,
+                isValueSet = false;
+
+            if (1 < arguments.length) {
+                value = opt_initialValue;
+                isValueSet = true;
+            }
+
+            for (index = 0; length > index; ++index) {
+                if (this.hasOwnProperty(index)) {
+                    if (isValueSet) {
+                        value = callback(value, this[index], index, this);
+                    } else {
+                        value = this[index];
+                        isValueSet = true;
+                    }
+                }
+            }
+
+            if (!isValueSet) {
+                throw new TypeError('Reduce of empty array with no initial value');
+            }
+
+            return value;
+        };
+    }
+
+    
+    /**
+     * Computes the multiplier necessary to make x >= 1,
+     * effectively eliminating miscalculations caused by
+     * finite precision.
+     */
+    function multiplier(x) {
+        var parts = x.toString().split('.');
+        if (parts.length < 2) {
+            return 1;
+        }
+        return Math.pow(10, parts[1].length);
+    }
+
+    /**
+     * Given a variable number of arguments, returns the maximum
+     * multiplier that must be used to normalize an operation involving
+     * all of them.
+     */
+    function correctionFactor() {
+        var args = Array.prototype.slice.call(arguments);
+        return args.reduce(function (prev, next) {
+            var mp = multiplier(prev),
+                mn = multiplier(next);
+        return mp > mn ? mp : mn;
+        }, -Infinity);
+    }        
+
+
+    /************************************
+        Numeral Prototype
+    ************************************/
+
+
+    numeral.fn = Numeral.prototype = {
+
+        clone : function () {
+            return numeral(this);
+        },
+
+        format : function (inputString, roundingFunction) {
+            return formatNumeral(this, 
+                  inputString ? inputString : defaultFormat, 
+                  (roundingFunction !== undefined) ? roundingFunction : Math.round
+              );
+        },
+
+        unformat : function (inputString) {
+            if (Object.prototype.toString.call(inputString) === '[object Number]') { 
+                return inputString; 
+            }
+            return unformatNumeral(this, inputString ? inputString : defaultFormat);
+        },
+
+        value : function () {
+            return this._value;
+        },
+
+        valueOf : function () {
+            return this._value;
+        },
+
+        set : function (value) {
+            this._value = Number(value);
+            return this;
+        },
+
+        add : function (value) {
+            var corrFactor = correctionFactor.call(null, this._value, value);
+            function cback(accum, curr, currI, O) {
+                return accum + corrFactor * curr;
+            }
+            this._value = [this._value, value].reduce(cback, 0) / corrFactor;
+            return this;
+        },
+
+        subtract : function (value) {
+            var corrFactor = correctionFactor.call(null, this._value, value);
+            function cback(accum, curr, currI, O) {
+                return accum - corrFactor * curr;
+            }
+            this._value = [value].reduce(cback, this._value * corrFactor) / corrFactor;            
+            return this;
+        },
+
+        multiply : function (value) {
+            function cback(accum, curr, currI, O) {
+                var corrFactor = correctionFactor(accum, curr);
+                return (accum * corrFactor) * (curr * corrFactor) /
+                    (corrFactor * corrFactor);
+            }
+            this._value = [this._value, value].reduce(cback, 1);
+            return this;
+        },
+
+        divide : function (value) {
+            function cback(accum, curr, currI, O) {
+                var corrFactor = correctionFactor(accum, curr);
+                return (accum * corrFactor) / (curr * corrFactor);
+            }
+            this._value = [this._value, value].reduce(cback);            
+            return this;
+        },
+
+        difference : function (value) {
+            return Math.abs(numeral(this._value).subtract(value).value());
+        }
+
+    };
+
+    /************************************
+        Exposing Numeral
+    ************************************/
+
+    // CommonJS module is defined
+    if (hasModule) {
+        module.exports = numeral;
+    }
+
+    /*global ender:false */
+    if (typeof ender === 'undefined') {
+        // here, `this` means `window` in the browser, or `global` on the server
+        // add `numeral` as a global object via a string identifier,
+        // for Closure Compiler 'advanced' mode
+        this['numeral'] = numeral;
+    }
+
+    /*global define:false */
+    if (typeof define === 'function' && define.amd) {
+        define([], function () {
+            return numeral;
+        });
+    }
+}).call(this);
+
+},{}],32:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./lib/core.js')
 require('./lib/done.js')
 require('./lib/es6-extensions.js')
 require('./lib/node-extensions.js')
-},{"./lib/core.js":30,"./lib/done.js":31,"./lib/es6-extensions.js":32,"./lib/node-extensions.js":33}],30:[function(require,module,exports){
+},{"./lib/core.js":33,"./lib/done.js":34,"./lib/es6-extensions.js":35,"./lib/node-extensions.js":36}],33:[function(require,module,exports){
 'use strict';
 
 var asap = require('asap')
@@ -15502,7 +16175,7 @@ function doResolve(fn, onFulfilled, onRejected) {
   }
 }
 
-},{"asap":34}],31:[function(require,module,exports){
+},{"asap":37}],34:[function(require,module,exports){
 'use strict';
 
 var Promise = require('./core.js')
@@ -15517,7 +16190,7 @@ Promise.prototype.done = function (onFulfilled, onRejected) {
     })
   })
 }
-},{"./core.js":30,"asap":34}],32:[function(require,module,exports){
+},{"./core.js":33,"asap":37}],35:[function(require,module,exports){
 'use strict';
 
 //This file contains the ES6 extensions to the core Promises/A+ API
@@ -15627,7 +16300,7 @@ Promise.prototype['catch'] = function (onRejected) {
   return this.then(null, onRejected);
 }
 
-},{"./core.js":30,"asap":34}],33:[function(require,module,exports){
+},{"./core.js":33,"asap":37}],36:[function(require,module,exports){
 'use strict';
 
 //This file contains then/promise specific extensions that are only useful for node.js interop
@@ -15689,9 +16362,8 @@ Promise.prototype.nodeify = function (callback, ctx) {
   })
 }
 
-},{"./core.js":30,"asap":34}],34:[function(require,module,exports){
-(function (process){
-
+},{"./core.js":33,"asap":37}],37:[function(require,module,exports){
+var process=require("__browserify_process");
 // Use the fastest possible means to execute a task in a future turn
 // of the event loop.
 
@@ -15805,8 +16477,7 @@ function asap(task) {
 module.exports = asap;
 
 
-}).call(this,require('_process'))
-},{"_process":7}],35:[function(require,module,exports){
+},{"__browserify_process":9}],38:[function(require,module,exports){
 /*
 	ractive.js v0.5.8
 	2014-09-18 - commit 2e726021 
@@ -29808,7 +30479,7 @@ module.exports = asap;
 
 }( typeof window !== 'undefined' ? window : this ) );
 
-},{}],36:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -31225,9 +31896,9 @@ module.exports = asap;
   }
 }.call(this));
 
-},{}],37:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 var Ractive = require("ractive");
-var template = require("template");
+var template = require("./templates.js");
 
 var log = require('loglevel');
 log.setLevel("trace");
@@ -31251,7 +31922,7 @@ window.runApp = function(mainComponent) {
     });
 };
 
-},{"./components/barchart.js":38,"./components/datatable.js":39,"./components/filter.js":40,"./components/master-detail.js":41,"./components/recruitmentPerformance-yy.js":42,"./components/timetarget.js":43,"./components/widgets.js":44,"./modules/fusion.js":45,"browser-request":1,"loglevel":27,"ractive":35,"template":undefined}],38:[function(require,module,exports){
+},{"./components/barchart.js":41,"./components/datatable.js":42,"./components/filter.js":43,"./components/master-detail.js":44,"./components/recruitmentPerformance-yy.js":45,"./components/timetarget.js":46,"./components/widgets.js":47,"./modules/fusion.js":48,"./templates.js":54,"browser-request":3,"loglevel":29,"ractive":38}],41:[function(require,module,exports){
 var Ractive = require('ractive');
 var d3 = require('d3');
 var _ = require('underscore');
@@ -31498,9 +32169,9 @@ Ractive.components.barchart = Ractive.extend({
     }
 });
 
-},{"../modules/util.js":49,"d3":6,"ractive":35,"underscore":36}],39:[function(require,module,exports){
+},{"../modules/util.js":53,"d3":8,"ractive":38,"underscore":39}],42:[function(require,module,exports){
 var Ractive = require("ractive");
-var template = require("template");
+var template = require("../templates.js");
 var _ = require("underscore");
 
 Ractive.components.datatable = Ractive.extend({
@@ -31518,9 +32189,9 @@ Ractive.components.datatable = Ractive.extend({
     }
 });
 
-},{"ractive":35,"template":undefined,"underscore":36}],40:[function(require,module,exports){
+},{"../templates.js":54,"ractive":38,"underscore":39}],43:[function(require,module,exports){
 var Ractive = require("ractive");
-var template = require("template");
+var template = require("../templates.js");
 var log = require("loglevel");
 
 Ractive.components.filter = Ractive.extend({
@@ -31540,10 +32211,10 @@ Ractive.components.filter = Ractive.extend({
         
         component.rows = [];
     },
-    isolated: true
+    isolated: false
 });
 
-},{"loglevel":27,"ractive":35,"template":undefined}],41:[function(require,module,exports){
+},{"../templates.js":54,"loglevel":29,"ractive":38}],44:[function(require,module,exports){
 /**
  * Component for presenting a list of options, along with a different 'detail'
  * component depending on which of the options is currently active.
@@ -31597,9 +32268,9 @@ Ractive.components.masterdetail = Ractive.extend({
     }
 });
 
-},{"../modules/util.js":49,"ractive":35}],42:[function(require,module,exports){
+},{"../modules/util.js":53,"ractive":38}],45:[function(require,module,exports){
 var Ractive     = require("ractive");
-var template    = require("template");
+var template    = require("../templates.js");
 var _           = require("underscore");
 
 var Recruitment = require("../modules/recruitment.js");
@@ -31763,9 +32434,9 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     }
 });
 
-},{"../modules/palette.js":47,"../modules/recruitment.js":48,"../modules/util.js":49,"ractive":35,"template":undefined,"underscore":36}],43:[function(require,module,exports){
+},{"../modules/palette.js":50,"../modules/recruitment.js":51,"../modules/util.js":53,"../templates.js":54,"ractive":38,"underscore":39}],46:[function(require,module,exports){
 var Ractive     = require("ractive");
-var template    = require("template");
+var template    = require("../templates.js");
 var _           = require("underscore");
 
 var Recruitment = require("../modules/recruitment.js");
@@ -31833,9 +32504,9 @@ Ractive.components.timetarget = Ractive.extend({
     }   
 });
 
-},{"../modules/palette.js":47,"../modules/recruitment.js":48,"ractive":35,"template":undefined,"underscore":36}],44:[function(require,module,exports){
+},{"../modules/palette.js":50,"../modules/recruitment.js":51,"../templates.js":54,"ractive":38,"underscore":39}],47:[function(require,module,exports){
 var Ractive = require("ractive");
-var template = require('template');
+var template = require("../templates.js");
 var _ = require("underscore");
 
 Ractive.components.dropdown = Ractive.extend({
@@ -31931,7 +32602,7 @@ Ractive.components.column = Ractive.extend({
     template: "<div class='column-xs-{{size ? size : 12}}'> {{yield}} </div>"
 });
 
-},{"ractive":35,"template":undefined,"underscore":36}],45:[function(require,module,exports){
+},{"../templates.js":54,"ractive":38,"underscore":39}],48:[function(require,module,exports){
 var Promise     = require('promise');
 var moment      = require('moment');
 var _           = require('underscore');
@@ -32069,7 +32740,7 @@ Fusion.lt = function(field, x) {
 
 module.exports = Fusion;
 
-},{"./util.js":49,"loglevel":27,"moment":28,"promise":29,"underscore":36}],46:[function(require,module,exports){
+},{"./util.js":53,"loglevel":29,"moment":30,"promise":32,"underscore":39}],49:[function(require,module,exports){
 /**
  * Operation
  * 
@@ -32683,7 +33354,7 @@ module.exports = operationModule({
     }
 });
 
-},{"./fusion.js":45,"./util.js":49,"loglevel":27,"moment":28,"promise":29,"underscore":36}],47:[function(require,module,exports){
+},{"./fusion.js":48,"./util.js":53,"loglevel":29,"moment":30,"promise":32,"underscore":39}],50:[function(require,module,exports){
 var Color   = require("color");
 var _       = require("underscore");
 
@@ -32714,7 +33385,7 @@ palette.generate = function(keys) {
 };
 
 module.exports = palette;
-},{"./util.js":49,"color":2,"underscore":36}],48:[function(require,module,exports){
+},{"./util.js":53,"color":4,"underscore":39}],51:[function(require,module,exports){
 var _           = require("underscore");
 var moment      = require("moment");
 
@@ -33030,7 +33701,86 @@ module.exports = Operation.module({
     }
 });
 
-},{"./fusion.js":45,"./operation.js":46,"./util.js":49,"moment":28,"underscore":36}],49:[function(require,module,exports){
+},{"./fusion.js":48,"./operation.js":49,"./util.js":53,"moment":30,"underscore":39}],52:[function(require,module,exports){
+var _ = require("underscore");
+var moment = require("moment");
+var numeral = require("numeral");
+
+/**
+ * Given a maximum value and a preferred number of steps,
+ * return a factor that will produce a nicely incremented y axis,
+ * while covering all values.
+ */
+function findStepFactor(maxVal, preferredStepCount) {
+  var stepMajor = 1;
+  
+  while (true) {
+    var stepMinor = _.find([1, 2, 5], function(x){ 
+      return (x * stepMajor * preferredStepCount) >= maxVal;
+    });
+    
+    if (stepMinor) return stepMinor * stepMajor;
+    else stepMajor *= 10;
+  }
+}
+
+/**
+ * Convert rawData into a timeseries chart model.
+ * 
+ * See timeseries.spec.js for an example of the rawData argument.
+ */
+module.exports = function(rawData) {
+    var dataPointsBySeries = _.map(rawData, 'points');
+    var mergedDataPoints = _.flatten(dataPointsBySeries, true);
+    
+    function tickValues(index) {
+      var values = _.map(mergedDataPoints, function(e){ 
+        return e[index]; 
+      });
+      
+      return _.sortBy(values, _.identity);
+    }
+    
+    var xTicks = _.map(tickValues(0), function(d){ return d.getTime(); });
+    
+    var maxY = _.max(tickValues(1));
+    var yFactor = findStepFactor(maxY, 5);
+    var yTicks = _.range(0, maxY + yFactor, yFactor);
+    
+    return {
+        x: {
+          ticks: _.uniq(xTicks, true),
+          format: function(time) {
+            return moment(time).format("MMM-YY");
+          }
+        },
+        y: {
+          ticks: yTicks,
+          format: function(value) {
+            return numeral(value).format("0,0");
+          }
+        },
+        
+        data: dataPointsBySeries,
+          
+        xaccessor: function(point){
+          return point[0].getTime();
+        },
+        yaccessor: function(point) { 
+          return point[1]; 
+        },
+        
+        width: rawData.width ? rawData.width : 600,
+        height: rawData.height ? rawData.height : 200,
+        
+        closed: true,
+        color: function(index) {
+          return rawData[index].color;
+        }
+    };
+};
+
+},{"moment":30,"numeral":31,"underscore":39}],53:[function(require,module,exports){
 var _ = require("underscore");
 var schema = require("js-schema");
 
@@ -33194,6 +33944,8 @@ module.exports = {
     getFY: getFY
 };
 
-},{"js-schema":8,"underscore":36}],"template":[function(require,module,exports){
-var templates = {"widgets.toggle.html":"{{# enabled }}\n    {{# value }}\n    <li class=\"active\"><a href=\"#\" on-click=\"toggle\">{{label}}</a></li>\n    {{/#}}\n    {{# !value }}\n    <li class=\"active\"><a href=\"#\" on-click=\"toggle\">{{label}}!</a></li>\n    {{/#}}\n{{else}}\n<li class=\"disabled\"><a href=\"#\">{{label}}</a></li>\n{{/#}}\n","widgets.panel.html":"<div class=\"panel panel-{{ type ? type : 'default'}}\">\n    <div class=\"panel-heading\">\n        {{ title }}\n    </div>\n    <div class=\"panel-body\">\n        {{ yield }}\n    </div>\n</div>\n","widgets.multidropdown.html":"<li class=\"dropdown\">\n    <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">{{ title }} <span class=\"caret\"></span></a>\n    <ul class=\"dropdown-menu\" role=\"menu\">\n        {{# items}}\n            {{# contains(selected, this) }}\n            <li class=\"active\">\n                <a href=\"#\" on-click=\"select\">{{ format(this) }}</a>\n            </li>\n            {{else}}\n            <li>\n                <a href=\"#\" on-click=\"select\">{{ format(this) }}</a>\n            </li>\n            {{/#}}\n        {{/#}}\n    </ul>\n</li>","widgets.dropdown.html":"<li class=\"dropdown\">\n    <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">{{ format(selected) }} <span class=\"caret\"></span></a>\n    <ul class=\"dropdown-menu\" role=\"menu\">\n        {{# items}}\n            {{# this === selected }}\n            <li class=\"active\">\n                <a href=\"#\">{{ format(this) }}</a>\n            </li>\n            {{/#}}\n            {{# this !== selected}}\n            <li>\n                <a href=\"#\" on-click=\"select\">{{ format(this) }}</a>\n            </li>\n            {{/#}}\n        {{/#}}\n    </ul>\n</li>","timetarget.html":"<panel title=\"Time & Target\">\n    <controlbar>\n        <multidropdown title='Trusts' items=\"{{memberOrgs}}\" selected=\"{{selectedOrgs}}\"></multidropdown>\n    </controlbar>\n    \n    <barchart\n        data='{{timeTargetGraphData}}'\n        group-spacing='10'>\n    </barchart>\n</panel>\n","recruitmentPerformance-yy.html":"<panel title=\"Annual recruitment performance\">\n    <controlbar>\n        <dropdown items=\"{{filterModeOptions}}\" selected=\"{{filterMode}}\"></dropdown>\n        <dropdown items=\"{{commercialOptions}}\" selected=\"{{commercial}}\"></dropdown>\n        <toggle label=\"Weighted\" value=\"{{weighted}}\"></toggle>\n    </controlbar>\n    \n    <controlbar>\n        <multidropdown \n            title={{filterMode.split(\" \")[1] + \"s\"}} \n            items=\"{{filterItems}}\" \n            selected=\"{{selectedFilterItems}}\"></multidropdown>\n    </controlbar>\n    \n    <barchart\n        data='{{annualRecruitmentData}}'\n        legend='{{examplelegend}}'\n        width='2000'\n        y-label=''\n        group-spacing='10'>\n    </barchart>\n    \n    <datatable \n        headers='{{ [\"\", \"2012-13\", \"2013-14\", \"2014-15\"] }}'\n        keys='{{ [\"grouping\", \"2012\", \"2013\", \"2014\"] }}' \n        data='{{tabledata}}'>\n    </datatable>\n</panel>\n","overview.html":"<div class='row'>\n    <div class='col-xs-12'>\n        <h1>Percentage of recruitment target met</h1>\n    </div>\n</div>\n\n<div class='row'>\n    <div class='col-xs-12'>\n        <h1>Proportion of studies recruiting to time & target</h1>\n    </div>\n</div>\n","master-detail.html":"<div class='row'>\n    <div class='col-xs-4 sidebar'>\n        {{#options}}\n        <div class='row'>\n            <div class='col-xs-12'>\n                <a href='#' class='{{id === current ? \"active\" : \"inactive\"}}' on-click='optionSelected'>\n                    {{title}}\n                </a>\n            </div>\n        </div>\n        {{/#}}\n    </div>\n    <div class='col-xs-6' id='detail'>\n    </div>\n</div>\n","filter.html":"{{# rows}}\n<div class='row'>\n    <div class='col-sm-12'>\n        <div class=\"btn-toolbar filterrow datafilter\" role=\"toolbar\">\n            <div class='btn-group btn-group-xs'>\n                <button on-click='delete' type=\"button\" class=\"close\">\n                    <span aria-hidden=\"true\">&times;</span>\n                    <span class=\"sr-only\">Delete</span>  \n                </button>\n            </div>  \n            <div class='btn-group'>\n                <button type=\"button\" class=\"btn btn-xs colorindicator\" style='background-color:{{dataColor}}'>\n                </button>\n            </div>\n            <div class='btn-group'>\n                {{# this.filters() }}\n                <dropdown options='{{options}}' index='{{selectedIndex}}'/>\n                {{/}}\n            </div>\n        </div>\n    </div>\n</div>\n{{/rows}}\n\n<div class='row'>\n    <button on-click=\"insert\" type=\"button\" class=\"btn btn-default\">Add</button>\n</div>\n","datatable.html":"<table class=\"table\">\n    <thead>\n        {{# headers ? headers : keys }}\n        <th>{{.}}</th>\n        {{/}}\n    </thead>\n    <tbody>\n        {{# rows }}\n        <tr>\n            {{# this }}\n            <td>{{.}}</td>\n            {{/}}\n        </tr>\n        {{/}}\n    </tbody>\n</table>\n"}; module.exports = function(name) { return templates[name] };
-},{}]},{},[37]);
+},{"js-schema":10,"underscore":39}],54:[function(require,module,exports){
+// Alias for the merged templates file.
+module.exports = require("../build/template.js");
+},{"../build/template.js":"Y6dZXr"}]},{},[40,41,42,43,44,45,46,47,48,49,51,50,52,53,"Y6dZXr",54])
+;

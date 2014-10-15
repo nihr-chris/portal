@@ -1,5 +1,5 @@
 var Ractive = require("ractive");
-var template = require('template');
+var template = require("../templates.js");
 var _ = require("underscore");
 
 Ractive.components.dropdown = Ractive.extend({

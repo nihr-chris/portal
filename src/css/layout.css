@@ -6,6 +6,10 @@
     margin-top: 10px;
 }
 
-.filter-menu {
-  right: 10px;
+.selectionbox .add {
+  float: left;
+}
+
+.selectionbox .item-flow {
+  float: left;
 }

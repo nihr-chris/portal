@@ -1,5 +1,5 @@
 var Ractive = require("ractive");
-var template = require("template");
+var template = require("../templates.js");
 var log = require("loglevel");
 
 Ractive.components.filter = Ractive.extend({
@@ -19,5 +19,5 @@ Ractive.components.filter = Ractive.extend({
         
         component.rows = [];
     },
-    isolated: true
+    isolated: false
 });
