@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+  <ModulePrefs title="Proxied Content Example">
+</ModulePrefs>
+  <Content view="canvas" 
+    href="http://gadget-doc-examples.googlecode.com/svn/trunk/opensocial-09/mycontent.html">
+  </Content>
+  <Content view="home">
+    <![CDATA[
+      Hello, home view!
+    ]]>
+  </Content>
+</Module>
