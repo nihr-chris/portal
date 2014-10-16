@@ -1,8 +1,6 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"Y6dZXr":[function(require,module,exports){
+;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var templates = {"widgets.toggle.html":"{{# enabled }}\n    {{# value }}\n    <li class=\"active\"><a href=\"#\" on-click=\"toggle\">{{label}}</a></li>\n    {{/#}}\n    {{# !value }}\n    <li class=\"active\"><a href=\"#\" on-click=\"toggle\">{{label}}!</a></li>\n    {{/#}}\n{{else}}\n<li class=\"disabled\"><a href=\"#\">{{label}}</a></li>\n{{/#}}\n","widgets.selectionbox.html":"<div class='selectionbox'>\n    <div class=\"add btn-group\">\n        <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n            <span class=\"glyphicon glyphicon-plus\"></span>\n        </button>\n        <ul class=\"dropdown-menu\" role=\"menu\">\n            {{# items }}\n                {{# !contains(selected, this) }}\n                <li><a href=\"#\" on-click=\"select\">{{.}}</a></li>\n                {{/}}\n            {{/}}\n        </ul>\n    </div>\n\n    <div class=\"item-flow\">\n        {{# items }}\n            {{# contains(selected, this) }}\n            <span class='item'>\n                \n            </span>\n            <li><a on-click=\"select\" href=\"#\">{{ format(.) }}</a></li>\n            {{/}}\n        {{/}}\n    </div>\n</div>\n","widgets.panel.html":"<div class=\"panel panel-{{ type ? type : 'default'}}\">\n    <div class=\"panel-heading\">\n        {{ title }}\n    </div>\n    <div class=\"panel-body\">\n        {{ yield }}\n    </div>\n</div>\nblubblub","widgets.multidropdown.html":"<li class=\"dropdown\">\n    <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">{{ title }} <span class=\"caret\"></span></a>\n    <ul class=\"dropdown-menu\" role=\"menu\">\n        {{# items}}\n            {{# contains(selected, this) }}\n            <li class=\"active\">\n                <a href=\"#\" on-click=\"select\">{{ format(this) }}</a>\n            </li>\n            {{else}}\n            <li>\n                <a href=\"#\" on-click=\"select\">{{ format(this) }}</a>\n            </li>\n            {{/#}}\n        {{/#}}\n    </ul>\n</li>","widgets.dropdown.html":"<li class=\"dropdown\">\n    <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">{{ format(selected) }} <span class=\"caret\"></span></a>\n    <ul class=\"dropdown-menu\" role=\"menu\">\n        {{# items}}\n            {{# this === selected }}\n            <li class=\"active\">\n                <a href=\"#\">{{ format(this) }}</a>\n            </li>\n            {{/#}}\n            {{# this !== selected}}\n            <li>\n                <a href=\"#\" on-click=\"select\">{{ format(this) }}</a>\n            </li>\n            {{/#}}\n        {{/#}}\n    </ul>\n</li>","timetarget.html":"<panel title=\"Time & Target\">\n    <controlbar>\n        <multidropdown title='Trusts' items=\"{{memberOrgs}}\" selected=\"{{selectedOrgs}}\"></multidropdown>\n    </controlbar>\n    \n    <barchart\n        data='{{timeTargetGraphData}}'\n        group-spacing='10'>\n    </barchart>\n</panel>\n","recruitmentPerformance-yy.html":"<panel title=\"Annual recruitment performance\">\n    <controlbar>\n        <dropdown items=\"{{filterModeOptions}}\" selected=\"{{filterMode}}\"></dropdown>\n        <dropdown items=\"{{commercialOptions}}\" selected=\"{{commercial}}\"></dropdown>\n        <toggle label=\"Weighted\" value=\"{{weighted}}\"></toggle>\n    </controlbar>\n    \n    <controlbar>\n        <multidropdown \n            title={{filterMode.split(\" \")[1] + \"s\"}} \n            items=\"{{filterItems}}\" \n            selected=\"{{selectedFilterItems}}\"></multidropdown>\n    </controlbar>\n    \n    <barchart\n        data='{{annualRecruitmentData}}'\n        legend='{{examplelegend}}'\n        width='2000'\n        y-label=''\n        group-spacing='10'>\n    </barchart>\n    \n    <datatable \n        headers='{{ [\"\", \"2012-13\", \"2013-14\", \"2014-15\"] }}'\n        keys='{{ [\"grouping\", \"2012\", \"2013\", \"2014\"] }}' \n        data='{{tabledata}}'>\n    </datatable>\n</panel>\n","overview.html":"<div class='row'>\n    <div class='col-xs-12'>\n        <h1>Percentage of recruitment target met</h1>\n    </div>\n</div>\n\n<div class='row'>\n    <div class='col-xs-12'>\n        <h1>Proportion of studies recruiting to time & target</h1>\n    </div>\n</div>\n","master-detail.html":"<div class='row'>\n    <div class='col-xs-4 sidebar'>\n        {{#options}}\n        <div class='row'>\n            <div class='col-xs-12'>\n                <a href='#' class='{{id === current ? \"active\" : \"inactive\"}}' on-click='optionSelected'>\n                    {{title}}\n                </a>\n            </div>\n        </div>\n        {{/#}}\n    </div>\n    <div class='col-xs-6' id='detail'>\n    </div>\n</div>\n","filter.html":"<div class='filter'>\n    {{# items }}\n    <div class='row'>\n        \n    </div>\n    {{/}}\n</div>\n","datatable.html":"<table class=\"table\">\n    <thead>\n        {{# headers ? headers : keys }}\n        <th>{{.}}</th>\n        {{/}}\n    </thead>\n    <tbody>\n        {{# rows }}\n        <tr>\n            {{# this }}\n            <td>{{.}}</td>\n            {{/}}\n        </tr>\n        {{/}}\n    </tbody>\n</table>\n"}; module.exports = function(name) { return templates[name] };
-},{}],"template":[function(require,module,exports){
-module.exports=require('Y6dZXr');
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 // Browser Request
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -478,7 +476,7 @@ function b64_enc (data) {
 }
 module.exports = request;
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 /* MIT license */
 var convert = require("color-convert"),
     string = require("color-string");
@@ -908,7 +906,7 @@ Color.prototype.setChannel = function(space, index, val) {
    return this;
 }
 
-},{"color-convert":6,"color-string":7}],5:[function(require,module,exports){
+},{"color-convert":5,"color-string":6}],4:[function(require,module,exports){
 /* MIT license */
 
 module.exports = {
@@ -1600,7 +1598,7 @@ for (var key in cssKeywords) {
   reverseKeywords[JSON.stringify(cssKeywords[key])] = key;
 }
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var conversions = require("./conversions");
 
 var convert = function() {
@@ -1693,7 +1691,7 @@ Converter.prototype.getValues = function(space) {
 });
 
 module.exports = convert;
-},{"./conversions":5}],7:[function(require,module,exports){
+},{"./conversions":4}],6:[function(require,module,exports){
 /* MIT license */
 var convert = require("color-convert");
 
@@ -1907,7 +1905,7 @@ function hexDouble(num) {
   return (str.length < 2) ? "0" + str : str;
 }
 
-},{"color-convert":6}],8:[function(require,module,exports){
+},{"color-convert":5}],7:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.4.11"
@@ -11141,7 +11139,7 @@ function hexDouble(num) {
   if (typeof define === "function" && define.amd) define(d3); else if (typeof module === "object" && module.exports) module.exports = d3;
   this.d3 = d3;
 }();
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -11196,7 +11194,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 module.exports = require('./lib/schema')
 
 // Patterns
@@ -11219,7 +11217,7 @@ require('./lib/extensions/Array')
 require('./lib/extensions/Function')
 require('./lib/extensions/Schema')
 
-},{"./lib/extensions/Array":12,"./lib/extensions/Boolean":13,"./lib/extensions/Function":14,"./lib/extensions/Number":15,"./lib/extensions/Object":16,"./lib/extensions/Schema":17,"./lib/extensions/String":18,"./lib/patterns/anything":19,"./lib/patterns/class":20,"./lib/patterns/equality":21,"./lib/patterns/nothing":22,"./lib/patterns/object":23,"./lib/patterns/or":24,"./lib/patterns/reference":25,"./lib/patterns/regexp":26,"./lib/patterns/schema":27,"./lib/schema":28}],11:[function(require,module,exports){
+},{"./lib/extensions/Array":11,"./lib/extensions/Boolean":12,"./lib/extensions/Function":13,"./lib/extensions/Number":14,"./lib/extensions/Object":15,"./lib/extensions/Schema":16,"./lib/extensions/String":17,"./lib/patterns/anything":18,"./lib/patterns/class":19,"./lib/patterns/equality":20,"./lib/patterns/nothing":21,"./lib/patterns/object":22,"./lib/patterns/or":23,"./lib/patterns/reference":24,"./lib/patterns/regexp":25,"./lib/patterns/schema":26,"./lib/schema":27}],10:[function(require,module,exports){
 var Schema = module.exports = function() {}
 
 Schema.prototype = {
@@ -11342,7 +11340,7 @@ Schema.fromJSON.def = Array.prototype.push.bind(fromJSONdefs)
 Schema.patterns = {}
 Schema.extensions = {}
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var Schema          = require('../BaseSchema')
   , EqualitySchema  = require('../patterns/equality')
   , anything        = require('../patterns/anything').instance
@@ -11447,7 +11445,7 @@ Array.like = function(other) {
 
 Array.schema = new ArraySchema().wrap()
 
-},{"../BaseSchema":11,"../patterns/anything":19,"../patterns/equality":21}],13:[function(require,module,exports){
+},{"../BaseSchema":10,"../patterns/anything":18,"../patterns/equality":20}],12:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var BooleanSchema = module.exports = Schema.extensions.BooleanSchema = new Schema.extend({
@@ -11479,14 +11477,14 @@ Schema.fromJSON.def(function(sch) {
 
 Boolean.schema = booleanSchema
 
-},{"../BaseSchema":11}],14:[function(require,module,exports){
+},{"../BaseSchema":10}],13:[function(require,module,exports){
 var ReferenceSchema = require('../patterns/reference')
 
 Function.reference = function(f) {
   return new ReferenceSchema(f).wrap()
 }
 
-},{"../patterns/reference":25}],15:[function(require,module,exports){
+},{"../patterns/reference":24}],14:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var NumberSchema = module.exports = Schema.extensions.NumberSchema = Schema.extend({
@@ -11606,7 +11604,7 @@ Number.step       = Number.schema.step
 
 Number.Integer    = Number.step(1)
 
-},{"../BaseSchema":11}],16:[function(require,module,exports){
+},{"../BaseSchema":10}],15:[function(require,module,exports){
 var ReferenceSchema = require('../patterns/reference')
   , EqualitySchema = require('../patterns/equality')
   , ObjectSchema = require('../patterns/object')
@@ -11621,7 +11619,7 @@ Object.reference = function(o) {
 
 Object.schema = new ObjectSchema().wrap()
 
-},{"../patterns/equality":21,"../patterns/object":23,"../patterns/reference":25}],17:[function(require,module,exports){
+},{"../patterns/equality":20,"../patterns/object":22,"../patterns/reference":24}],16:[function(require,module,exports){
 var Schema = require('../BaseSchema')
   , schema = require('../schema')
 
@@ -11701,7 +11699,7 @@ Schema.fromJSON.def(function(sch) {
   }
 })
 
-},{"../BaseSchema":11,"../schema":28}],18:[function(require,module,exports){
+},{"../BaseSchema":10,"../schema":27}],17:[function(require,module,exports){
 var RegexpSchema = require('../patterns/regexp')
 
 String.of = function() {
@@ -11719,7 +11717,7 @@ String.of = function() {
 
 String.schema = new RegexpSchema().wrap()
 
-},{"../patterns/regexp":26}],19:[function(require,module,exports){
+},{"../patterns/regexp":25}],18:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var AnythingSchema = module.exports = Schema.patterns.AnythingSchema = Schema.extend({
@@ -11748,7 +11746,7 @@ Schema.fromJSON.def(function(sch) {
   if (sch.type === 'any') return anything
 })
 
-},{"../BaseSchema":11}],20:[function(require,module,exports){
+},{"../BaseSchema":10}],19:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var ClassSchema = module.exports = Schema.patterns.ClassSchema = Schema.extend({
@@ -11790,7 +11788,7 @@ Schema.fromJS.def(function(constructor) {
   }
 })
 
-},{"../BaseSchema":11}],21:[function(require,module,exports){
+},{"../BaseSchema":10}],20:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 // Object deep equality
@@ -11841,7 +11839,7 @@ Schema.fromJS.def(function(sch) {
   if (sch instanceof Array && sch.length === 1) return new EqualitySchema(sch[0])
 })
 
-},{"../BaseSchema":11}],22:[function(require,module,exports){
+},{"../BaseSchema":10}],21:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var NothingSchema = module.exports = Schema.patterns.NothingSchema = Schema.extend({
@@ -11867,7 +11865,7 @@ Schema.fromJSON.def(function(sch) {
   if (sch.type === 'null') return nothing
 })
 
-},{"../BaseSchema":11}],23:[function(require,module,exports){
+},{"../BaseSchema":10}],22:[function(require,module,exports){
 var Schema    = require('../BaseSchema')
   , anything  = require('./anything').instance
   , nothing   = require('./nothing').instance
@@ -12088,7 +12086,7 @@ Schema.fromJSON.def(function(json) {
   return new ObjectSchema(properties, other)
 })
 
-},{"../BaseSchema":11,"./anything":19,"./nothing":22}],24:[function(require,module,exports){
+},{"../BaseSchema":10,"./anything":18,"./nothing":21}],23:[function(require,module,exports){
 var Schema = require('../BaseSchema')
   , EqualitySchema = require('../patterns/equality')
 
@@ -12171,7 +12169,7 @@ Schema.fromJSON.def(function(sch) {
   }
 })
 
-},{"../BaseSchema":11,"../patterns/equality":21}],25:[function(require,module,exports){
+},{"../BaseSchema":10,"../patterns/equality":20}],24:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var ReferenceSchema = module.exports = Schema.patterns.ReferenceSchema = Schema.extend({
@@ -12213,7 +12211,7 @@ Schema.fromJS.def(function(value) {
   return new ReferenceSchema(value)
 })
 
-},{"../BaseSchema":11}],26:[function(require,module,exports){
+},{"../BaseSchema":10}],25:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 var RegexpSchema = module.exports = Schema.patterns.RegexpSchema = Schema.extend({
@@ -12266,14 +12264,14 @@ Schema.fromJS.def(function(regexp) {
   if (regexp instanceof RegExp) return new RegexpSchema(regexp)
 })
 
-},{"../BaseSchema":11}],27:[function(require,module,exports){
+},{"../BaseSchema":10}],26:[function(require,module,exports){
 var Schema = require('../BaseSchema')
 
 Schema.fromJS.def(function(sch) {
   if (sch instanceof Schema) return sch
 })
 
-},{"../BaseSchema":11}],28:[function(require,module,exports){
+},{"../BaseSchema":10}],27:[function(require,module,exports){
 var Schema = require('./BaseSchema')
 
 schema = module.exports = function(schemaDescription) {
@@ -12315,7 +12313,7 @@ schema.fromJSON = function(sch) {
   return Schema.fromJSON(sch).wrap()
 }
 
-},{"./BaseSchema":11}],29:[function(require,module,exports){
+},{"./BaseSchema":10}],28:[function(require,module,exports){
 /*
 * loglevel - https://github.com/pimterry/loglevel
 *
@@ -12522,7 +12520,7 @@ schema.fromJSON = function(sch) {
     return self;
 }));
 
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};//! moment.js
 //! version : 2.8.3
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -15380,7 +15378,7 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
     }
 }).call(this);
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /*!
  * numeral.js
  * version : 1.5.3
@@ -16061,14 +16059,14 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
     }
 }).call(this);
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./lib/core.js')
 require('./lib/done.js')
 require('./lib/es6-extensions.js')
 require('./lib/node-extensions.js')
-},{"./lib/core.js":33,"./lib/done.js":34,"./lib/es6-extensions.js":35,"./lib/node-extensions.js":36}],33:[function(require,module,exports){
+},{"./lib/core.js":32,"./lib/done.js":33,"./lib/es6-extensions.js":34,"./lib/node-extensions.js":35}],32:[function(require,module,exports){
 'use strict';
 
 var asap = require('asap')
@@ -16175,7 +16173,7 @@ function doResolve(fn, onFulfilled, onRejected) {
   }
 }
 
-},{"asap":37}],34:[function(require,module,exports){
+},{"asap":36}],33:[function(require,module,exports){
 'use strict';
 
 var Promise = require('./core.js')
@@ -16190,7 +16188,7 @@ Promise.prototype.done = function (onFulfilled, onRejected) {
     })
   })
 }
-},{"./core.js":33,"asap":37}],35:[function(require,module,exports){
+},{"./core.js":32,"asap":36}],34:[function(require,module,exports){
 'use strict';
 
 //This file contains the ES6 extensions to the core Promises/A+ API
@@ -16300,7 +16298,7 @@ Promise.prototype['catch'] = function (onRejected) {
   return this.then(null, onRejected);
 }
 
-},{"./core.js":33,"asap":37}],36:[function(require,module,exports){
+},{"./core.js":32,"asap":36}],35:[function(require,module,exports){
 'use strict';
 
 //This file contains then/promise specific extensions that are only useful for node.js interop
@@ -16362,7 +16360,7 @@ Promise.prototype.nodeify = function (callback, ctx) {
   })
 }
 
-},{"./core.js":33,"asap":37}],37:[function(require,module,exports){
+},{"./core.js":32,"asap":36}],36:[function(require,module,exports){
 var process=require("__browserify_process");
 // Use the fastest possible means to execute a task in a future turn
 // of the event loop.
@@ -16477,7 +16475,7 @@ function asap(task) {
 module.exports = asap;
 
 
-},{"__browserify_process":9}],38:[function(require,module,exports){
+},{"__browserify_process":8}],37:[function(require,module,exports){
 /*
 	ractive.js v0.5.8
 	2014-09-18 - commit 2e726021 
@@ -30479,7 +30477,7 @@ module.exports = asap;
 
 }( typeof window !== 'undefined' ? window : this ) );
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -31896,7 +31894,7 @@ module.exports = asap;
   }
 }.call(this));
 
-},{}],40:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 var Ractive = require("ractive");
 var template = require("./templates.js");
 
@@ -31922,7 +31920,7 @@ window.runApp = function(mainComponent) {
     });
 };
 
-},{"./components/barchart.js":41,"./components/datatable.js":42,"./components/filter.js":43,"./components/master-detail.js":44,"./components/recruitmentPerformance-yy.js":45,"./components/timetarget.js":46,"./components/widgets.js":47,"./modules/fusion.js":48,"./templates.js":54,"browser-request":3,"loglevel":29,"ractive":38}],41:[function(require,module,exports){
+},{"./components/barchart.js":40,"./components/datatable.js":41,"./components/filter.js":42,"./components/master-detail.js":43,"./components/recruitmentPerformance-yy.js":44,"./components/timetarget.js":45,"./components/widgets.js":46,"./modules/fusion.js":47,"./templates.js":53,"browser-request":2,"loglevel":28,"ractive":37}],40:[function(require,module,exports){
 var Ractive = require('ractive');
 var d3 = require('d3');
 var _ = require('underscore');
@@ -32169,7 +32167,7 @@ Ractive.components.barchart = Ractive.extend({
     }
 });
 
-},{"../modules/util.js":53,"d3":8,"ractive":38,"underscore":39}],42:[function(require,module,exports){
+},{"../modules/util.js":52,"d3":7,"ractive":37,"underscore":38}],41:[function(require,module,exports){
 var Ractive = require("ractive");
 var template = require("../templates.js");
 var _ = require("underscore");
@@ -32189,7 +32187,7 @@ Ractive.components.datatable = Ractive.extend({
     }
 });
 
-},{"../templates.js":54,"ractive":38,"underscore":39}],43:[function(require,module,exports){
+},{"../templates.js":53,"ractive":37,"underscore":38}],42:[function(require,module,exports){
 var Ractive = require("ractive");
 var template = require("../templates.js");
 var log = require("loglevel");
@@ -32214,7 +32212,7 @@ Ractive.components.filter = Ractive.extend({
     isolated: false
 });
 
-},{"../templates.js":54,"loglevel":29,"ractive":38}],44:[function(require,module,exports){
+},{"../templates.js":53,"loglevel":28,"ractive":37}],43:[function(require,module,exports){
 /**
  * Component for presenting a list of options, along with a different 'detail'
  * component depending on which of the options is currently active.
@@ -32268,7 +32266,7 @@ Ractive.components.masterdetail = Ractive.extend({
     }
 });
 
-},{"../modules/util.js":53,"ractive":38}],45:[function(require,module,exports){
+},{"../modules/util.js":52,"ractive":37}],44:[function(require,module,exports){
 var Ractive     = require("ractive");
 var template    = require("../templates.js");
 var _           = require("underscore");
@@ -32434,7 +32432,7 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     }
 });
 
-},{"../modules/palette.js":50,"../modules/recruitment.js":51,"../modules/util.js":53,"../templates.js":54,"ractive":38,"underscore":39}],46:[function(require,module,exports){
+},{"../modules/palette.js":49,"../modules/recruitment.js":50,"../modules/util.js":52,"../templates.js":53,"ractive":37,"underscore":38}],45:[function(require,module,exports){
 var Ractive     = require("ractive");
 var template    = require("../templates.js");
 var _           = require("underscore");
@@ -32504,7 +32502,7 @@ Ractive.components.timetarget = Ractive.extend({
     }   
 });
 
-},{"../modules/palette.js":50,"../modules/recruitment.js":51,"../templates.js":54,"ractive":38,"underscore":39}],47:[function(require,module,exports){
+},{"../modules/palette.js":49,"../modules/recruitment.js":50,"../templates.js":53,"ractive":37,"underscore":38}],46:[function(require,module,exports){
 var Ractive = require("ractive");
 var template = require("../templates.js");
 var _ = require("underscore");
@@ -32602,7 +32600,7 @@ Ractive.components.column = Ractive.extend({
     template: "<div class='column-xs-{{size ? size : 12}}'> {{yield}} </div>"
 });
 
-},{"../templates.js":54,"ractive":38,"underscore":39}],48:[function(require,module,exports){
+},{"../templates.js":53,"ractive":37,"underscore":38}],47:[function(require,module,exports){
 var Promise     = require('promise');
 var moment      = require('moment');
 var _           = require('underscore');
@@ -32740,7 +32738,7 @@ Fusion.lt = function(field, x) {
 
 module.exports = Fusion;
 
-},{"./util.js":53,"loglevel":29,"moment":30,"promise":32,"underscore":39}],49:[function(require,module,exports){
+},{"./util.js":52,"loglevel":28,"moment":29,"promise":31,"underscore":38}],48:[function(require,module,exports){
 /**
  * Operation
  * 
@@ -33354,7 +33352,7 @@ module.exports = operationModule({
     }
 });
 
-},{"./fusion.js":48,"./util.js":53,"loglevel":29,"moment":30,"promise":32,"underscore":39}],50:[function(require,module,exports){
+},{"./fusion.js":47,"./util.js":52,"loglevel":28,"moment":29,"promise":31,"underscore":38}],49:[function(require,module,exports){
 var Color   = require("color");
 var _       = require("underscore");
 
@@ -33385,7 +33383,7 @@ palette.generate = function(keys) {
 };
 
 module.exports = palette;
-},{"./util.js":53,"color":4,"underscore":39}],51:[function(require,module,exports){
+},{"./util.js":52,"color":3,"underscore":38}],50:[function(require,module,exports){
 var _           = require("underscore");
 var moment      = require("moment");
 
@@ -33701,7 +33699,7 @@ module.exports = Operation.module({
     }
 });
 
-},{"./fusion.js":48,"./operation.js":49,"./util.js":53,"moment":30,"underscore":39}],52:[function(require,module,exports){
+},{"./fusion.js":47,"./operation.js":48,"./util.js":52,"moment":29,"underscore":38}],51:[function(require,module,exports){
 var _ = require("underscore");
 var moment = require("moment");
 var numeral = require("numeral");
@@ -33780,7 +33778,7 @@ module.exports = function(rawData) {
     };
 };
 
-},{"moment":30,"numeral":31,"underscore":39}],53:[function(require,module,exports){
+},{"moment":29,"numeral":30,"underscore":38}],52:[function(require,module,exports){
 var _ = require("underscore");
 var schema = require("js-schema");
 
@@ -33944,8 +33942,8 @@ module.exports = {
     getFY: getFY
 };
 
-},{"js-schema":10,"underscore":39}],54:[function(require,module,exports){
+},{"js-schema":9,"underscore":38}],53:[function(require,module,exports){
 // Alias for the merged templates file.
 module.exports = require("../build/template.js");
-},{"../build/template.js":"Y6dZXr"}]},{},[40,41,42,43,44,45,46,47,48,49,51,50,52,53,"Y6dZXr",54])
+},{"../build/template.js":1}]},{},[39,40,41,42,44,45,43,46,47,49,50,51,53,1,52,48])
 ;
