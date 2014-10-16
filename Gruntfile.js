@@ -2,28 +2,9 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         watch: {
-            html: {
-                files: ['src/*', 'src/css/*'],
-                tasks: ['roots']
-            },
-            templates: {
-                files: ['./src/components/*.html'],
-                tasks: ['include_templates']
-            },
-            modules: {
-                files: ['src/modules/*', 'spec/*'],
-                tasks: ['test']
-            }
-        },
-        processhtml: {
-            build: {
-                files: {
-                    'build/recruitment.html': ['src/recruitment.html'],
-                    'build/timetarget.html': ['src/timetarget.html']
-                },
-                options: {
-                    includeBase: '.'
-                }
+            dev: {
+                files: ['src/css/*'],
+                tasks: ['cssmin']
             }
         },
         mochaTest: {
@@ -37,7 +18,7 @@ module.exports = function(grunt) {
         },
         watchify: {
             app: {
-                src: ['./src/**/*.js', './build/template.js'],
+                src: ['./src/**/*.js'],
                 dest: 'build/app.js'
             }
         },
