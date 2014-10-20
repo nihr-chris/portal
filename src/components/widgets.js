@@ -87,8 +87,16 @@ Ractive.components.controlbar = Ractive.extend({
     template: "<ul class='nav nav-pills'> {{yield}} </ul>"
 });
 
+Ractive.components.contentrow = Ractive.extend({
+    template: "<div class='row'> <div class='column-xs-12'>{{yield}}</div> </div>"
+});
+
 Ractive.components.row = Ractive.extend({
     template: "<div class='row'> {{yield}} </div>"
+});
+
+Ractive.components.spacer = Ractive.extend({
+    template: "<div class='row spacer'> {{yield}} </div>"
 });
 
 Ractive.components.column = Ractive.extend({

@@ -32197,14 +32197,17 @@ Ractive.components.filter = Ractive.extend({
     init: function () {
         var component = this;
         
+        if (!component.get("newitem")) {
+            throw new Error("Filter must always have a newitem attribute set");
+        }
+        
         component.on('delete', function(event) {
-            log.info("remove filter");
             component.data.removeRow(event.context);
         });
         
-        component.on('insert', function(event) {
-            log.info("add filter");
-            component.data.addRow();
+        component.on('add', function(event) {
+            var newitem = component.get("newitem");
+            component.push("items", newitem());
         });
         
         component.rows = [];
@@ -32212,6 +32215,22 @@ Ractive.components.filter = Ractive.extend({
     isolated: false
 });
 
+if (window.developmentMode) {
+    Ractive.components.testFilter = Ractive.extend({
+        template:   "<filter items='{{filteritems}}' newitem='{{newitem}}'>" 
+                    + "<dropdown items={{menuitems}} selected='{{menuselected}}'></dropdown>"
+                    + "</filter>",
+        data: {
+            filteritems: [
+                {menuitems: ["a", "b", "c"], menuselected: "a"}
+            ],
+            
+            newitem: function() {
+                return {menuitems: ["a", "b", "c"], menuselected: "a"};
+            }
+        },
+    });
+}
 },{"../templates.js":53,"loglevel":28,"ractive":37}],43:[function(require,module,exports){
 /**
  * Component for presenting a list of options, along with a different 'detail'
@@ -32286,11 +32305,32 @@ var commercialMap = {
     "Noncommercial Only": false
 };
 
+function getTrusts() {
+    return ["a", "b", "c"];
+}
+
+function getDivisions() {
+    return ["a", "b", "c"];
+}
+
+function getSpecialties() {
+    return ["a", "b", "c"];
+}
+
 Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     template: template("recruitmentPerformance-yy.html"),
     
     init: function() {
         var component = this;
+        
+        component.set("newfilter", function() {
+            return {
+                allTrusts: getTrusts(), allDivisions: getDivisions(), allSpecialties: getSpecialties(),
+                trusts: [], divisions: [], specialties: []
+            };
+        });
+        
+        component.set("filters", []);
         
         component.observe("filterMode", function(newval, oldval) {
             if (newval && oldval) component.loadAll();
@@ -32393,41 +32433,6 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
         examplelegend: [
             {key: 2001, color: "#98abc5"},
             {key: 2002, color: "#8a89a6"}
-        ],
-        exampledata: [
-            {
-                key: "Guy's", 
-                values: [
-                    {
-                        key: 2001,
-                        values: [
-                            {color: "#98abc5", value: 5},
-                        ]
-                    },
-                    {
-                        key: 2002,
-                        values: [
-                            {color: "#8a89a6", value: 8},
-                        ]
-                    },
-                ]
-            }, {
-                key: "King's", 
-                values: [
-                    {
-                        key: 2001,
-                        values: [
-                            {color: "#98abc5", value: 2},
-                        ]
-                    },
-                    {
-                        key: 2002,
-                        values: [
-                            {color: "#8a89a6", value: 1},
-                        ]
-                    },
-                ]
-            }
         ]
     }
 });
@@ -32592,8 +32597,16 @@ Ractive.components.controlbar = Ractive.extend({
     template: "<ul class='nav nav-pills'> {{yield}} </ul>"
 });
 
+Ractive.components.contentrow = Ractive.extend({
+    template: "<div class='row'> <div class='column-xs-12'>{{yield}}</div> </div>"
+});
+
 Ractive.components.row = Ractive.extend({
     template: "<div class='row'> {{yield}} </div>"
+});
+
+Ractive.components.spacer = Ractive.extend({
+    template: "<div class='row spacer'> {{yield}} </div>"
 });
 
 Ractive.components.column = Ractive.extend({
@@ -33966,5 +33979,5 @@ if (window.developmentMode) {
     module.exports = require("../build/template.js");
 }
 
-},{"../build/template.js":1}]},{},[39,40,41,43,42,44,45,46,47,48,49,50,51,52,53])
+},{"../build/template.js":1}]},{},[39,40,43,45,44,42,46,41,47,48,49,51,53,52,50])
 ;

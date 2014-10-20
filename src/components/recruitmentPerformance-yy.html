@@ -1,16 +1,9 @@
 <panel title="Annual recruitment performance">
-    <controlbar>
-        <dropdown items="{{filterModeOptions}}" selected="{{filterMode}}"></dropdown>
-        <dropdown items="{{commercialOptions}}" selected="{{commercial}}"></dropdown>
-        <toggle label="Weighted" value="{{weighted}}"></toggle>
-    </controlbar>
-    
-    <controlbar>
-        <multidropdown 
-            title={{filterMode.split(" ")[1] + "s"}} 
-            items="{{filterItems}}" 
-            selected="{{selectedFilterItems}}"></multidropdown>
-    </controlbar>
+    <filter items='{{filters}}' newitem='{{newfilter}}'>
+        <multidropdown title="Trusts" items="{{allTrusts}}" selected="{{trusts}}"></multidropdown>
+        <multidropdown title="Divisions" items="{{allDivisions}}" selected="{{divisions}}"></multidropdown>
+        <multidropdown title="Specialties" items="{{allSpecialties}}" selected="{{specialties}}"></multidropdown>
+    </filter>
     
     <barchart
         data='{{annualRecruitmentData}}'

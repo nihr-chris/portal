@@ -1,7 +1,17 @@
-<div class='filter'>
+<div class='filter well'>
     {{# items }}
-    <div class='row'>
-        
-    </div>
+    <spacer></spacer>
+    <contentrow>
+        <div class="input-group">
+        {{>content}}
+        </div>
+    </contentrow>
+    <spacer></spacer>
     {{/}}
+    
+    <contentrow>
+    <button type="button" class="btn btn-default filter-add-btn btn-xs" on-click="add">
+        <span class="glyphicon glyphicon-plus"></span>
+    </button>
+    </contentrow>
 </div>

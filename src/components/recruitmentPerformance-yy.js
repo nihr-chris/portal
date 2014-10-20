@@ -17,11 +17,32 @@ var commercialMap = {
     "Noncommercial Only": false
 };
 
+function getTrusts() {
+    return ["a", "b", "c"];
+}
+
+function getDivisions() {
+    return ["a", "b", "c"];
+}
+
+function getSpecialties() {
+    return ["a", "b", "c"];
+}
+
 Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     template: template("recruitmentPerformance-yy.html"),
     
     init: function() {
         var component = this;
+        
+        component.set("newfilter", function() {
+            return {
+                allTrusts: getTrusts(), allDivisions: getDivisions(), allSpecialties: getSpecialties(),
+                trusts: [], divisions: [], specialties: []
+            };
+        });
+        
+        component.set("filters", []);
         
         component.observe("filterMode", function(newval, oldval) {
             if (newval && oldval) component.loadAll();
@@ -124,41 +145,6 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
         examplelegend: [
             {key: 2001, color: "#98abc5"},
             {key: 2002, color: "#8a89a6"}
-        ],
-        exampledata: [
-            {
-                key: "Guy's", 
-                values: [
-                    {
-                        key: 2001,
-                        values: [
-                            {color: "#98abc5", value: 5},
-                        ]
-                    },
-                    {
-                        key: 2002,
-                        values: [
-                            {color: "#8a89a6", value: 8},
-                        ]
-                    },
-                ]
-            }, {
-                key: "King's", 
-                values: [
-                    {
-                        key: 2001,
-                        values: [
-                            {color: "#98abc5", value: 2},
-                        ]
-                    },
-                    {
-                        key: 2002,
-                        values: [
-                            {color: "#8a89a6", value: 1},
-                        ]
-                    },
-                ]
-            }
         ]
     }
 });

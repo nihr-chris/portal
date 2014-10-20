@@ -7,17 +7,37 @@ Ractive.components.filter = Ractive.extend({
     init: function () {
         var component = this;
         
+        if (!component.get("newitem")) {
+            throw new Error("Filter must always have a newitem attribute set");
+        }
+        
         component.on('delete', function(event) {
-            log.info("remove filter");
             component.data.removeRow(event.context);
         });
         
-        component.on('insert', function(event) {
-            log.info("add filter");
-            component.data.addRow();
+        component.on('add', function(event) {
+            var newitem = component.get("newitem");
+            component.push("items", newitem());
         });
         
         component.rows = [];
     },
     isolated: false
 });
+
+if (window.developmentMode) {
+    Ractive.components.testFilter = Ractive.extend({
+        template:   "<filter items='{{filteritems}}' newitem='{{newitem}}'>" 
+                    + "<dropdown items={{menuitems}} selected='{{menuselected}}'></dropdown>"
+                    + "</filter>",
+        data: {
+            filteritems: [
+                {menuitems: ["a", "b", "c"], menuselected: "a"}
+            ],
+            
+            newitem: function() {
+                return {menuitems: ["a", "b", "c"], menuselected: "a"};
+            }
+        },
+    });
+}
