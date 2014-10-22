@@ -1,21 +1,42 @@
-<panel title="Annual recruitment performance">
-    <filter items='{{filters}}' newitem='{{newfilter}}'>
-        <multidropdown title="Trusts" items="{{allTrusts}}" selected="{{trusts}}"></multidropdown>
-        <multidropdown title="Divisions" items="{{allDivisions}}" selected="{{divisions}}"></multidropdown>
-        <multidropdown title="Specialties" items="{{allSpecialties}}" selected="{{specialties}}"></multidropdown>
-    </filter>
-    
-    <barchart
-        data='{{annualRecruitmentData}}'
-        legend='{{examplelegend}}'
-        width='2000'
-        y-label=''
-        group-spacing='10'>
-    </barchart>
-    
-    <datatable 
-        headers='{{ ["", "2012-13", "2013-14", "2014-15"] }}'
-        keys='{{ ["grouping", "2012", "2013", "2014"] }}' 
-        data='{{tabledata}}'>
-    </datatable>
-</panel>
+<filter items='{{filters}}' newitem='{{newfilter}}'>
+    <table>
+    <tr>
+        <td class='col-colorwell'>
+        <colorwell color='{{filtercolor}}'></colorwell>
+        </td>
+        
+        <td class='col-dropdown'>
+        <multidropdown title="Trusts: {{ formatSelected(trusts) }}" items="{{allTrusts}}" selected="{{trusts}}">
+        </multidropdown>
+        </td>
+        
+        <td class='col-dropdown'>
+        <multidropdown title="Divisions: {{ formatSelected(divisions) }}" items="{{allDivisions}}" selected="{{divisions}}">
+        </multidropdown>
+        </td>
+        
+        <td class='col-dropdown'>
+        <multidropdown title="Specialties: {{ formatSelected(specialties) }}" items="{{allSpecialties}}" selected="{{specialties}}">
+        </multidropdown>
+        </td>
+        
+        <td class='col-close'>
+        <button type="button" class="close" on-click='delete'><span aria-hidden="true">&times;</span><span class="sr-only">Remove</span></button>
+        </td>
+    </tr>
+    </table>
+</filter>
+
+<barchart
+    data='{{annualRecruitmentData}}'
+    legend='{{examplelegend}}'
+    width='2000'
+    y-label=''
+    group-spacing='10'>
+</barchart>
+
+<datatable 
+    headers='{{ ["", "2012-13", "2013-14", "2014-15"] }}'
+    keys='{{ ["grouping", "2012", "2013", "2014"] }}' 
+    data='{{tabledata}}'>
+</datatable>

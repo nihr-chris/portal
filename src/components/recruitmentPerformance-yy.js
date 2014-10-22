@@ -35,13 +35,6 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     init: function() {
         var component = this;
         
-        component.set("newfilter", function() {
-            return {
-                allTrusts: getTrusts(), allDivisions: getDivisions(), allSpecialties: getSpecialties(),
-                trusts: [], divisions: [], specialties: []
-            };
-        });
-        
         component.set("filters", []);
         
         component.observe("filterMode", function(newval, oldval) {
@@ -126,6 +119,22 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     },
     
     data: {
+        formatSelected: function(array) {
+            switch(array.length) {
+                case 0: return "All";
+                case 1: return array[0];
+                default: return "Multiple";
+            }
+        },
+        
+        newfilter: function() {
+            return {
+                allTrusts: getTrusts(), allDivisions: getDivisions(), allSpecialties: getSpecialties(),
+                trusts: [], divisions: [], specialties: [],
+                filtercolor: "red"
+            };
+        },
+        
         filterModeOptions:  [
             "By Trust",
             "By Division",

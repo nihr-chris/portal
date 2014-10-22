@@ -32188,9 +32188,11 @@ Ractive.components.datatable = Ractive.extend({
 });
 
 },{"../templates.js":53,"ractive":37,"underscore":38}],42:[function(require,module,exports){
-var Ractive = require("ractive");
-var template = require("../templates.js");
-var log = require("loglevel");
+var template    = require("../templates.js");
+
+var _           = require("underscore");
+var Ractive     = require("ractive");
+var log         = require("loglevel");
 
 Ractive.components.filter = Ractive.extend({
     template: template('filter.html'),
@@ -32202,7 +32204,10 @@ Ractive.components.filter = Ractive.extend({
         }
         
         component.on('delete', function(event) {
-            component.data.removeRow(event.context);
+            var index = _.indexOf(component.get("items"), event.context);
+            if (index !== -1) {
+                component.splice("items", index, 1);
+            }
         });
         
         component.on('add', function(event) {
@@ -32231,7 +32236,7 @@ if (window.developmentMode) {
         },
     });
 }
-},{"../templates.js":53,"loglevel":28,"ractive":37}],43:[function(require,module,exports){
+},{"../templates.js":53,"loglevel":28,"ractive":37,"underscore":38}],43:[function(require,module,exports){
 /**
  * Component for presenting a list of options, along with a different 'detail'
  * component depending on which of the options is currently active.
@@ -32323,13 +32328,6 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     init: function() {
         var component = this;
         
-        component.set("newfilter", function() {
-            return {
-                allTrusts: getTrusts(), allDivisions: getDivisions(), allSpecialties: getSpecialties(),
-                trusts: [], divisions: [], specialties: []
-            };
-        });
-        
         component.set("filters", []);
         
         component.observe("filterMode", function(newval, oldval) {
@@ -32414,6 +32412,22 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     },
     
     data: {
+        formatSelected: function(array) {
+            switch(array.length) {
+                case 0: return "All";
+                case 1: return array[0];
+                default: return "Multiple";
+            }
+        },
+        
+        newfilter: function() {
+            return {
+                allTrusts: getTrusts(), allDivisions: getDivisions(), allSpecialties: getSpecialties(),
+                trusts: [], divisions: [], specialties: [],
+                filtercolor: "red"
+            };
+        },
+        
         filterModeOptions:  [
             "By Trust",
             "By Division",
@@ -32586,6 +32600,14 @@ Ractive.components.toggle = Ractive.extend({
         enabled: true,
         value: false,
         label: ""
+    }
+});
+
+Ractive.components.colorwell = Ractive.extend({
+    template: "<span class='colorwell' style='background-color: {{color}}'></span>",
+    
+    data: {
+        color: "steelblue"
     }
 });
 

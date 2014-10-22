@@ -79,6 +79,14 @@ Ractive.components.toggle = Ractive.extend({
     }
 });
 
+Ractive.components.colorwell = Ractive.extend({
+    template: "<span class='colorwell' style='background-color: {{color}}'></span>",
+    
+    data: {
+        color: "steelblue"
+    }
+});
+
 Ractive.components.panel = Ractive.extend({
     template: template("widgets.panel.html")
 });

@@ -1,21 +1,32 @@
-.filterrow {
-  padding-top:5px;
-  padding-bottom:5px;
-  vertical-align: middle;
-}
-
-.colorindicator {
-    border-width: 0px;
-    width: 50px;
-    height: 22px;
-}
-
-.datafilter {
-  padding-top:5px;
-  padding-bottom:5px;
-}
-
 .filter {
   padding-top:5px;
   padding-bottom:5px;
+}
+
+.filter .placeholder {
+  padding-left: 20px;
+  color: dimgray;
+  font-size: 14pt;
+  font-weight: bolder;
+}
+
+.filter .spacer {
+    height: 2px;
+}
+
+.filter .col-dropdown,
+.filter .col-close {
+    padding: 5px;
+}
+
+.filter .col-colorwell {
+    padding: 0px;
+}
+
+.filter td > * {
+  vertical-align: middle;
+}
+
+.filter .colorwell {
+  width: 5px;
 }

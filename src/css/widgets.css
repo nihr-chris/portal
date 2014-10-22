@@ -1,4 +1,12 @@
-.filter .spacer {
-    height: 2px;
+.colorwell {
+    box-sizing: border-box;
+    position: relative;
+    min-height: 1px;
+    width: 4px;
+    height: 30px;
+    border-radius: 2px;
+    border-width: 1px;
+    border-color: #999;
+    margin: 0;
+    display: inline-block;
 }
-

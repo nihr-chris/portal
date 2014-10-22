@@ -1,6 +1,8 @@
-var Ractive = require("ractive");
-var template = require("../templates.js");
-var log = require("loglevel");
+var template    = require("../templates.js");
+
+var _           = require("underscore");
+var Ractive     = require("ractive");
+var log         = require("loglevel");
 
 Ractive.components.filter = Ractive.extend({
     template: template('filter.html'),
@@ -12,7 +14,10 @@ Ractive.components.filter = Ractive.extend({
         }
         
         component.on('delete', function(event) {
-            component.data.removeRow(event.context);
+            var index = _.indexOf(component.get("items"), event.context);
+            if (index !== -1) {
+                component.splice("items", index, 1);
+            }
         });
         
         component.on('add', function(event) {

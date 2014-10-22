@@ -1,11 +1,11 @@
 <div class='filter well'>
+    {{# (items.length === 0) && placeholder }}
+    <span class="placeholder">{{placeholder}}</span>
+    {{/}}
+    
     {{# items }}
     <spacer></spacer>
-    <contentrow>
-        <div class="input-group">
-        {{>content}}
-        </div>
-    </contentrow>
+    {{>content}}
     <spacer></spacer>
     {{/}}
     
