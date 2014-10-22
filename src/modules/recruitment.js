@@ -83,16 +83,13 @@ module.exports = Operation.module({
                 // UNCLEAN!!! UNCLEAN!!!
                 // [todo] - tidy it up.
                 
-                // [hack]
-                rows =_.filter(rows, function(x){ return x.FY >= 2012 });
-                
                 return _.map(_.groupBy(rows, "Grouping"), function(rows, grouping) {
                     return {
                         key: grouping,
                         values: _.map(_.groupBy(rows, "FY"), function(rows, fy) {
                             if (params.weighted) {
                                 return {
-                                    key: "" + fy + "-" + ((fy % 100) + 1), // [hack]
+                                    key: fy,
                                     values: _.map(_.groupBy(rows, "Banding"), function(rows, banding) {
                                         if (rows.length !== 1) {
                                             throw new Error("Multiple rows returned for banding/fy/grouping");

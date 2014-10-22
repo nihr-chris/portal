@@ -32479,6 +32479,10 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     },
     
     data: {
+        recruitmentGraphPerformanceData: function(filters) {
+            return Recruitment.operation().graph(filters);
+        },
+        
         formatSelected: function(array) {
             switch(array.length) {
                 case 0: return "All";
@@ -33571,16 +33575,13 @@ module.exports = Operation.module({
                 // UNCLEAN!!! UNCLEAN!!!
                 // [todo] - tidy it up.
                 
-                // [hack]
-                rows =_.filter(rows, function(x){ return x.FY >= 2012 });
-                
                 return _.map(_.groupBy(rows, "Grouping"), function(rows, grouping) {
                     return {
                         key: grouping,
                         values: _.map(_.groupBy(rows, "FY"), function(rows, fy) {
                             if (params.weighted) {
                                 return {
-                                    key: "" + fy + "-" + ((fy % 100) + 1), // [hack]
+                                    key: fy,
                                     values: _.map(_.groupBy(rows, "Banding"), function(rows, banding) {
                                         if (rows.length !== 1) {
                                             throw new Error("Multiple rows returned for banding/fy/grouping");
@@ -34068,5 +34069,5 @@ if (window.developmentMode) {
     module.exports = require("../build/template.js");
 }
 
-},{"../build/template.js":1}]},{},[39,40,44,46,45,43,47,42,48,49,50,52,54,53,51])
+},{"../build/template.js":1}]},{},[39,40,41,42,44,43,45,47,46,48,49,51,50,52,53,54])
 ;

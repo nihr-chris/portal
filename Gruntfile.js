@@ -2,9 +2,13 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         watch: {
-            dev: {
+            css: {
                 files: ['src/css/*'],
                 tasks: ['cssmin']
+            },
+            spec: {
+                files: ['spec/*', 'src/modules/*'],
+                tasks: ['mochaTest']
             }
         },
         mochaTest: {

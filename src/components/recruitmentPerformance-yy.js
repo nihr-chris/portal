@@ -119,6 +119,10 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     },
     
     data: {
+        recruitmentGraphPerformanceData: function(filters) {
+            return Recruitment.operation().graph(filters);
+        },
+        
         formatSelected: function(array) {
             switch(array.length) {
                 case 0: return "All";
