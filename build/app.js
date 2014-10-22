@@ -31912,6 +31912,7 @@ require('./components/barchart.js');
 require('./components/recruitmentPerformance-yy.js');
 require('./components/timetarget.js');
 require('./components/datatable.js');
+require('./components/data.js');
 
 window.runApp = function(mainComponent) {
     new Ractive({
@@ -31920,7 +31921,7 @@ window.runApp = function(mainComponent) {
     });
 };
 
-},{"./components/barchart.js":40,"./components/datatable.js":41,"./components/filter.js":42,"./components/master-detail.js":43,"./components/recruitmentPerformance-yy.js":44,"./components/timetarget.js":45,"./components/widgets.js":46,"./modules/fusion.js":47,"./templates.js":53,"browser-request":2,"loglevel":28,"ractive":37}],40:[function(require,module,exports){
+},{"./components/barchart.js":40,"./components/data.js":41,"./components/datatable.js":42,"./components/filter.js":43,"./components/master-detail.js":44,"./components/recruitmentPerformance-yy.js":45,"./components/timetarget.js":46,"./components/widgets.js":47,"./modules/fusion.js":48,"./templates.js":54,"browser-request":2,"loglevel":28,"ractive":37}],40:[function(require,module,exports){
 var Ractive = require('ractive');
 var d3 = require('d3');
 var _ = require('underscore');
@@ -32167,7 +32168,73 @@ Ractive.components.barchart = Ractive.extend({
     }
 });
 
-},{"../modules/util.js":52,"d3":7,"ractive":37,"underscore":38}],41:[function(require,module,exports){
+},{"../modules/util.js":53,"d3":7,"ractive":37,"underscore":38}],41:[function(require,module,exports){
+var Ractive = require("ractive")
+
+/**
+ * <data>
+ * 
+ * Invisible component that binds to a function returning a Promise and an argument
+ * to the function.
+ * 
+ * When either changes, the component calls the function, waits for the promise
+ * to complete, then updates its 'value' attribute with the result of the promise.
+ */
+ 
+Ractive.components.data = Ractive.extend({
+    template: "",
+    init: function() {
+        this.observe("query params", this.makeQuery.bind(this));
+    },
+    
+    makeQuery: function() {
+        var query = this.get("query"), params = this.get("params");
+        if (!query || !params) return;
+        
+        var promise = query(params);
+        var updateValue = this.updateValue.bind(this);
+        
+        this.currentPromise = promise;
+        
+        promise.then(
+            function(value){ updateValue(value, promise) }
+        );
+    },
+    
+    updateValue: function(value, promise) {
+        // Guard against long-running query completing after a later query
+        // and overwriting the later query's value
+        if (promise !== this.currentPromise) return;
+        
+        this.set("value", value);
+    }
+});
+
+if (window.developmentMode) {
+    var Promise = require("promise");
+    
+    Ractive.components.datatest = Ractive.extend({
+        template: (
+            "<data query='{{makeQuery}}' params='{{queryParams}}' value='{{queryValue}}'>"
+            + "</data>"
+            + "{{ queryValue ? queryValue : 'waiting...' }}"
+        ),
+        
+        data: {
+            makeQuery: function(params){
+                return new Promise(function(resolve) {
+                    window.setTimeout(function(){
+                        resolve(params);
+                    }, 5000);
+                });
+            },
+            
+            queryParams: "Hello world!"
+        }
+    });
+}
+
+},{"promise":31,"ractive":37}],42:[function(require,module,exports){
 var Ractive = require("ractive");
 var template = require("../templates.js");
 var _ = require("underscore");
@@ -32187,7 +32254,7 @@ Ractive.components.datatable = Ractive.extend({
     }
 });
 
-},{"../templates.js":53,"ractive":37,"underscore":38}],42:[function(require,module,exports){
+},{"../templates.js":54,"ractive":37,"underscore":38}],43:[function(require,module,exports){
 var template    = require("../templates.js");
 
 var _           = require("underscore");
@@ -32236,7 +32303,7 @@ if (window.developmentMode) {
         },
     });
 }
-},{"../templates.js":53,"loglevel":28,"ractive":37,"underscore":38}],43:[function(require,module,exports){
+},{"../templates.js":54,"loglevel":28,"ractive":37,"underscore":38}],44:[function(require,module,exports){
 /**
  * Component for presenting a list of options, along with a different 'detail'
  * component depending on which of the options is currently active.
@@ -32290,7 +32357,7 @@ Ractive.components.masterdetail = Ractive.extend({
     }
 });
 
-},{"../modules/util.js":52,"ractive":37}],44:[function(require,module,exports){
+},{"../modules/util.js":53,"ractive":37}],45:[function(require,module,exports){
 var Ractive     = require("ractive");
 var template    = require("../templates.js");
 var _           = require("underscore");
@@ -32451,7 +32518,7 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     }
 });
 
-},{"../modules/palette.js":49,"../modules/recruitment.js":50,"../modules/util.js":52,"../templates.js":53,"ractive":37,"underscore":38}],45:[function(require,module,exports){
+},{"../modules/palette.js":50,"../modules/recruitment.js":51,"../modules/util.js":53,"../templates.js":54,"ractive":37,"underscore":38}],46:[function(require,module,exports){
 var Ractive     = require("ractive");
 var template    = require("../templates.js");
 var _           = require("underscore");
@@ -32521,7 +32588,7 @@ Ractive.components.timetarget = Ractive.extend({
     }   
 });
 
-},{"../modules/palette.js":49,"../modules/recruitment.js":50,"../templates.js":53,"ractive":37,"underscore":38}],46:[function(require,module,exports){
+},{"../modules/palette.js":50,"../modules/recruitment.js":51,"../templates.js":54,"ractive":37,"underscore":38}],47:[function(require,module,exports){
 var Ractive = require("ractive");
 var template = require("../templates.js");
 var _ = require("underscore");
@@ -32635,7 +32702,7 @@ Ractive.components.column = Ractive.extend({
     template: "<div class='column-xs-{{size ? size : 12}}'> {{yield}} </div>"
 });
 
-},{"../templates.js":53,"ractive":37,"underscore":38}],47:[function(require,module,exports){
+},{"../templates.js":54,"ractive":37,"underscore":38}],48:[function(require,module,exports){
 var Promise     = require('promise');
 var moment      = require('moment');
 var _           = require('underscore');
@@ -32773,7 +32840,7 @@ Fusion.lt = function(field, x) {
 
 module.exports = Fusion;
 
-},{"./util.js":52,"loglevel":28,"moment":29,"promise":31,"underscore":38}],48:[function(require,module,exports){
+},{"./util.js":53,"loglevel":28,"moment":29,"promise":31,"underscore":38}],49:[function(require,module,exports){
 /**
  * Operation
  * 
@@ -33387,7 +33454,7 @@ module.exports = operationModule({
     }
 });
 
-},{"./fusion.js":47,"./util.js":52,"loglevel":28,"moment":29,"promise":31,"underscore":38}],49:[function(require,module,exports){
+},{"./fusion.js":48,"./util.js":53,"loglevel":28,"moment":29,"promise":31,"underscore":38}],50:[function(require,module,exports){
 var Color   = require("color");
 var _       = require("underscore");
 
@@ -33418,7 +33485,7 @@ palette.generate = function(keys) {
 };
 
 module.exports = palette;
-},{"./util.js":52,"color":3,"underscore":38}],50:[function(require,module,exports){
+},{"./util.js":53,"color":3,"underscore":38}],51:[function(require,module,exports){
 var _           = require("underscore");
 var moment      = require("moment");
 
@@ -33734,7 +33801,7 @@ module.exports = Operation.module({
     }
 });
 
-},{"./fusion.js":47,"./operation.js":48,"./util.js":52,"moment":29,"underscore":38}],51:[function(require,module,exports){
+},{"./fusion.js":48,"./operation.js":49,"./util.js":53,"moment":29,"underscore":38}],52:[function(require,module,exports){
 var _ = require("underscore");
 var moment = require("moment");
 var numeral = require("numeral");
@@ -33813,7 +33880,7 @@ module.exports = function(rawData) {
     };
 };
 
-},{"moment":29,"numeral":30,"underscore":38}],52:[function(require,module,exports){
+},{"moment":29,"numeral":30,"underscore":38}],53:[function(require,module,exports){
 var _ = require("underscore");
 var schema = require("js-schema");
 
@@ -33977,7 +34044,7 @@ module.exports = {
     getFY: getFY
 };
 
-},{"js-schema":9,"underscore":38}],53:[function(require,module,exports){
+},{"js-schema":9,"underscore":38}],54:[function(require,module,exports){
 if (window.developmentMode) {
     // In development mode, synchronously fetch the template locally.
     
@@ -34001,5 +34068,5 @@ if (window.developmentMode) {
     module.exports = require("../build/template.js");
 }
 
-},{"../build/template.js":1}]},{},[39,40,43,45,44,42,46,41,47,48,49,51,53,52,50])
+},{"../build/template.js":1}]},{},[39,40,44,46,45,43,47,42,48,49,50,52,54,53,51])
 ;

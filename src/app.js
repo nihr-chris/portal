@@ -15,6 +15,7 @@ require('./components/barchart.js');
 require('./components/recruitmentPerformance-yy.js');
 require('./components/timetarget.js');
 require('./components/datatable.js');
+require('./components/data.js');
 
 window.runApp = function(mainComponent) {
     new Ractive({

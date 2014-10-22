@@ -27,16 +27,28 @@
     </table>
 </filter>
 
+
+<data query='{{recruitmentPerformanceGraphData}}' 
+    params='{{filters}}'
+    value='{{graphData}}'>
+</data>
+
 <barchart
-    data='{{annualRecruitmentData}}'
+    data='{{graphData}}'
     legend='{{examplelegend}}'
     width='2000'
     y-label=''
     group-spacing='10'>
 </barchart>
 
+
+<data query='{{recruitmentPerformanceTableData}}' 
+    params='{{filters}}'
+    value='{{tableData}}'>
+</data>
+
 <datatable 
     headers='{{ ["", "2012-13", "2013-14", "2014-15"] }}'
     keys='{{ ["grouping", "2012", "2013", "2014"] }}' 
-    data='{{tabledata}}'>
+    data='{{tableData}}'>
 </datatable>
