@@ -408,6 +408,14 @@ module.exports = operationModule({
             });
         },
         
+        empty: function() {
+            return this.childOperation({
+                inputColumns: [],
+                outputColumns: [],
+                transform: function(){ return [] }
+            });
+        },
+        
         withRunningTotal: function(params) {
             var totalField = params.inField;
             var summedField = params.field;

@@ -21,22 +21,22 @@
         </td>
         
         <td class='col-dropdown'>
-        <multidropdown title="Trusts: {{ formatSelected(trusts) }}" items="{{trustOptions}}" selected="{{trusts}}">
+        <multidropdown title="Trusts: {{ formatSelected(MemberOrg) }}" items="{{trustOptions}}" selected="{{MemberOrg}}">
         </multidropdown>
         </td>
         
         <td class='col-dropdown'>
-        <multidropdown title="Divisions: {{ formatSelected(divisions) }}" items="{{divisionOptions}}" selected="{{divisions}}">
+        <multidropdown title="Divisions: {{ formatSelected(MainReportingDivision) }}" items="{{divisionOptions}}" selected="{{MainReportingDivision}}">
         </multidropdown>
         </td>
         
         <td class='col-dropdown'>
-        <multidropdown title="Specialties: {{ formatSelected(specialties) }}" items="{{specialtyOptions}}" selected="{{specialties}}">
+        <multidropdown title="Specialties: {{ formatSelected(MainSpecialty) }}" items="{{specialtyOptions}}" selected="{{MainSpecialty}}">
         </multidropdown>
         </td>
         
         <td class='col-dropdown'>
-        <multidropdown title="{{ formatSelectedCommercial(commercial) }}" items="{{commercialOptions}}" selected="{{commercial}}">
+        <multidropdown title="{{ formatSelectedCommercial(CommercialStudy) }}" items="{{commercialOptions}}" selected="{{CommercialStudy}}">
         </multidropdown>
         </td>
     </tr>
@@ -44,7 +44,7 @@
 </filter>
 
 
-<data query='{{recruitmentPerformanceGraphData}}' 
+<data query='{{getGraphData}}' 
     params='{{filters}}'
     value='{{graphData}}'>
 </data>

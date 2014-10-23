@@ -31716,7 +31716,7 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     },
     
     data: {
-        recruitmentGraphPerformanceData: function(filters) {
+        getGraphData: function(filters) {
             return Recruitment.operation().weightedGraph(filters);
         },
         
@@ -31725,8 +31725,8 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
         },
         
         commercialOptions: [
-            ["Commercial"],
-            ["Non-Commercial"],
+            "Commercial",
+            "Non-Commercial",
         ],
         
         formatSelectedCommercial: function(selected) {
@@ -31744,7 +31744,7 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
         
         newfilter: function() {
             return {
-                trusts: [], divisions: [], specialties: [], commercial: []
+                MemberOrg: [], MainReportingDivision: [], MainSpecialty: [], CommercialStudy: []
             };
         }
     }
@@ -32543,6 +32543,14 @@ module.exports = operationModule({
             });
         },
         
+        empty: function() {
+            return this.childOperation({
+                inputColumns: [],
+                outputColumns: [],
+                transform: function(){ return [] }
+            });
+        },
+        
         withRunningTotal: function(params) {
             var totalField = params.inField;
             var summedField = params.field;
@@ -32953,7 +32961,7 @@ module.exports = Operation.module({
                 .sum({
                     valuesFromField: "MonthRecruitment",
                     inField: "FYRecruitment",
-                    groupBy: ["FY"]
+                    groupBy: ["FY", "Banding"]
                 })
                 .withFilterDescription(filter)
                 .barChart({
@@ -32964,7 +32972,8 @@ module.exports = Operation.module({
                 });
             });
             
-            return _.first(groups).union(_.rest(groups));
+            if (groups.length === 0) return this.empty();
+            else return _.first(groups).union(_.rest(groups));
         },
         
         
@@ -33195,7 +33204,6 @@ var checkArgs = function() {
         
         var msg = "Invalid argument types:\n" + JSON.stringify(errors);
         
-        if (console.trace) console.trace();
         throw new TypeError(msg);
     }
 };

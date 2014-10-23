@@ -37,7 +37,7 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     },
     
     data: {
-        recruitmentGraphPerformanceData: function(filters) {
+        getGraphData: function(filters) {
             return Recruitment.operation().weightedGraph(filters);
         },
         
@@ -46,8 +46,8 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
         },
         
         commercialOptions: [
-            ["Commercial"],
-            ["Non-Commercial"],
+            "Commercial",
+            "Non-Commercial",
         ],
         
         formatSelectedCommercial: function(selected) {
@@ -65,7 +65,7 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
         
         newfilter: function() {
             return {
-                trusts: [], divisions: [], specialties: [], commercial: []
+                MemberOrg: [], MainReportingDivision: [], MainSpecialty: [], CommercialStudy: []
             };
         }
     }

@@ -28,7 +28,7 @@ module.exports = Operation.module({
                 .sum({
                     valuesFromField: "MonthRecruitment",
                     inField: "FYRecruitment",
-                    groupBy: ["FY"]
+                    groupBy: ["FY", "Banding"]
                 })
                 .withFilterDescription(filter)
                 .barChart({
@@ -39,7 +39,8 @@ module.exports = Operation.module({
                 });
             });
             
-            return _.first(groups).union(_.rest(groups));
+            if (groups.length === 0) return this.empty();
+            else return _.first(groups).union(_.rest(groups));
         },
         
         
