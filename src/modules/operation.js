@@ -386,6 +386,10 @@ module.exports = operationModule({
         },
         
         withFY: function(fieldMap) {
+            util.checkArgs(arguments, {
+                '*': String
+            });
+            
             return this.withOperation({
                 inputColumns: _.values(fieldMap),
                 addedColumns: _.keys(fieldMap),
@@ -393,6 +397,14 @@ module.exports = operationModule({
                     var dateColumn = fieldMap[outputColumn];
                     return util.getFY(row[dateColumn]);
                 }
+            });
+        },
+        
+        format: function(fn) {
+            return this.childOperation({
+                inputColumns: [],
+                outputColumns: [],
+                transform: fn
             });
         },
         
@@ -514,14 +526,6 @@ module.exports = operationModule({
             });
         },
         
-        format: function(transform) {
-            return this.childOperation({
-                inputColumns: [],
-                outputColumns: [],
-                transform: transform
-            });
-        },
-        
         filterValues: function(params) {
             return this.childOperation({
                 inputColumns: [params.column],
@@ -587,7 +591,7 @@ module.exports = operationModule({
             
             return this.summarizeOperation({
                 summarizeColumns: [summedColumn],
-                addedColumns: [summedColumn],
+                addedColumns: [totalColumn],
                 
                 groupBy: params.groupBy,
                 summarize: function(rows, summary) {
@@ -603,13 +607,20 @@ module.exports = operationModule({
         
         /** Set Operations **/
         
-        union: function(otherOperation) {
+        union: function(otherOperations) {
+            if (!_.isArray(otherOperations)) {
+                otherOperations = [otherOperations];
+            }
+            
+            var operations = [this].concat(otherOperations);
+            var columns = _.uniq(_.flatten(_.map(operations, "outputColumns")));
+            
             return this.childOperation({
-                inputColumns: otherOperation.outputColumns,
-                outputColumns: otherOperation.outputColumns,
+                inputColumns: columns,
+                outputColumns: columns,
                 transform: function(rows) {
-                    return otherOperation.promise.then(function(otherRows) {
-                        return _.union(rows, otherRows);
+                    return Promise.all(operations).then(function(rows) {
+                        return _.flatten(rows);
                     });
                 }
             });

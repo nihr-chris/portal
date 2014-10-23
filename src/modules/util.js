@@ -38,14 +38,18 @@ var checkArgs = function() {
 
 
 function getFY(date) {
-    var month = date.getMonth(date);
-    var year = date.getFullYear(date);
+    var startYear = (function() {
+        var month = date.getMonth(date);
+        var year = date.getFullYear(date);
+        
+        if (month < 3) {
+            return year - 1;
+        } else {
+            return year;
+        }
+    })();
     
-    if (month < 3) {
-        return year - 1;
-    } else {
-        return year;
-    }
+    return String(startYear) + "-" + String((startYear + 1) % 100);
 }
 
 

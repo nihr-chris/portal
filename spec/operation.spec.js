@@ -307,8 +307,8 @@ describe("any Operation", function(){
                     {date: new Date("2011-3-1")}
                 ])
                 .toReturn([
-                    {date: new Date("2011-4-1"), fy: 2011}, 
-                    {date: new Date("2011-3-1"), fy: 2010}
+                    {date: new Date("2011-4-1"), fy: "2011-12"}, 
+                    {date: new Date("2011-3-1"), fy: "2010-11"}
                 ]);
              });
          });
@@ -338,7 +338,7 @@ describe("any Operation", function(){
          });
          
          describe("union", function() {
-             it("should return union of operation result", function() {
+             it("should return union with other operation", function() {
                 var otherOperation = mocks.rootOperation([
                     {id: 3},
                     {id: 4},
@@ -356,6 +356,33 @@ describe("any Operation", function(){
                     {id: 2},
                     {id: 3},
                     {id: 4}
+                ]);
+             });
+             
+             it("should return union with array of operations", function() {
+                var otherOperation1 = mocks.rootOperation([
+                    {id: 3},
+                    {id: 4},
+                ]);
+                var otherOperation2 = mocks.rootOperation([
+                    {id: 5},
+                    {id: 6},
+                ]);
+                 
+                return expectOperation(function(parent){
+                    return parent.union([otherOperation1, otherOperation2]);
+                })
+                .withInput([
+                    {id: 1},
+                    {id: 2}
+                ])
+                .toReturn([
+                    {id: 1},
+                    {id: 2},
+                    {id: 3},
+                    {id: 4},
+                    {id: 5},
+                    {id: 6},
                 ]);
              });
          });

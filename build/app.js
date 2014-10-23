@@ -32168,17 +32168,62 @@ var _           = require("underscore");
 
 var Operation   = require("./operation.js");
 var util        = require("./util.js");
-var Fusion      = require("./fusion.js");
 
 module.exports = Operation.module({
     operations: {
-        barGroup: function(params) {
+        
+        /**
+         * Transforms a series of rows into a series of of objects describing
+         * stacked bar chart groups.
+         */
+        barChart: function(params) {
+            util.checkArgs(arguments, {
+                valueFrom: String,
+                stackBy: [String, null],
+                seriesBy: [String, null],
+                groupBy: [String, null]
+            });
             
+            function group(rows, column, transform) {
+                if (column) {
+                    var grouped = _.groupBy(rows, column);
+                    return _.map(grouped, transform);
+                } else {
+                    return[transform(rows, "")];
+                }
+            }
+            
+            function sumRowValues(memo, row) {
+                return memo + row[params.valueFrom];
+            }
+            
+            return this.childOperation({
+                inputColumns: _.compact([params.valueFrom, params.stackBy, params.seriesBy, params.groupBy]),
+                outputColumns: [],
+                
+                transform: function(rows) {
+                    return group(rows, params.groupBy, function(rows, key) {
+                        var groupValues = group(rows, params.seriesBy, function(rows, key) {
+                            var barValues = group(rows, params.stackBy, function(rows, key) {
+                                
+                                return {
+                                    key: key,
+                                    value: _.reduce(rows, sumRowValues, 0)
+                                };
+                            });
+                            
+                            return {key: key, values: barValues};
+                        });
+                        
+                        return {key: key, values: groupValues};
+                    });
+                }
+            });
         }
     }
 });
 
-},{"./fusion.js":47,"./operation.js":49,"./util.js":54,"underscore":37}],49:[function(require,module,exports){
+},{"./operation.js":49,"./util.js":54,"underscore":37}],49:[function(require,module,exports){
 /**
  * Operation
  * 
@@ -32567,6 +32612,10 @@ module.exports = operationModule({
         },
         
         withFY: function(fieldMap) {
+            util.checkArgs(arguments, {
+                '*': String
+            });
+            
             return this.withOperation({
                 inputColumns: _.values(fieldMap),
                 addedColumns: _.keys(fieldMap),
@@ -32574,6 +32623,14 @@ module.exports = operationModule({
                     var dateColumn = fieldMap[outputColumn];
                     return util.getFY(row[dateColumn]);
                 }
+            });
+        },
+        
+        format: function(fn) {
+            return this.childOperation({
+                inputColumns: [],
+                outputColumns: [],
+                transform: fn
             });
         },
         
@@ -32695,14 +32752,6 @@ module.exports = operationModule({
             });
         },
         
-        format: function(transform) {
-            return this.childOperation({
-                inputColumns: [],
-                outputColumns: [],
-                transform: transform
-            });
-        },
-        
         filterValues: function(params) {
             return this.childOperation({
                 inputColumns: [params.column],
@@ -32768,7 +32817,7 @@ module.exports = operationModule({
             
             return this.summarizeOperation({
                 summarizeColumns: [summedColumn],
-                addedColumns: [summedColumn],
+                addedColumns: [totalColumn],
                 
                 groupBy: params.groupBy,
                 summarize: function(rows, summary) {
@@ -32784,13 +32833,20 @@ module.exports = operationModule({
         
         /** Set Operations **/
         
-        union: function(otherOperation) {
+        union: function(otherOperations) {
+            if (!_.isArray(otherOperations)) {
+                otherOperations = [otherOperations];
+            }
+            
+            var operations = [this].concat(otherOperations);
+            var columns = _.uniq(_.flatten(_.map(operations, "outputColumns")));
+            
             return this.childOperation({
-                inputColumns: otherOperation.outputColumns,
-                outputColumns: otherOperation.outputColumns,
+                inputColumns: columns,
+                outputColumns: columns,
                 transform: function(rows) {
-                    return otherOperation.promise.then(function(otherRows) {
-                        return _.union(rows, otherRows);
+                    return Promise.all(operations).then(function(rows) {
+                        return _.flatten(rows);
                     });
                 }
             });
@@ -32956,28 +33012,92 @@ module.exports = Operation.module({
                 CommercialStudy: Array.of(String)
             }));
             
+            var operation = this;
             var groups = _.map(groupFilters, function(filter) {
-                return this.fetchRecruitment({
+                return operation.fetchRecruitment({
                     filter: filter,
                     groupBy: ["Month", "Banding"]
                 })
                 .withFY({
                     FY: "Month"
                 })
+                .justFields(["FY", "Banding", "MonthRecruitment"])
                 .sum({
                     valuesFromField: "MonthRecruitment",
-                    inField: "FYRecruitment"
+                    inField: "FYRecruitment",
+                    groupBy: ["FY"]
                 })
-                .barGroup({
-                    value: "FYRecruitment",
+                .withFilterDescription(filter)
+                .barChart({
+                    valueFrom: "FYRecruitment",
+                    groupBy: "Filter",
                     stackBy: "Banding",
-                    seriesBy: "FY",
-                    stackColors: palette.generate(["Interventional/Both", "Observational", "Large"])
+                    seriesBy: "FY"
                 });
             });
             
             return _.first(groups).union(_.rest(groups));
         },
+        
+        
+        withFilterDescription: function(filter) {
+            util.checkArgs(arguments, {
+                MemberOrg: Array.of(String),
+                CommercialStudy: Array.of(String),
+                MainSpecialty: Array.of(String),
+                MainReportingDivision: Array.of(String)
+            });
+            
+            function memberOrgDec() {
+                if (filter.MemberOrg.length > 0) {
+                    return filter.MemberOrg.join(" & ");
+                } else {
+                    return "CRN-Wide";
+                }
+            }
+            
+            function specialtyDivisionDesc() {
+                var desc = [];
+                
+                if (filter.MainSpecialty.length > 0) {
+                    desc.push(filter.MainSpecialty.join(" & "));
+                }
+                if (filter.MainReportingDivision.length > 0) {
+                    desc.push(filter.MainReportingDivision.join(" & "));
+                }
+                
+                return (desc.length === 0) ? null : desc.join(", ");
+            }
+            
+            function commercialDesc() {
+                if (filter.CommercialStudy.length === 1) {
+                    return "(" + filter.CommercialStudy[0] + ")";
+                } else {
+                    return null;
+                }
+            }
+            
+            var afterColon = _.compact([specialtyDivisionDesc(), commercialDesc()]);
+            var filterDesc;
+            if (afterColon.length > 0) {
+                filterDesc = memberOrgDec() + ": " + afterColon.join(" ");
+            } else {
+                filterDesc = memberOrgDec();
+            }
+            
+            return this.childOperation({
+                inputColumns: [],
+                outputColumns: this.outputColumns.concat(["Filter"]),
+                
+                transform: function(rows) {
+                    return _.map(rows, function(r) {
+                        var next = _.clone(r);
+                        next.Filter = filterDesc;
+                        return next;
+                    });
+                }
+            });
+        }
     }
 });
 
@@ -33154,14 +33274,18 @@ var checkArgs = function() {
 
 
 function getFY(date) {
-    var month = date.getMonth(date);
-    var year = date.getFullYear(date);
+    var startYear = (function() {
+        var month = date.getMonth(date);
+        var year = date.getFullYear(date);
+        
+        if (month < 3) {
+            return year - 1;
+        } else {
+            return year;
+        }
+    })();
     
-    if (month < 3) {
-        return year - 1;
-    } else {
-        return year;
-    }
+    return String(startYear) + "-" + String((startYear + 1) % 100);
 }
 
 
