@@ -38,6 +38,25 @@ module.exports = Operation.module({
             });
         },
         
+        filterOptions: function(column) {
+            util.checkArgs(arguments, String);
+            
+            var table = this.recruitmentTable;
+            return this.childOperation({
+                inputColumns: [],
+                outputColumns: [],
+                transform: function() {
+                    return table.fetch({
+                        select:  [column],
+                        groupBy: [column]
+                    });
+                }
+            })
+            .format(function(rows) {
+                return _.map(rows, column);
+            });
+        },
+        
         timeTargetStudyInfo: function(params) {
             util.checkArgs(arguments, {
                 open: Boolean,

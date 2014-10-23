@@ -59,6 +59,30 @@ describe("data", function() {
         });
     });
     
+    describe("filterOptions", function() {
+        it("should fetch all options", function() {
+            return expectOperation(Query, function(parent) {
+                return parent.filterOptions("MyColumn");
+            })
+            .toMakeQuery({
+                select: [
+                    "MyColumn"
+                ],
+                groupBy: [
+                    "MyColumn"
+                ]
+            })
+            .withStubbedResult([
+                {MyColumn: "a"},
+                {MyColumn: "b"}
+            ])
+            .onTable("recruitmentTable")
+            .andReturn([
+                "a", "b"
+            ]);
+        });
+    });
+    
     describe("timeTargetStudyInfo", function() {
         it("should fetch open commercial studies", function() {
             return expectOperation(Query, function(parent) {

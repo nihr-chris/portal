@@ -1,4 +1,4 @@
-<div>
+<span class='btn-group'>
     <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown">
     {{format(selected)}} <span class="caret"></span>
     </button>
@@ -8,8 +8,7 @@
             <li class="active">
                 <a href="#">{{ format(this) }}</a>
             </li>
-            {{/#}}
-            {{# this !== selected}}
+            {{else}}
             <li>
                 <a href="#" on-click="select">{{ format(this) }}</a>
             </li>
