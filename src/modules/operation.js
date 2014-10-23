@@ -78,25 +78,6 @@ var operationModule = function(params) {
         });
     };
     
-    var addOperations = function(map) {
-        _.each(map, function(op, name) {
-            if (Operation.prototype[name] && Operation.prototype[name] !== op) {
-                throw new Error(
-                    "Attempt to add operation " + name
-                    + ", which is already defined in module"
-                );
-            }
-            
-            Operation.prototype[name] = op; 
-        });
-    };
-    
-    _.each(params.imports, function(module) {
-        addOperations(module.prototype);
-    });
-    addOperations(params.operations);
-    
-    
     /**
      * Returns a submodule of the operation module it is called on. Submodules inherit
      * all operations from their parent, along with any other models passed as
@@ -114,150 +95,175 @@ var operationModule = function(params) {
             operations: util.merge([params.operations, childParams.operations])
         });
     };
-        
-    /**
-     * This is a more convenient way of creating a child operation than just using
-     * `new Operation()`. It automatically checks that the parent will return the right
-     * columns and wraps the transform function inside a promise.
-     */
-    Operation.prototype.childOperation = function(params) {
-        util.checkArgs(arguments, {
-            inputColumns: Array.of(String),
-            outputColumns: Array.of(String),
-            transform: Function
-        });
-        
-        var incomingColumns = this.outputColumns;
-        var requiredColumns = params.inputColumns;
-        
-        var missingColumns = _.difference(requiredColumns, incomingColumns);
-        if (missingColumns.length > 0) {
-            throw new Error("Child operation is incompatible with parent "
-                + "as it requires columns missing from the parent: "
-                + missingColumns.join(", "));
-        }
-        
-        return new Operation({
-            outputColumns: params.outputColumns,
-            promise: this.promise.then(function(value) {
-                // break here to catch values from operations
-                return params.transform(value);
-                
-            }, function(error) {
-                // break here to catch errors from operations
-                throw error;
-            }),
-            references: this.references
-        });
-    };
     
-    
-    Operation.prototype.withOperation = function(params) {
-        util.checkArgs(arguments, {
-            addedColumns: Array.of(String),
-            inputColumns: [Array.of(String), null],
-            rowValues: Function
-        });
-        
-        return this.childOperation({
-            inputColumns: params.inputColumns ? params.inputColumns : [],
-            outputColumns: _.union(params.addedColumns, this.outputColumns),
-            transform: function(rows) {
-                return _.map(rows, function(row) {
-                    var result = _.clone(row);
-                    _.each(params.addedColumns, function(outputColumn) {
-                        result[outputColumn] = params.rowValues(row, outputColumn);
-                    });
-                    return result;
-                });
+    var prototypeMethods = {
+        /**
+         * This is a more convenient way of creating a child operation than just using
+         * `new Operation()`. It automatically checks that the parent will return the right
+         * columns and wraps the transform function inside a promise.
+         */
+        childOperation: function(params) {
+            util.checkArgs(arguments, {
+                inputColumns: Array.of(String),
+                outputColumns: Array.of(String),
+                transform: Function
+            });
+            
+            var incomingColumns = this.outputColumns;
+            var requiredColumns = params.inputColumns;
+            
+            var missingColumns = _.difference(requiredColumns, incomingColumns);
+            if (missingColumns.length > 0) {
+                throw new Error("Child operation is incompatible with parent "
+                    + "as it requires columns missing from the parent: "
+                    + missingColumns.join(", "));
             }
-        });
-    };  
-    
-    
-    /**
-     * Private helper method for creating operations that summarize many rows into
-     * fewer rows (similar to SQL's GROUP BY + aggregation functions).
-     * 
-     * Most of the common logic (/ugliness) for a summarizing operation lives here.
-     * For example, count() calls this, passing in the additional logic specific to
-     * counting.
-     */
-    Operation.prototype.summarizeOperation = function(params) {
-        util.checkArgs(arguments, {
-            // Names of columns to group by
-            groupBy: Array.of(String),
             
-            // Function that takes an array of rows and writes summarized values to
-            // one or more new columns
-            summarize: Function,
-            
-            // Array of column names that are summarized by the summarize function.
-            // These are deleted from the returned rows.
-            summarizeColumns: Array.of(String),
-            
-            // Array of column names that are added by the summarize function. Used
-            // for error-checking by child operations.
-            addedColumns: Array.of(String)
-        });
-        
-        var keptColumns = _.difference(this.outputColumns, params.summarizeColumns);
-        
-        return this.childOperation({
-            inputColumns: _.union(params.summarizeColumns, params.groupBy),
-            outputColumns: _.union(keptColumns, params.addedColumns),
-            transform: function(rows) {
-                // Group...
-                var groups = _.groupBy(rows, function(row) {
-                    return JSON.stringify(_.pick(row, params.groupBy));
-                });
-                
-                // And summarize...
-                return _.map(groups, function(groupRows) {
-                    var result = {};
-                    var firstRow = groupRows[0];
+            return new Operation({
+                outputColumns: params.outputColumns,
+                promise: this.promise.then(function(value) {
+                    // break here to catch values from operations
+                    return params.transform(value);
                     
-                    // Check that there isn't any variation within the group for each
-                    // unsummarized column. Raise an error if there is.
-                    
-                    // SQL would require all returned columns to either be grouped or 
-                    // passed to an aggregation function, but it's actually quite useful 
-                    // to copy across values from columns we aren't grouping by, while
-                    // checking that they would have been part of the same group if 
-                    // we'd included them in the groupBy array.
-                    _.each(groupRows, function(row) {
-                        _.each(keptColumns, function(column) {
-                            if (firstRow[column] !== row[column]) {
-                                throw new Error(
-                                    "Column " + column + " has an ambiguous value that is "
-                                    + "not being grouped or summarized.\n"
-                                    + "Could be " + row[column] + " or " + firstRow[column]
-                                );
-                            }
+                }, function(error) {
+                    // break here to catch errors from operations
+                    throw error;
+                }),
+                references: this.references
+            });
+        },
+        
+        
+        withOperation: function(params) {
+            util.checkArgs(arguments, {
+                addedColumns: Array.of(String),
+                inputColumns: [Array.of(String), null],
+                rowValues: Function
+            });
+            
+            return this.childOperation({
+                inputColumns: params.inputColumns ? params.inputColumns : [],
+                outputColumns: _.union(params.addedColumns, this.outputColumns),
+                transform: function(rows) {
+                    return _.map(rows, function(row) {
+                        var result = _.clone(row);
+                        _.each(params.addedColumns, function(outputColumn) {
+                            result[outputColumn] = params.rowValues(row, outputColumn);
                         });
+                        return result;
+                    });
+                }
+            });
+        },
+        
+        
+        /**
+         * Private helper method for creating operations that summarize many rows into
+         * fewer rows (similar to SQL's GROUP BY + aggregation functions).
+         * 
+         * Most of the common logic (/ugliness) for a summarizing operation lives here.
+         * For example, count() calls this, passing in the additional logic specific to
+         * counting.
+         */
+        summarizeOperation: function(params) {
+            util.checkArgs(arguments, {
+                // Names of columns to group by
+                groupBy: Array.of(String),
+                
+                // Function that takes an array of rows and writes summarized values to
+                // one or more new columns
+                summarize: Function,
+                
+                // Array of column names that are summarized by the summarize function.
+                // These are deleted from the returned rows.
+                summarizeColumns: Array.of(String),
+                
+                // Array of column names that are added by the summarize function. Used
+                // for error-checking by child operations.
+                addedColumns: Array.of(String)
+            });
+            
+            var keptColumns = _.difference(this.outputColumns, params.summarizeColumns);
+            
+            return this.childOperation({
+                inputColumns: _.union(params.summarizeColumns, params.groupBy),
+                outputColumns: _.union(keptColumns, params.addedColumns),
+                transform: function(rows) {
+                    // Group...
+                    var groups = _.groupBy(rows, function(row) {
+                        return JSON.stringify(_.pick(row, params.groupBy));
                     });
                     
-                    // Take the first row's value for each unsummarized column
-                    _.each(keptColumns, function(column) {
-                        result[column] = firstRow[column];
+                    // And summarize...
+                    return _.map(groups, function(groupRows) {
+                        var result = {};
+                        var firstRow = groupRows[0];
+                        
+                        // Check that there isn't any variation within the group for each
+                        // unsummarized column. Raise an error if there is.
+                        
+                        // SQL would require all returned columns to either be grouped or 
+                        // passed to an aggregation function, but it's actually quite useful 
+                        // to copy across values from columns we aren't grouping by, while
+                        // checking that they would have been part of the same group if 
+                        // we'd included them in the groupBy array.
+                        _.each(groupRows, function(row) {
+                            _.each(keptColumns, function(column) {
+                                if (firstRow[column] !== row[column]) {
+                                    throw new Error(
+                                        "Column " + column + " has an ambiguous value that is "
+                                        + "not being grouped or summarized.\n"
+                                        + "Could be " + row[column] + " or " + firstRow[column]
+                                    );
+                                }
+                            });
+                        });
+                        
+                        // Take the first row's value for each unsummarized column
+                        _.each(keptColumns, function(column) {
+                            result[column] = firstRow[column];
+                        });
+                        
+                        // Merge in the summarized column values
+                        params.summarize(groupRows, result);
+                        
+                        return result;
                     });
-                    
-                    // Merge in the summarized column values
-                    params.summarize(groupRows, result);
-                    
-                    return result;
-                });
+                }
+            });
+        },
+        
+        then: function(completionHandler, errorHandler) {
+            return this.promise.then(completionHandler, errorHandler);
+        },
+        
+        catch: function(handler) {
+            return this.promise.catch(handler);
+        }
+    };
+        
+    function addOperations(map) {
+        _.each(map, function(op, name) {
+            if (name in prototypeMethods) return;
+            
+            if (Operation.prototype[name] && Operation.prototype[name] !== op) {
+                throw new Error(
+                    "Attempt to add operation " + name
+                    + ", which is already defined in module"
+                );
             }
+            
+            Operation.prototype[name] = op; 
         });
-    };
+    }
+
+    Operation.prototype = _.clone(prototypeMethods);
     
-    Operation.prototype.then = function(completionHandler, errorHandler) {
-        return this.promise.then(completionHandler, errorHandler);
-    };
+    _.each(params.imports, function(module) {
+        addOperations(module.prototype);
+    });
     
-    Operation.prototype.catch = function(handler) {
-        return this.promise.catch(handler);
-    };
+    addOperations(params.operations);
     
     return Operation;
 };
