@@ -31865,7 +31865,7 @@ Ractive.components.multidropdown = Ractive.extend({
         if (!component.get("items")) component.set("items", []);
         if (!component.get("items")) component.set("selected", []);
         
-        component.on('select', function(event) {
+        component.on('toggle', function(event) {
             var oldSelection = component.get("selected");
             var item = event.context;
             

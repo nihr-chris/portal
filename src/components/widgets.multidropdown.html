@@ -6,11 +6,11 @@
         {{# items}}
             {{# contains(selected, this) }}
             <li class="active">
-                <a href="#">{{ format(this) }}</a>
+                <a href="#" on-click="toggle">{{ format(this) }}</a>
             </li>
             {{else}}
             <li>
-                <a href="#" on-click="select">{{ format(this) }}</a>
+                <a href="#" on-click="toggle">{{ format(this) }}</a>
             </li>
             {{/#}}
         {{/#}}
