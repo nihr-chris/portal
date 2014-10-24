@@ -31330,8 +31330,8 @@ Ractive.components.barchart = Ractive.extend({
         
         var maxY = _.max(allYValues);
         
-        var biggestGroup = _.max(data, function(d){ return d.values.length });
-        var numBars = biggestGroup.values.length * data.length;
+        var biggestGroup = (data.length === 0) ? null : _.max(data, function(d){ return d.values.length });
+        var numBars = biggestGroup ? (biggestGroup.values.length * data.length) : 0;
         
         var width = this.get("barWidth") * numBars;
         var height = this.get("height");
@@ -31694,13 +31694,15 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     
     init: function() {
         this.set("filters", []);
+        this.set("weighted", true);
     },
     
     data: {
-        getGraphData: function(filters) {
-            return Recruitment.operation().weightedGraph({
-                filters: filters,
-                financialYears: ["2012-13", "2013-14", "2014-15"]
+        getGraphData: function(params) {
+            return Recruitment.operation().yearRecruitmentGraph({
+                filters: params.filters,
+                financialYears: ["2012-13", "2013-14", "2014-15"],
+                weighted: params.weighted
             });
         },
         

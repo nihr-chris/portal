@@ -87,8 +87,8 @@ Ractive.components.barchart = Ractive.extend({
         
         var maxY = _.max(allYValues);
         
-        var biggestGroup = _.max(data, function(d){ return d.values.length });
-        var numBars = biggestGroup.values.length * data.length;
+        var biggestGroup = (data.length === 0) ? null : _.max(data, function(d){ return d.values.length });
+        var numBars = biggestGroup ? (biggestGroup.values.length * data.length) : 0;
         
         var width = this.get("barWidth") * numBars;
         var height = this.get("height");

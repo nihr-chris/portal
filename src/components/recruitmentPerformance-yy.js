@@ -9,13 +9,15 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     
     init: function() {
         this.set("filters", []);
+        this.set("weighted", true);
     },
     
     data: {
-        getGraphData: function(filters) {
-            return Recruitment.operation().weightedGraph({
-                filters: filters,
-                financialYears: ["2012-13", "2013-14", "2014-15"]
+        getGraphData: function(params) {
+            return Recruitment.operation().yearRecruitmentGraph({
+                filters: params.filters,
+                financialYears: ["2012-13", "2013-14", "2014-15"],
+                weighted: params.weighted
             });
         },
         

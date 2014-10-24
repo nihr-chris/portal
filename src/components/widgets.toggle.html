@@ -1,10 +1,11 @@
-{{# enabled }}
-    {{# value }}
-    <li class="active"><a href="#" on-click="toggle">{{label}}</a></li>
+<div class="btn-group">
+    {{# enabled }}
+        {{# value }}
+        <button type="button" class="btn btn-primary btn-sm active" on-click="toggle">{{label}}</button>
+        {{else}}
+        <button type="button" class="btn btn-sm" on-click="toggle">{{label}}</button>
+        {{/#}}
+    {{else}}
+    <button type="button" class="btn btn-sm" disabled="disabled" on-click="toggle">{{label}}</button>
     {{/#}}
-    {{# !value }}
-    <li class="active"><a href="#" on-click="toggle">{{label}}!</a></li>
-    {{/#}}
-{{else}}
-<li class="disabled"><a href="#">{{label}}</a></li>
-{{/#}}
+</div>
