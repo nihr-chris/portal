@@ -32998,7 +32998,7 @@ var Operation   = require("./operation.js");
 module.exports = Operation.module({
     imports: [require("./graph.js"), require("./query.js")],
     operations: {
-        weightedGraph: function(params) {
+        yearRecruitmentGraph: function(params) {
             util.checkArgs(arguments, {
                 filters: Array.of({
                     MemberOrg: Array.of(String),
@@ -33006,7 +33006,8 @@ module.exports = Operation.module({
                     MainReportingDivision: Array.of(String),
                     CommercialStudy: Array.of(String)
                 }),
-                financialYears: Array.of(String)
+                financialYears: Array.of(String),
+                weighted: Boolean
             });
             
             var operation = this;
@@ -33028,11 +33029,20 @@ module.exports = Operation.module({
                     inField: "FYRecruitment",
                     groupBy: ["FY", "Banding"]
                 })
+                .weight({
+                    field: "FYRecruitment",
+                    byFactors: {
+                        "Interventional/Both": params.weighted ? 14 : 1,
+                        "Observational": params.weighted ? 3 : 1,
+                        "Large": 1,
+                    },
+                    onField: "Banding"
+                })
                 .withFilterDescription(filter)
                 .barChart({
                     valueFrom: "FYRecruitment",
                     groupBy: "Filter",
-                    stackBy: "Banding",
+                    stackBy: params.weighted ? "Banding" : undefined,
                     seriesBy: "FY"
                 });
             });

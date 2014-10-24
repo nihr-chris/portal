@@ -9,14 +9,15 @@ var Recruitment     = require("../src/modules/recruitment.js");
 var _               = require("underscore");
 
 describe("recruitment", function() {
-    describe("weightedGraph", function() {
-        it("should produce graph in date range", function(){
+    describe("yearRecruitmentGraph", function() {
+        it("should produce weighted graph in date range", function(){
             return expectOperation(Recruitment, function(parent) {
-                return parent.weightedGraph({
+                return parent.yearRecruitmentGraph({
                     filters: [
                         {MemberOrg: ["Guy's"], CommercialStudy: ["Commercial"], MainSpecialty: ["Mental Health"], MainReportingDivision: ["Division 4"]}
                     ],
-                    financialYears: ["2010-11"]
+                    financialYears: ["2010-11"],
+                    weighted: true
                 });
             })
             .toMakeQuery({
@@ -30,7 +31,10 @@ describe("recruitment", function() {
                 groupBy: ["Month", "Banding"]
             })
             .withStubbedResult([
+                {MonthRecruitment: 2, Month: new Date("2011-3-31"), Banding: "Interventional/Both"},
+                {MonthRecruitment: 2, Month: new Date("2011-3-31"), Banding: "Observational"},
                 {MonthRecruitment: 2, Month: new Date("2011-3-31"), Banding: "Large"},
+                
                 {MonthRecruitment: 2, Month: new Date("2001-3-31"), Banding: "Large"},
             ])
             .onTable("recruitmentTable")
@@ -41,7 +45,52 @@ describe("recruitment", function() {
                         {
                             key: "2010-11",
                             values: [
-                                {key: "Large", value: 2}
+                                {key: "Interventional/Both", value: 28},
+                                {key: "Observational", value: 6},
+                                {key: "Large", value: 2},
+                            ]
+                        }
+                    ]
+                }
+            ]);
+        });
+        
+        it("should produce unweighted graph in date range", function(){
+            return expectOperation(Recruitment, function(parent) {
+                return parent.yearRecruitmentGraph({
+                    filters: [
+                        {MemberOrg: ["Guy's"], CommercialStudy: ["Commercial"], MainSpecialty: ["Mental Health"], MainReportingDivision: ["Division 4"]}
+                    ],
+                    financialYears: ["2010-11"],
+                    weighted: false
+                });
+            })
+            .toMakeQuery({
+                select: ["SUM(Recruitment) AS MonthRecruitment", "Month", "Banding"],
+                where: [
+                    Fusion.in("MemberOrg", ["Guy's"]),
+                    Fusion.in("CommercialStudy", ["Commercial"]),
+                    Fusion.in("MainSpecialty", ["Mental Health"]),
+                    Fusion.in("MainReportingDivision", ["Division 4"])
+                ],
+                groupBy: ["Month", "Banding"]
+            })
+            .withStubbedResult([
+                {MonthRecruitment: 2, Month: new Date("2011-3-31"), Banding: "Interventional/Both"},
+                {MonthRecruitment: 2, Month: new Date("2011-3-31"), Banding: "Observational"},
+                {MonthRecruitment: 2, Month: new Date("2011-3-31"), Banding: "Large"},
+                
+                {MonthRecruitment: 2, Month: new Date("2001-3-31"), Banding: "Large"},
+            ])
+            .onTable("recruitmentTable")
+            .andReturn([
+                {
+                    key: "Guy's: Mental Health, Division 4 (Commercial)",
+                    values: [
+                        {
+                            key: "2010-11",
+                            values: [
+                                {key: "", value: 6},
                             ]
                         }
                     ]
