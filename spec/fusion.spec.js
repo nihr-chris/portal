@@ -55,7 +55,7 @@ describe("Fusion", function() {
     });
     
     it("should escape strings", function() {
-        expect(Fusion.eql("f1", "'")).to.eql("f1 = '\\''");
+        expect(Fusion.eql("f1", "''")).to.eql("f1 = '\\'\\''");
     });
     
     it("should construct fetch request with filters, fields and groupings", function() {

@@ -7,7 +7,7 @@ var util        = require('./util.js');
 
 var encodeQueryParam = function(x) {
     if (_.isString(x)) {
-        return "'" + x.replace("'", "\\'") + "'";
+        return "'" + x.replace(/'/g, "\\'") + "'";
     }
     else if (_.isNumber(x)) {
         return x;
