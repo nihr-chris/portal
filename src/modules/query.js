@@ -53,7 +53,7 @@ module.exports = Operation.module({
                 }
             })
             .format(function(rows) {
-                return _.map(rows, column);
+                return _.without(_.map(rows, column), 0);
             });
         },
         
