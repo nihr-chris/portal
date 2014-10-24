@@ -31240,35 +31240,37 @@ window.runApp = function(mainComponent) {
     });
 };
 
-},{"./components/barchart.js":39,"./components/data.js":40,"./components/datatable.js":41,"./components/filter.js":42,"./components/master-detail.js":43,"./components/recruitmentPerformance-yy.js":44,"./components/timetarget.js":45,"./components/widgets.js":46,"./modules/fusion.js":47,"./templates.js":55,"browser-request":2,"loglevel":28,"ractive":36}],39:[function(require,module,exports){
-var Ractive = require('ractive');
-var d3 = require('d3');
-var _ = require('underscore');
-var util = require ('../modules/util.js');
+},{"./components/barchart.js":39,"./components/data.js":40,"./components/datatable.js":41,"./components/filter.js":42,"./components/master-detail.js":43,"./components/recruitmentPerformance-yy.js":44,"./components/timetarget.js":45,"./components/widgets.js":46,"./modules/fusion.js":48,"./templates.js":56,"browser-request":2,"loglevel":28,"ractive":36}],39:[function(require,module,exports){
+var Ractive     = require('ractive');
+var d3          = require('d3');
+var _           = require('underscore');
+
+var util        = require ('../modules/util.js');
+var barchart    = require('../modules/barchart.utils.js');
 
 // copypasta: http://bl.ocks.org/mbostock/7555321
 function wrap(text, width) {
-  text.each(function() {
-    var text = d3.select(this),
-        words = text.text().split(/\s+/).reverse(),
-        word,
-        line = [],
-        lineNumber = 0,
-        lineHeight = 1.1, // ems
-        y = text.attr("y"),
-        dy = parseFloat(text.attr("dy")),
-        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-    while (word = words.pop()) {
-      line.push(word);
-      tspan.text(line.join(" "));
-      if (tspan.node().getComputedTextLength() > width) {
-        line.pop();
-        tspan.text(line.join(" "));
-        line = [word];
-        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
-      }
-    }
-  });
+    text.each(function() {
+        var text = d3.select(this),
+            words = text.text().split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 1.1, // ems
+            y = text.attr("y"),
+            dy = parseFloat(text.attr("dy")),
+            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        while ((word = words.pop())) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+            }
+        }
+    });
 }
 
 Ractive.components.barchart = Ractive.extend({
@@ -31318,6 +31320,8 @@ Ractive.components.barchart = Ractive.extend({
     },
     
     updateGraph: function(data) {
+        
+        barchart.colorise(data);
         console.log(data);
         
         var allBarData = _.flatten(_.map(data, "values"), true);
@@ -31487,7 +31491,7 @@ Ractive.components.barchart = Ractive.extend({
     }
 });
 
-},{"../modules/util.js":54,"d3":7,"ractive":36,"underscore":37}],40:[function(require,module,exports){
+},{"../modules/barchart.utils.js":47,"../modules/util.js":55,"d3":7,"ractive":36,"underscore":37}],40:[function(require,module,exports){
 var Ractive = require("ractive")
 
 /**
@@ -31573,7 +31577,7 @@ Ractive.components.datatable = Ractive.extend({
     }
 });
 
-},{"../templates.js":55,"ractive":36,"underscore":37}],42:[function(require,module,exports){
+},{"../templates.js":56,"ractive":36,"underscore":37}],42:[function(require,module,exports){
 var template    = require("../templates.js");
 
 var _           = require("underscore");
@@ -31622,7 +31626,7 @@ if (window.developmentMode) {
         },
     });
 }
-},{"../templates.js":55,"loglevel":28,"ractive":36,"underscore":37}],43:[function(require,module,exports){
+},{"../templates.js":56,"loglevel":28,"ractive":36,"underscore":37}],43:[function(require,module,exports){
 /**
  * Component for presenting a list of options, along with a different 'detail'
  * component depending on which of the options is currently active.
@@ -31676,37 +31680,12 @@ Ractive.components.masterdetail = Ractive.extend({
     }
 });
 
-},{"../modules/util.js":54,"ractive":36}],44:[function(require,module,exports){
+},{"../modules/util.js":55,"ractive":36}],44:[function(require,module,exports){
 var Ractive     = require("ractive");
 var template    = require("../templates.js");
 var _           = require("underscore");
 
 var Recruitment = require("../modules/recruitment.js");
-var palette     = require("../modules/palette.js");
-var util        = require("../modules/util.js");
-
-var modeMap = {
-    "By Trust":     "trust",
-    "By Division":  "division",
-    "By Specialty": "specialty"
-};
-
-var commercialMap = {
-    "Commercial Only": true,
-    "Noncommercial Only": false
-};
-
-function getTrusts() {
-    return ["a", "b", "c"];
-}
-
-function getDivisions() {
-    return ["a", "b", "c"];
-}
-
-function getSpecialties() {
-    return ["a", "b", "c"];
-}
 
 Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     template: template("recruitmentPerformance-yy.html"),
@@ -31750,7 +31729,7 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     }
 });
 
-},{"../modules/palette.js":50,"../modules/recruitment.js":52,"../modules/util.js":54,"../templates.js":55,"ractive":36,"underscore":37}],45:[function(require,module,exports){
+},{"../modules/recruitment.js":53,"../templates.js":56,"ractive":36,"underscore":37}],45:[function(require,module,exports){
 var Ractive     = require("ractive");
 var template    = require("../templates.js");
 var _           = require("underscore");
@@ -31820,7 +31799,7 @@ Ractive.components.timetarget = Ractive.extend({
     }   
 });
 
-},{"../modules/palette.js":50,"../modules/recruitment.js":52,"../templates.js":55,"ractive":36,"underscore":37}],46:[function(require,module,exports){
+},{"../modules/palette.js":51,"../modules/recruitment.js":53,"../templates.js":56,"ractive":36,"underscore":37}],46:[function(require,module,exports){
 var Ractive = require("ractive");
 var template = require("../templates.js");
 var _ = require("underscore");
@@ -31934,7 +31913,41 @@ Ractive.components.column = Ractive.extend({
     template: "<div class='column-xs-{{size ? size : 12}}'> {{yield}} </div>"
 });
 
-},{"../templates.js":55,"ractive":36,"underscore":37}],47:[function(require,module,exports){
+},{"../templates.js":56,"ractive":36,"underscore":37}],47:[function(require,module,exports){
+var _ = require('underscore');
+var palette = require('./palette.js');
+
+var barchart = {};
+
+barchart.legend = function(data) {
+    
+};
+
+barchart.eachStack = function(chartData, fn) {
+    _.each(chartData, function(group){
+        _.each(group.values, function(bar){
+            _.each(bar.values, fn);
+        });
+    });
+};
+
+barchart.colorise = function(data) {
+    var options = [];
+    
+    barchart.eachStack(data, function(stack) {
+        if (!_.contains(options, stack.key)) options.push(stack.key);
+    });
+    
+    var colors = palette.generate(options);
+    
+    barchart.eachStack(data, function(stack) {
+        stack.color = colors[stack.key];
+    });
+};
+
+module.exports = barchart;
+
+},{"./palette.js":51,"underscore":37}],48:[function(require,module,exports){
 var Promise     = require('promise');
 var moment      = require('moment');
 var _           = require('underscore');
@@ -32072,7 +32085,7 @@ Fusion.lt = function(field, x) {
 
 module.exports = Fusion;
 
-},{"./util.js":54,"loglevel":28,"moment":29,"promise":30,"underscore":37}],48:[function(require,module,exports){
+},{"./util.js":55,"loglevel":28,"moment":29,"promise":30,"underscore":37}],49:[function(require,module,exports){
 var _           = require("underscore");
 
 var Operation   = require("./operation.js");
@@ -32132,7 +32145,7 @@ module.exports = Operation.module({
     }
 });
 
-},{"./operation.js":49,"./util.js":54,"underscore":37}],49:[function(require,module,exports){
+},{"./operation.js":50,"./util.js":55,"underscore":37}],50:[function(require,module,exports){
 /**
  * Operation
  * 
@@ -32771,7 +32784,7 @@ module.exports = operationModule({
     }
 });
 
-},{"./fusion.js":47,"./util.js":54,"loglevel":28,"moment":29,"promise":30,"underscore":37}],50:[function(require,module,exports){
+},{"./fusion.js":48,"./util.js":55,"loglevel":28,"moment":29,"promise":30,"underscore":37}],51:[function(require,module,exports){
 var Color   = require("color");
 var _       = require("underscore");
 
@@ -32802,7 +32815,7 @@ palette.generate = function(keys) {
 };
 
 module.exports = palette;
-},{"./util.js":54,"color":3,"underscore":37}],51:[function(require,module,exports){
+},{"./util.js":55,"color":3,"underscore":37}],52:[function(require,module,exports){
 var _           = require("underscore");
 
 var Operation   = require("./operation.js");
@@ -32930,7 +32943,7 @@ module.exports = Operation.module({
     }
 });
 
-},{"./fusion.js":47,"./operation.js":49,"./util.js":54,"underscore":37}],52:[function(require,module,exports){
+},{"./fusion.js":48,"./operation.js":50,"./util.js":55,"underscore":37}],53:[function(require,module,exports){
 var _           = require("underscore");
 
 var util        = require("./util.js");
@@ -33038,7 +33051,7 @@ module.exports = Operation.module({
     }
 });
 
-},{"./graph.js":48,"./operation.js":49,"./palette.js":50,"./query.js":51,"./util.js":54,"underscore":37}],53:[function(require,module,exports){
+},{"./graph.js":49,"./operation.js":50,"./palette.js":51,"./query.js":52,"./util.js":55,"underscore":37}],54:[function(require,module,exports){
 var _           = require("underscore");
 var moment      = require("moment");
 
@@ -33170,7 +33183,7 @@ module.exports = Operation.module({
     }
 });
 
-},{"./operation.js":49,"./util.js":54,"moment":29,"underscore":37}],54:[function(require,module,exports){
+},{"./operation.js":50,"./util.js":55,"moment":29,"underscore":37}],55:[function(require,module,exports){
 var _ = require("underscore");
 var schema = require("js-schema");
 
@@ -33337,7 +33350,7 @@ module.exports = {
     getFY: getFY
 };
 
-},{"js-schema":9,"underscore":37}],55:[function(require,module,exports){
+},{"js-schema":9,"underscore":37}],56:[function(require,module,exports){
 if (window.developmentMode) {
     // In development mode, synchronously fetch the template locally.
     
@@ -33361,5 +33374,5 @@ if (window.developmentMode) {
     module.exports = require("../build/template.js");
 }
 
-},{"../build/template.js":1}]},{},[38,39,40,42,41,43,45,44,46,48,49,52,53,51,54,47,50,55])
+},{"../build/template.js":1}]},{},[38,39,40,42,41,43,45,44,46,49,50,53,54,52,55,48,51,56])
 ;

@@ -3,31 +3,6 @@ var template    = require("../templates.js");
 var _           = require("underscore");
 
 var Recruitment = require("../modules/recruitment.js");
-var palette     = require("../modules/palette.js");
-var util        = require("../modules/util.js");
-
-var modeMap = {
-    "By Trust":     "trust",
-    "By Division":  "division",
-    "By Specialty": "specialty"
-};
-
-var commercialMap = {
-    "Commercial Only": true,
-    "Noncommercial Only": false
-};
-
-function getTrusts() {
-    return ["a", "b", "c"];
-}
-
-function getDivisions() {
-    return ["a", "b", "c"];
-}
-
-function getSpecialties() {
-    return ["a", "b", "c"];
-}
 
 Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     template: template("recruitmentPerformance-yy.html"),
