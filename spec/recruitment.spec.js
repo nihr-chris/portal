@@ -10,11 +10,14 @@ var _               = require("underscore");
 
 describe("recruitment", function() {
     describe("weightedGraph", function() {
-        it("should produce graph", function(){
+        it("should produce graph in date range", function(){
             return expectOperation(Recruitment, function(parent) {
-                return parent.weightedGraph([
-                    {MemberOrg: ["Guy's"], CommercialStudy: ["Commercial"], MainSpecialty: ["Mental Health"], MainReportingDivision: ["Division 4"]}
-                ]);
+                return parent.weightedGraph({
+                    filters: [
+                        {MemberOrg: ["Guy's"], CommercialStudy: ["Commercial"], MainSpecialty: ["Mental Health"], MainReportingDivision: ["Division 4"]}
+                    ],
+                    financialYears: ["2010-11"]
+                });
             })
             .toMakeQuery({
                 select: ["SUM(Recruitment) AS MonthRecruitment", "Month", "Banding"],
@@ -27,7 +30,8 @@ describe("recruitment", function() {
                 groupBy: ["Month", "Banding"]
             })
             .withStubbedResult([
-                {MonthRecruitment: 2, Month: new Date("2011-3-31"), Banding: "Large"}
+                {MonthRecruitment: 2, Month: new Date("2011-3-31"), Banding: "Large"},
+                {MonthRecruitment: 2, Month: new Date("2001-3-31"), Banding: "Large"},
             ])
             .onTable("recruitmentTable")
             .andReturn([

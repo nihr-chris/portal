@@ -2,27 +2,33 @@ var _           = require("underscore");
 
 var util        = require("./util.js");
 var Operation   = require("./operation.js");
-var palette     = require("./palette.js");
 
 module.exports = Operation.module({
     imports: [require("./graph.js"), require("./query.js")],
     operations: {
-        weightedGraph: function(groupFilters) {
-            util.checkArgs(arguments, Array.of({
-                MemberOrg: Array.of(String),
-                MainSpecialty: Array.of(String),
-                MainReportingDivision: Array.of(String),
-                CommercialStudy: Array.of(String)
-            }));
+        weightedGraph: function(params) {
+            util.checkArgs(arguments, {
+                filters: Array.of({
+                    MemberOrg: Array.of(String),
+                    MainSpecialty: Array.of(String),
+                    MainReportingDivision: Array.of(String),
+                    CommercialStudy: Array.of(String)
+                }),
+                financialYears: Array.of(String)
+            });
             
             var operation = this;
-            var groups = _.map(groupFilters, function(filter) {
+            var groups = _.map(params.filters, function(filter) {
                 return operation.fetchRecruitment({
                     filter: filter,
                     groupBy: ["Month", "Banding"]
                 })
                 .withFY({
                     FY: "Month"
+                })
+                .filterValues({
+                    column: "FY",
+                    values: params.financialYears
                 })
                 .justFields(["FY", "Banding", "MonthRecruitment"])
                 .sum({
