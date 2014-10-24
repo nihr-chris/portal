@@ -31696,7 +31696,10 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     
     data: {
         getGraphData: function(filters) {
-            return Recruitment.operation().weightedGraph(filters);
+            return Recruitment.operation().weightedGraph({
+                filters: filters,
+                financialYears: ["2012-13", "2013-14", "2014-15"]
+            });
         },
         
         getFilterOptions: function(column) {
