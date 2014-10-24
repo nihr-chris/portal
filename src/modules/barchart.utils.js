@@ -25,7 +25,9 @@ barchart.colorise = function(data) {
     var colors = palette.generate(options);
     
     barchart.eachStack(data, function(stack) {
-        stack.color = colors[stack.key];
+        if (!stack.color) {
+            stack.color = colors[stack.key];
+        }
     });
 };
 

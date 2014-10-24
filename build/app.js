@@ -31741,7 +31741,7 @@ var Ractive     = require("ractive");
 var template    = require("../templates.js");
 var _           = require("underscore");
 
-var Recruitment = require("../modules/recruitment.js");
+var TimeTarget  = require("../modules/timetarget.js");
 var palette     = require("../modules/palette.js");
 
 Ractive.components.timetarget = Ractive.extend({
@@ -31782,7 +31782,7 @@ Ractive.components.timetarget = Ractive.extend({
     
     load: function() {
         this.set("timeTargetGraphData",
-            Recruitment.operation()
+            TimeTarget.operation()
             .timeTargetStudyInfo({
                 open: this.get("open"),
                 commercial: this.get("commercial"),
@@ -31806,7 +31806,7 @@ Ractive.components.timetarget = Ractive.extend({
     }   
 });
 
-},{"../modules/palette.js":51,"../modules/recruitment.js":53,"../templates.js":56,"ractive":36,"underscore":37}],46:[function(require,module,exports){
+},{"../modules/palette.js":51,"../modules/timetarget.js":54,"../templates.js":56,"ractive":36,"underscore":37}],46:[function(require,module,exports){
 var Ractive = require("ractive");
 var template = require("../templates.js");
 var _ = require("underscore");
@@ -31948,7 +31948,9 @@ barchart.colorise = function(data) {
     var colors = palette.generate(options);
     
     barchart.eachStack(data, function(stack) {
-        stack.color = colors[stack.key];
+        if (!stack.color) {
+            stack.color = colors[stack.key];
+        }
     });
 };
 
@@ -33123,6 +33125,7 @@ var Operation   = require("./operation.js");
 var util        = require("./util.js");
 
 module.exports = Operation.module({
+    imports: [require("./query.js")],
     operations: {
         withTimeTargetInfo: function() {
             var currentDate = moment(this.currentDate);
@@ -33227,7 +33230,7 @@ module.exports = Operation.module({
                         ragBars.push({
                             key: label,
                             values: [
-                                {color: color, value: value}
+                                {key: "", color: color, value: value}
                             ]
                         });
                     }
@@ -33247,7 +33250,7 @@ module.exports = Operation.module({
     }
 });
 
-},{"./operation.js":50,"./util.js":55,"moment":29,"underscore":37}],55:[function(require,module,exports){
+},{"./operation.js":50,"./query.js":52,"./util.js":55,"moment":29,"underscore":37}],55:[function(require,module,exports){
 var _ = require("underscore");
 var schema = require("js-schema");
 

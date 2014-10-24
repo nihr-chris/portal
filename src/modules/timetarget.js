@@ -5,6 +5,7 @@ var Operation   = require("./operation.js");
 var util        = require("./util.js");
 
 module.exports = Operation.module({
+    imports: [require("./query.js")],
     operations: {
         withTimeTargetInfo: function() {
             var currentDate = moment(this.currentDate);
@@ -109,7 +110,7 @@ module.exports = Operation.module({
                         ragBars.push({
                             key: label,
                             values: [
-                                {color: color, value: value}
+                                {key: "", color: color, value: value}
                             ]
                         });
                     }

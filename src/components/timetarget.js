@@ -2,7 +2,7 @@ var Ractive     = require("ractive");
 var template    = require("../templates.js");
 var _           = require("underscore");
 
-var Recruitment = require("../modules/recruitment.js");
+var TimeTarget  = require("../modules/timetarget.js");
 var palette     = require("../modules/palette.js");
 
 Ractive.components.timetarget = Ractive.extend({
@@ -43,7 +43,7 @@ Ractive.components.timetarget = Ractive.extend({
     
     load: function() {
         this.set("timeTargetGraphData",
-            Recruitment.operation()
+            TimeTarget.operation()
             .timeTargetStudyInfo({
                 open: this.get("open"),
                 commercial: this.get("commercial"),
