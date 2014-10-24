@@ -5,14 +5,12 @@ var util    = require("./util.js")
 
 var palette = {};
 var baseColors = [
-    "#5DA5DA",
-    "#FAA43A",
-    "#60BD68",
-    "#F17CB0",
-    "#B2912F",
-    "#B276B2",
-    "#DECF3F",
-    "#F15854"
+    "#bd0026",
+    "#f03b20",
+    "#fd8d3c",
+    "#feb24c",
+    "#fed976",
+    "#ffffb2",
 ];
 
 palette.generate = function(keys) {

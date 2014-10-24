@@ -226,7 +226,7 @@ Ractive.components.barchart = Ractive.extend({
             .attr("width", function(){
                 return x1.rangeBand() - 1;
             })
-            .transition()
+            // .transition()
             .attr("height", function(d){ 
                 return height - y(d.value);
             })
