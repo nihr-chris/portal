@@ -31385,6 +31385,7 @@ Ractive.components.barchart = Ractive.extend({
             ;
             
         dataView.select(".y.axis")
+            .transition()
             .call(yAxis)
             .select("text")
                 .attr("transform", "rotate(-90)")
@@ -31398,7 +31399,7 @@ Ractive.components.barchart = Ractive.extend({
         // Data Representations
             
         var groupRepresentation = dataView.selectAll("g.group")
-            .data(data, function(d){ return d.key });
+            .data(data); // [todo] - Use something other than index as key?
         
         var x1Axis = d3.svg.axis()
             .scale(x1)
@@ -31468,6 +31469,7 @@ Ractive.components.barchart = Ractive.extend({
             .attr("width", function(){
                 return x1.rangeBand() - 1;
             })
+            .transition()
             .attr("height", function(d){ 
                 return height - y(d.value);
             })
