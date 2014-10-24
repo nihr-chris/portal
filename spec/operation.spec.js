@@ -491,6 +491,51 @@ describe("any Operation", function(){
             });
         });
         
+        describe("weight", function() {
+            it("should weight specified fields with default factor", function() {
+                return expectOperation(function(parent) {
+                    return parent.weight({
+                        field: "value",
+                        byFactors: {
+                            a: 2,
+                            b: 3,
+                        },
+                        onField: "category",
+                        defaultFactor: 1
+                    });
+                })
+                .withInput([
+                    {category: "a", value: 5},
+                    {category: "b", value: 6},
+                    {category: "c", value: 4},
+                ])
+                .toReturn([
+                    {category: "a", value: 10},
+                    {category: "b", value: 18},
+                    {category: "c", value: 4},
+                ]);
+            });
+            
+            it("should fail for unexpected category if no default provided", function() {
+                return expectOperation(function(parent) {
+                    return parent.weight({
+                        field: "value",
+                        byFactors: {
+                            a: 2,
+                            b: 3
+                        },
+                        onField: "category"
+                    });
+                })
+                .withInput([
+                    {category: "a", value: 5},
+                    {category: "b", value: 6},
+                    {category: "c", value: 4},
+                ])
+                .toFailWithError("Unexpected value 'c'");
+            });
+        });
+        
         describe("withTimeTargetRatings", function() {
             it("should add ratings for open studies", function() {
                 return expectOperation(function(parent) {

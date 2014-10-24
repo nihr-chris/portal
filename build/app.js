@@ -32561,6 +32561,47 @@ module.exports = operationModule({
             });
         },
         
+        weight: function(params) {
+            util.checkArgs(arguments, {
+                field: String,
+                byFactors: {'*': Number},
+                onField: String,
+                defaultFactor: [Number, null]
+            });
+            
+            var categoryField = params.onField;
+            var factors = params.byFactors;
+            var valueField = params.field;
+            
+            return this.childOperation({
+                inputColumns: [params.field, params.onField],
+                outputColumns: this.outputColumns,
+                transform: function(rows) {
+                    return _.map(rows, function(row) {
+                        var outRow = _.clone(row);
+                        var category = row[categoryField];
+                        
+                        if (category in factors) {
+                            var factor = factors[category];
+                            outRow[valueField] *= factor;
+                            
+                        } else {
+                            if ("defaultFactor" in params) {
+                                outRow[valueField] *= params.defaultFactor;
+                            } else {
+                                throw new Error(
+                                    "Unexpected value '" + category + "'"
+                                    + " in " + categoryField
+                                );
+                            }
+                        }
+                        
+                        return outRow;
+                    });
+                }
+            });
+        },
+        
         empty: function() {
             return this.childOperation({
                 inputColumns: [],
