@@ -283,11 +283,7 @@ describe("timetarget", function() {
     describe("timeTargetGraph", function() {
         it("should produce graph data", function() {
             return expectOperation(TimeTarget, function(parent) {
-                return parent.timeTargetGraph({
-                    colors: {
-                        Red: "r", Amber: "a", Green: "g", IncompleteInformation: "i"
-                    }
-                });
+                return parent.timeTargetGraph();
             })
             .withInput([
                 {RAG: "Red", MemberOrg: "1", PortfolioStudyID: 1},
@@ -304,17 +300,17 @@ describe("timetarget", function() {
                 {
                     key: "1",
                     values: [
-                        {key: "Red", values: [{key: "", color: "r", value: 1}]},
-                        {key: "Amber", values: [{key: "", color: "a", value: 1}]},
-                        {key: "Green", values: [{key: "", color: "g", value: 2}]},
+                        {key: "Red", values: [{key: "Red", value: 1}]},
+                        {key: "Amber", values: [{key: "Amber", value: 1}]},
+                        {key: "Green", values: [{key: "Green", value: 2}]},
                     ]
                 },{
                     key: "2",
                     values: [
-                        {key: "Red", values: [{key: "", color: "r", value: 1}]},
-                        {key: "Amber", values: [{key: "", color: "a", value: 2}]},
-                        {key: "Green", values: [{key: "", color: "g", value: 1}]},
-                        {key: "Incomplete Information", values: [{key: "", color: "i", value: 1}]},
+                        {key: "Red", values: [{key: "Red", value: 1}]},
+                        {key: "Amber", values: [{key: "Amber", value: 2}]},
+                        {key: "Green", values: [{key: "Green", value: 1}]},
+                        {key: "Incomplete Information", values: [{key: "Incomplete Information", value: 1}]},
                     ]
                 },
             ]);

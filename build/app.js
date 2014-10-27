@@ -33203,10 +33203,6 @@ module.exports = Operation.module({
         },
         
         timeTargetGraph: function(params) {
-            util.checkArgs(arguments, {
-                colors: {Red: String, Amber: String, Green: String, IncompleteInformation: String}
-            });
-            
             return this.justFields(["RAG", "MemberOrg"]).count({
                 valuesFromField: "RAG",
                 inFields: {
@@ -33221,19 +33217,19 @@ module.exports = Operation.module({
                 return _.map(rows, function(r) {
                     var ragBars = [];
                     
-                    function addBar(label, color, value) {
+                    function addBar(label, value) {
                         ragBars.push({
                             key: label,
                             values: [
-                                {key: "", color: color, value: value}
+                                {key: label, value: value}
                             ]
                         });
                     }
                     
-                    if (r.RedStudies > 0) addBar("Red", params.colors.Red, r.RedStudies);
-                    if (r.AmberStudies > 0) addBar("Amber", params.colors.Amber, r.AmberStudies);
-                    if (r.GreenStudies > 0) addBar("Green", params.colors.Green, r.GreenStudies);
-                    if (r.IncompleteStudies > 0) addBar("Incomplete Information", params.colors.IncompleteInformation, r.IncompleteStudies);
+                    if (r.RedStudies > 0) addBar("Red", r.RedStudies);
+                    if (r.AmberStudies > 0) addBar("Amber", r.AmberStudies);
+                    if (r.GreenStudies > 0) addBar("Green", r.GreenStudies);
+                    if (r.IncompleteStudies > 0) addBar("Incomplete Information", r.IncompleteStudies);
                 
                     return {
                         "key": r.MemberOrg,
