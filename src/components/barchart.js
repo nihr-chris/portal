@@ -77,9 +77,8 @@ Ractive.components.barchart = Ractive.extend({
     },
     
     updateGraph: function(data) {
-        
-        barchart.colorise(data);
-        console.log(data);
+        var legend = barchart.legend(data);
+        barchart.colorise(data, legend);
         
         var allBarData = _.flatten(_.map(data, "values"), true);
         var allXValues = _.map(allBarData, function(d){ return d.key });

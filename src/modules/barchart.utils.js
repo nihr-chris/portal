@@ -4,7 +4,13 @@ var palette = require('./palette.js');
 var barchart = {};
 
 barchart.legend = function(data) {
+    var options = [];
     
+    barchart.eachStack(data, function(stack) {
+        if (!_.contains(options, stack.key)) options.push(stack.key);
+    });
+    
+    return palette.generate(options);
 };
 
 barchart.eachStack = function(chartData, fn) {
@@ -15,18 +21,10 @@ barchart.eachStack = function(chartData, fn) {
     });
 };
 
-barchart.colorise = function(data) {
-    var options = [];
-    
-    barchart.eachStack(data, function(stack) {
-        if (!_.contains(options, stack.key)) options.push(stack.key);
-    });
-    
-    var colors = palette.generate(options);
-    
+barchart.colorise = function(data, legend) {
     barchart.eachStack(data, function(stack) {
         if (!stack.color) {
-            stack.color = colors[stack.key];
+            stack.color = legend[stack.key];
         }
     });
 };
