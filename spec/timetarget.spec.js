@@ -304,17 +304,17 @@ describe("timetarget", function() {
                 {
                     key: "1",
                     values: [
-                        {key: "Red", values: [{color: "r", value: 1}]},
-                        {key: "Amber", values: [{color: "a", value: 1}]},
-                        {key: "Green", values: [{color: "g", value: 2}]},
+                        {key: "Red", values: [{key: "", color: "r", value: 1}]},
+                        {key: "Amber", values: [{key: "", color: "a", value: 1}]},
+                        {key: "Green", values: [{key: "", color: "g", value: 2}]},
                     ]
                 },{
                     key: "2",
                     values: [
-                        {key: "Red", values: [{color: "r", value: 1}]},
-                        {key: "Amber", values: [{color: "a", value: 2}]},
-                        {key: "Green", values: [{color: "g", value: 1}]},
-                        {key: "Incomplete Information", values: [{color: "i", value: 1}]},
+                        {key: "Red", values: [{key: "", color: "r", value: 1}]},
+                        {key: "Amber", values: [{key: "", color: "a", value: 2}]},
+                        {key: "Green", values: [{key: "", color: "g", value: 1}]},
+                        {key: "Incomplete Information", values: [{key: "", color: "i", value: 1}]},
                     ]
                 },
             ]);
