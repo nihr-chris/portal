@@ -8,7 +8,11 @@
 <body>
   <script>
       function submit(data, tableID, clientID) {
-          window.alert("hello, world!");
+          document.body.innerHTML = (
+              "Data: " + data + "\n"
+              + "Table: " + tableID + "\n"
+              + "Client: " + clientID + "\n"
+          );
       }
   </script>
 </body>
