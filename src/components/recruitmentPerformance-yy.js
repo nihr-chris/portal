@@ -10,15 +10,28 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
     init: function() {
         this.set("filters", []);
         this.set("weighted", true);
+        this.set("graphType", "byRY");
     },
     
     data: {
         getGraphData: function(params) {
-            return Recruitment.operation().yearRecruitmentGraph({
-                filters: params.filters,
-                financialYears: ["2012-13", "2013-14", "2014-15"],
-                weighted: params.weighted
-            });
+            switch(params.graphType) {
+                case "byFY", "byRY": {
+                    return Recruitment.operation().yearRecruitmentGraph({
+                        filters: params.filters,
+                        mode: "byFY",
+                        years: ["2012-13", "2013-14", "2014-15"],
+                        weighted: params.weighted
+                    });
+                }
+                case "byMonth": {
+                    return Recruitment.operation().monthRecruitmentGraph({
+                        filters: params.filters,
+                        year: "2014-15",
+                        weighted: params.weighted
+                    });
+                }
+            }
         },
         
         getFilterOptions: function(column) {
@@ -40,6 +53,14 @@ Ractive.components.recruitmentPerformanceYY = Ractive.extend({
                 case 0: return "All";
                 case 1: return array[0];
                 default: return "Multiple";
+            }
+        },
+        
+        formatGraphType: function(type) {
+            switch(type) {
+                case "byFY": return "Annual (by Financial Year)";
+                case "byRY": return "Annual (by Recruitment Year)";
+                case "byMonth": return "Monthly";
             }
         },
         
